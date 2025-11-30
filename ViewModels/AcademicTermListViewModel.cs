@@ -6,32 +6,10 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    public partial class AcademicTermListViewModel : BaseViewModel
+    public partial class AcademicTermListViewModel : ObservableObject
     {
-        private readonly CourseService _courseService;
 
-        [ObservableProperty]
-        private ObservableCollection<AcademicTerm> academicTerms;
-
-        [ObservableProperty]
-        private bool isAddingTerm;
-
-        [ObservableProperty]
-        public bool isRemovingTerm;
-
-        public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
-
-        [ObservableProperty]
-        private string newTermName = string.Empty;
-
-        [ObservableProperty]
-        private DateTime newTermStartDate = DateTime.Now;
-
-        [ObservableProperty]
-        private DateTime newTermEndDate = DateTime.Now.AddMonths(6);
-
-
-        public AcademicTermListViewModel(CourseService courseService)
+        public AcademicTermListViewModel(DatabaseService database)
         {
             Name = "                      Academic Terms";
             _courseService = courseService;

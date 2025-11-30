@@ -4,41 +4,48 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static C_971.Models.CourseStatus;
 
 namespace C_971.Models
 {
-    public partial class Course : BaseEntity
+    [SQLite.Table("Courses")]
+    public partial class Course
     {
-        public enum Status { InProgress, Completed, Dropped, Planned }
+        // Primary Key
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
 
-        [ObservableProperty]
-        private int termId;
 
-        [ObservableProperty]
-        private DateTime startDate = DateTime.Now;
+        // Name
+        [MaxLength(100)]
+        public required string Name { get; set; } = string.Empty;
 
-        [ObservableProperty]
-        private DateTime endDate = DateTime.Now;
 
-        [ObservableProperty]
-        private Status courseStatus = Status.InProgress;
+        // Description
+        [MaxLength(250)]
+        public string Description { get; set; } = string.Empty;
 
-        [ObservableProperty]
-        private bool startDateNotifications = true;
 
-        [ObservableProperty]
-        private bool endDateNotifications = true;
+        // Start and End Dates
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now;
 
-        [ObservableProperty]
-        private CourseInstructor? instructor;
 
-        [ObservableProperty]
-        private ObservableCollection<CourseNote> notes = new ObservableCollection<CourseNote>();
+        // Course Status
+        public CourseStatus Status { get; set; } = NotEnrolled;
 
-        [ObservableProperty]
-        private List<CourseAssessment> assessments = new List<CourseAssessment>();
+
+        // Notifications
+        public bool StartDateNotifications { get; set; } = true;
+        public bool EndDateNotifications { get; set; }  = true;
+
+
+        // Foreign Keys
+        public int TermId { get; set; }
+        public int? InstructorId { get; set; }  
     }
 }
