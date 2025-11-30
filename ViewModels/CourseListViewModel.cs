@@ -3,21 +3,16 @@ using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(AcademicTerm), "term")]
-    public partial class CourseListViewModel : BaseViewModel
+    public partial class CourseListViewModel : ObservableObject
     {
-        private readonly CourseService courseService;
-        public ObservableCollection<Course> Courses { get; private set; } = new ObservableCollection<Course>();
+        public ObservableCollection<Course> Courses { get; private set; } = [];
+
+        private readonly DatabaseService _databaseService;
 
         [ObservableProperty]
         private AcademicTerm academicTerm;
@@ -42,24 +37,21 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string newCourseStatus = "Planned";
 
-        public ObservableCollection<string> StatusOptions { get; private set; } =
-            new ObservableCollection<string> { "In Progress", "Completed", "Dropped", "Planned" };
+        [ObservableProperty]
+        private bool isLoading = false;
 
-        private Course.Status GetStatusFromString(string statusString)
+        [ObservableProperty]
+        private string name = "Courses";
+
+        [ObservableProperty]
+        private bool isRefreshing;
+
+        public ObservableCollection<string> StatusOptions { get; private set; } =
+            ["In Progress", "Completed", "Dropped", "Planned"];
+
+        public CourseListViewModel(DatabaseService databaseService)
         {
-            return statusString switch
-            {
-                "In Progress" => Course.Status.InProgress,
-                "Completed" => Course.Status.Completed,
-                "Dropped" => Course.Status.Dropped,
-                "Planned" => Course.Status.Planned,
-                _ => Course.Status.Planned
-            };
-        }
-        public CourseListViewModel(CourseService courseService)
-        {
-            Name = "Courses";
-            this.courseService = courseService;
+            _databaseService = databaseService;
         }
 
         // Called automatically when AcademicTerm property is set via QueryProperty
@@ -70,9 +62,6 @@ namespace C_971.ViewModels
                 GetCourseList();
             }
         }
-
-        [ObservableProperty]
-        private bool isRefreshing;
 
         [RelayCommand]
         public void GetCourseList()
@@ -90,13 +79,13 @@ namespace C_971.ViewModels
                 if (AcademicTerm != null)
                 {
                     // Get only courses for this specific term
-                    courses = courseService.GetCoursesForTerm(AcademicTerm.Id);
+                    courses = _databaseService.GetCoursesForTerm(AcademicTerm.Id);
                     Name = $"{AcademicTerm.Name} - Courses";
                 }
                 else
                 {
                     // Get all courses if no term is selected
-                    courses = courseService.GetCourses();
+                    courses = _databaseService.GetAllCourses();
                     Name = "All Courses";
                 }
 
@@ -189,7 +178,7 @@ namespace C_971.ViewModels
             }
 
             // Parse the string to enum
-            if (Enum.TryParse<Course.Status>(NewCourseStatus.Replace(" ", ""), out var status))
+            if (Enum.TryParse<CourseStatus>(NewCourseStatus.Replace(" ", ""), out var status))
             {
                 // Generate the next ID
                 int nextId = Courses.Any() ? Courses.Max(c => c.Id) + 1 : 1;
@@ -201,8 +190,7 @@ namespace C_971.ViewModels
                     Name = NewCourseName,
                     StartDate = NewCourseStartDate,
                     EndDate = NewCourseEndDate,
-                    CourseStatus = GetStatusFromString(NewCourseStatus)  // Now using the enum value
-                                                                         // Add other required properties
+                    Status = status,
                 };
 
                 // Add to collection

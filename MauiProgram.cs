@@ -26,15 +26,14 @@ namespace C_971
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-            builder.Services.AddSingleton<CourseService>();
+            // Register database service and interface
+            builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
 
             builder.Services.AddTransient<AcademicTermListView>();
             builder.Services.AddTransient<AcademicTermListViewModel>();
 
             builder.Services.AddTransient<CourseListView>();
             builder.Services.AddTransient<CourseListViewModel>();
-
-            builder.Services.AddTransient<BaseViewModel>();
 
             builder.Services.AddTransient<CourseDetailsView>();
             builder.Services.AddTransient<CourseDetailsViewModel>();

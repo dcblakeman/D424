@@ -25,7 +25,7 @@ namespace C_971.Models
 
         // Start, Due, and Completed Dates
         public DateTime StartDate { get; set; } = DateTime.Now;
-        public DateTime DueDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now;
         public DateTime? CompletedDate { get; set; } = null;
 
 

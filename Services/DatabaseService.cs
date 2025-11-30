@@ -6,7 +6,7 @@ using System.Text;
 
 namespace C_971.Services
 {
-    public class DatabaseService
+    public class DatabaseService : IDatabaseService
     {
         private SQLiteAsyncConnection? _database;
 
@@ -36,6 +36,14 @@ namespace C_971.Services
             return term.Id != 0
                 ? await _database.UpdateAsync(term)
                 : await _database.InsertAsync(term);
+        }
+
+        public async Task<IEnumerable<AcademicTerm>> SearchTermsByNameAsync(string newValue)
+        {
+            await InitializeAsync();
+            return await _database.Table<AcademicTerm>()
+                .Where(t => t.Name.Contains(newValue))
+                .ToListAsync();
         }
 
         // Courses
@@ -87,8 +95,42 @@ namespace C_971.Services
             await InitializeAsync();
             return await _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId)
-                .OrderBy(a => a.DueDate)
                 .ToListAsync();
+        }
+
+        internal async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task DeleteCourseNoteAsync(CourseNote note)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void UpdateCourse(Course course)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal List<Course> GetAllCourses()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal List<Course> GetCoursesForTerm(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task<IEnumerable<object>> GetNotesForCourseAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task LoadNotes()
+        {
+            throw new NotImplementedException();
         }
     }
 }

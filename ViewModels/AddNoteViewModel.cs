@@ -1,15 +1,18 @@
 ﻿using C_971.Models;
 using C_971.Services;
+using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
-    public partial class AddNoteViewModel : BaseViewModel
+    public partial class AddNoteViewModel(DatabaseService databaseService) : ObservableObject
     {
-        private readonly CourseService courseService;
+        private readonly DatabaseService _database = databaseService;
+
+        [ObservableProperty]
+        private ObservableCollection<CourseNote> courseNote = [];
 
         [ObservableProperty]
         private Course course;
@@ -20,11 +23,75 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private DateTime createdDate = DateTime.Now;
 
-        public AddNoteViewModel(CourseService courseService)
+        [RelayCommand]
+        async Task LoadCourseNotes()
         {
-            this.courseService = courseService;
+            if (Course == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Course not found", "OK");
+                return;
+            }
+
+            var notes = await _database.GetCourseNotesByCourseIdAsync(Course.Id);
+            CourseNote.Clear();
+            foreach (var note in notes)
+            {
+                CourseNote.Add((CourseNote)note);
+            }
         }
 
+        [RelayCommand]
+        async Task Clear()
+        {
+            NoteContent = string.Empty;
+            CreatedDate = DateTime.Now;
+        }
+
+        [RelayCommand]
+        async Task RefreshNotes()
+        {
+            await LoadCourseNotes();
+        }
+
+        [RelayCommand]
+        async Task DeleteNote(CourseNote note)
+        {
+            if (note == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Note not found", "OK");
+                return;
+            }
+            await _database.DeleteCourseNoteAsync(note);
+            CourseNote.Remove(note);
+            await Shell.Current.DisplayAlertAsync("Success", "Note deleted", "OK");
+        }
+
+        [RelayCommand]
+        async Task EditNote(CourseNote note)
+        {
+            if (note == null)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Note not found", "OK");
+                return;
+            }
+            // Navigate to edit note page with the selected note
+            await Shell.Current.GoToAsync(nameof(ViewNotesView), true, new Dictionary<string, object>
+            {
+                { "note", note }
+            });
+        }
+
+        async Task LoadNotesForCourse()
+        {
+            if (Course == null)
+                return;
+            var notes = await _database.GetCourseNotesByCourseIdAsync(Course.Id);
+            CourseNote.Clear();
+            foreach (var note in notes)
+            {
+                CourseNote.Add((CourseNote)note);
+            }
+        }
         partial void OnCourseChanged(Course value)
         {
             if (value != null)
@@ -48,23 +115,14 @@ namespace C_971.ViewModels
                 return;
             }
 
-            var newNote = new CourseNote
+            _ = new CourseNote
             {
-                Id = (Course.Notes?.Count ?? 0) + 1,
                 NoteContent = NoteContent,
                 CreatedDate = CreatedDate,
                 CourseId = Course.Id,
-                Course = Course
             };
 
-            if (Course.Notes == null)
-            {
-                Course.Notes = new ObservableCollection<CourseNote>();
-            }
-
-            Course.Notes.Add(newNote);
-
-            System.Diagnostics.Debug.WriteLine($"Note added. Total notes for course {Course.Name}: {Course.Notes.Count}");
+            System.Diagnostics.Debug.WriteLine($"Note added. Total notes for course {Course.Name}: {CourseNote.Count}");
 
             await Shell.Current.DisplayAlertAsync("Success", "Note saved!", "OK");
 

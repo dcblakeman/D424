@@ -1,52 +1,52 @@
 ﻿using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
-    public partial class ViewNotesViewModel : BaseViewModel
+    public partial class ViewNotesViewModel : ObservableObject
     {
-        private readonly CourseService courseService;
+        private readonly DatabaseService _databaseService;
+        private bool _isLoading;
+
+        [ObservableProperty]
+        private ObservableCollection<CourseNote> notes = [];
 
         [ObservableProperty]
         private Course course;
 
         [ObservableProperty]
-        private ObservableCollection<CourseNote> notes = new ObservableCollection<CourseNote>();
+        private string name = "Course Notes";
 
-        public ViewNotesViewModel(CourseService courseService)
+        [ObservableProperty]
+        private CourseNote note;
+
+        public ViewNotesViewModel(DatabaseService databaseService)
         {
-            this.courseService = courseService;
-            Name = "View Notes";
+            _databaseService = databaseService;
         }
 
-        // This gets called automatically when Course is set via QueryProperty
-        partial void OnCourseChanged(Course value)
+        [RelayCommand]
+        public async Task LoadNotesAsync()
         {
-            if (value != null)
+            if (Course == null)
             {
-                LoadNotes();
+                Debug.WriteLine("Course is null in LoadNotesAsync");
+                return;
             }
-        }
-
-        private void LoadNotes()
-        {
+            _isLoading = true;
             Notes.Clear();
-
-            if (Course?.Notes != null)
+            var notesFromDb = await _databaseService.GetCourseNotesByCourseIdAsync(Course.Id);
+            foreach (var note in notesFromDb)
             {
-                foreach (var note in Course.Notes)
-                {
-                    Notes.Add(note);
-                }
-                System.Diagnostics.Debug.WriteLine($"Loaded {Notes.Count} notes for course {Course.Name}");
+                Notes.Add((CourseNote)note);
             }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"No notes found for course {Course?.Name}");
-            }
+            _isLoading = false;
         }
     }
 }

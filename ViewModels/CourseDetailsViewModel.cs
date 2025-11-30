@@ -1,4 +1,5 @@
 ﻿using C_971.Models;
+using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,16 +15,26 @@ using System.Threading.Tasks;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), ("course"))]
-    public partial class CourseDetailsViewModel : BaseViewModel
+    public partial class CourseDetailsViewModel : ObservableObject
     {
-        private Services.CourseService? courseService;
+        private DatabaseService _databaseService;
 
         public ObservableCollection<string> StatusOptions { get; private set; }
         public ObservableCollection<string> AssessmentTypeOptions { get; private set; }
         public string Title => IsEditing ? "Edit Course Details" : "Course Details"; // Dynamic title based on mode
-        
+        public Course Course { get; set; }
+        private CourseInstructor CourseInstructor => CourseInstructor ?? new CourseInstructor();
+        private CourseAssessment CourseAssessment => CourseAssessment ?? new CourseAssessment();
+
+        [ObservableProperty]
+        private int termId;
+
+        [ObservableProperty]
+        private string id;
+
         [ObservableProperty]
         private bool isEditing;
+
         public bool IsNotEditing => !IsEditing;
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
@@ -77,39 +88,39 @@ namespace C_971.ViewModels
             }
 
             // Validate Instructor Information
-            if (Course.Instructor == null)
+            if (CourseInstructor.Id > 0)
             {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor information is required.", "OK");
+                await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor Id is required.", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(Course.Instructor.Name))
+            if (string.IsNullOrWhiteSpace(CourseInstructor.Name))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor name is required.", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(Course.Instructor.Email))
+            if (string.IsNullOrWhiteSpace(CourseInstructor.Email))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor email is required.", "OK");
                 return false;
             }
 
             // Validate email format
-            if (!IsValidEmail(Course.Instructor.Email))
+            if (!IsValidEmail(CourseInstructor.Email))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid email address for the instructor.", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(Course.Instructor.Phone))
+            if (string.IsNullOrWhiteSpace(CourseInstructor.Phone))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor phone number is required.", "OK");
                 return false;
             }
 
             // Validate phone format (basic validation)
-            if (!IsValidPhone(Course.Instructor.Phone))
+            if (!IsValidPhone(CourseInstructor.Phone))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number for the instructor.", "OK");
                 return false;
@@ -134,7 +145,7 @@ namespace C_971.ViewModels
         private bool IsValidPhone(string phone)
         {
             // Remove any formatting characters
-            string cleanPhone = new string(phone.Where(char.IsDigit).ToArray());
+            string cleanPhone = new(phone.Where(char.IsDigit).ToArray());
 
             // Check if it's a valid length (10 digits for US format)
             return cleanPhone.Length >= 10 && cleanPhone.Length <= 15;
@@ -143,9 +154,9 @@ namespace C_971.ViewModels
         {
 
             // Save changes to the course via the service
-            if (courseService != null && Course != null)
+            if (_databaseService != null && Course != null)
             {
-                courseService.UpdateCourse(Course);
+                _databaseService.UpdateCourse(Course);
 
                 // Schedule or cancel course date notifications
                 await ScheduleCourseNotifications();
@@ -182,34 +193,32 @@ namespace C_971.ViewModels
             }
 
             // Handle assessment notifications
-            if (Course.Assessments != null)
+            if (CourseAssessment.Id <0)
             {
-                for (int i = 0; i < Course.Assessments.Count && i < 2; i++)
+                for (int i = 0; i < CourseAssessment.Id && i < 2; i++)
                 {
-                    var assessment = Course.Assessments[i];
-
                     // Cancel existing assessment notifications
-                    CancelNotification($"assessment_start_{assessment.Id}");
-                    CancelNotification($"assessment_end_{assessment.Id}");
+                    CancelNotification($"assessment_start_{CourseAssessment.Id}");
+                    CancelNotification($"assessment_end_{CourseAssessment.Id}");
 
                     // Schedule new assessment notifications if enabled
-                    if (assessment.StartDateNotifications && assessment.StartDate > DateTime.Now)
+                    if (CourseAssessment.StartDateNotifications && CourseAssessment.StartDate > DateTime.Now)
                     {
                         await ScheduleNotification(
-                            $"assessment_start_{assessment.Id}",
-                            $"Assessment Starting: {assessment.Name}",
-                            $"Your assessment '{assessment.Name}' starts today!",
-                            assessment.StartDate
+                            $"assessment_start_{CourseAssessment.Id}",
+                            $"Assessment Starting: {CourseAssessment.Name}",
+                            $"Your assessment '{CourseAssessment.Name}' starts today!",
+                            CourseAssessment.StartDate
                         );
                     }
 
-                    if (assessment.EndDateNotifications && assessment.EndDate > DateTime.Now)
+                    if (CourseAssessment.EndDateNotifications && CourseAssessment.EndDate > DateTime.Now)
                     {
                         await ScheduleNotification(
-                            $"assessment_end_{assessment.Id}",
-                            $"Assessment Due: {assessment.Name}",
-                            $"Your assessment '{assessment.Name}' is due today!",
-                            assessment.EndDate
+                            $"assessment_end_{CourseAssessment.Id}",
+                            $"Assessment Due: {CourseAssessment.Name}",
+                            $"Your assessment '{CourseAssessment.Name}' is due today!",
+                            CourseAssessment.EndDate
                         );
                     }
                 }
@@ -251,21 +260,21 @@ namespace C_971.ViewModels
             }
         }
 
-        public void Initialize(Services.CourseService courseService)
-        {
-            this.courseService = courseService;
-        }
-
-        public CourseDetailsViewModel()
+        public void Initialize()
         {
             // Initialize properties
-            Course = new Models.Course(); // Ensure Course is not null
-            StatusOptions = new ObservableCollection<string> { "In Progress", "Completed", "Dropped", "Planned" };
-            AssessmentTypeOptions = new ObservableCollection<string> { "Objective", "Performance" };
+            Course = new Course(); // Ensure Course is not null
+            StatusOptions = ["In Progress", "Completed", "Dropped", "Planned"];
+            AssessmentTypeOptions = ["Objective", "Performance"];
             IsEditing = false; // Start in display mode
 
             // Request notification permissions
             _ = RequestNotificationPermissions();
+        }
+
+        public CourseDetailsViewModel(DatabaseService databaseService)
+        {
+            _databaseService = databaseService;
         }
 
         private async Task RequestNotificationPermissions()
