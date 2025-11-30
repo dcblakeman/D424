@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.AcademicTermListView"
+             xmlns:model="clr-namespace:C_971.Models"  
+             xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
+             x:DataType="viewmodel:AcademicTermListViewModel"
+             x:Name="AcademicTermListPage"
+             Title="{Binding Name}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Search Bar Section -->
+        <Border Grid.Row="0"
+                Stroke="#2196F3"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                Margin="15,10,15,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+
+            <SearchBar x:Name="ContentSearchBar"
+                       Placeholder="Search terms, courses, assessments..."
+                       SearchCommand="{Binding SearchCommand}"
+                       Text="{Binding SearchText, Mode=TwoWay}"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       PlaceholderColor="Gray"
+                       FontSize="16"
+                       Margin="5"/>
+        </Border>
+
+        <!-- Buttons Section -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="10" Padding="15">
+            <Button Grid.Column="0"
+                    Text="Add Term"
+                    Command="{Binding AddTermCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingTerm}"/>
+            <Button Grid.Column="1"
+                    Text="Remove Term"
+                    Command="{Binding RemoveTermCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingTerm}"/>
+            <Button Grid.Column="2"
+                Text="Exit"
+                Command="{Binding ExitAppCommand}"
+                BackgroundColor="#9E9E9E"
+                TextColor="White"
+                IsVisible="{Binding IsNotAddingTerm}"/>
+        </Grid>
+
+        <!-- Remove Mode Instructions -->
+        <Border Grid.Row="2"
+                BackgroundColor="LightCoral"
+                Stroke="Red"
+                StrokeThickness="1"
+                Padding="10"
+                Margin="15,0,15,10"
+                IsVisible="{Binding IsRemovingTerm}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5"/>
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       Text="Select a term to remove"
+                       FontAttributes="Bold"
+                       TextColor="DarkRed"
+                       VerticalOptions="Center"/>
+                <Button Grid.Column="1"
+                        Text="Cancel"
+                        Command="{Binding CancelRemoveTermCommand}"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </Grid>
+        </Border>
+
+        <!-- Add New Term Section (shown when adding) -->
+        <Border Grid.Row="2" 
+                Stroke="DarkBlue"
+                StrokeThickness="2"
+                Padding="10"
+                BackgroundColor="LightBlue"
+                Margin="15,0,15,10"
+                IsVisible="{Binding IsAddingTerm}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5"/>
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                <!-- Header -->
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                       Text="Add New Term" 
+                       FontAttributes="Bold" 
+                       FontSize="16" 
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+                <!-- Term Name -->
+                <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding NewTermName}" Placeholder="Enter term name" VerticalOptions="Center"/>
+
+                <!-- Start Date -->
+                <Label Grid.Row="2" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="2" Grid.Column="1" Date="{Binding NewTermStartDate}" VerticalOptions="Center"/>
+
+                <!-- End Date -->
+                <Label Grid.Row="3" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="3" Grid.Column="1" Date="{Binding NewTermEndDate}" VerticalOptions="Center"/>
+
+                <!-- Save/Cancel Buttons -->
+                <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                    <Button Grid.Column="0"
+                            Text="Save"
+                            Command="{Binding SaveNewTermCommand}"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White"/>
+                    <Button Grid.Column="1"
+                            Text="Cancel"
+                            Command="{Binding CancelAddTermCommand}"
+                            BackgroundColor="#F44336"
+                            TextColor="White"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Content Section -->
+        <RefreshView Grid.Row="3"
+                     Command="{Binding LoadAcademicTermsCommand}"
+                     IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding AcademicTerms}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:AcademicTerm">
+                        <Grid Padding="10">
+                            <Border StrokeThickness="1"   
+                                    Stroke="{Binding Source={x:Reference AcademicTermListPage}, Path=BindingContext.IsRemovingTerm, Converter={StaticResource BoolToRemoveColorConverter}}"
+                                    Padding="10"
+                                    BackgroundColor="{Binding Source={x:Reference AcademicTermListPage}, Path=BindingContext.IsRemovingTerm, Converter={StaticResource BoolToRemoveBgColorConverter}}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnTermTapped"/>
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout Spacing="5">
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="ID:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Id}"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="Name:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Name}" LineBreakMode="TailTruncation"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="Dates:" FontAttributes="Bold"/>
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding StartDate, StringFormat='{0:MM/dd/yyyy}'}"/>
+                                                    <Span Text=" - "/>
+                                                    <Span Text="{Binding EndDate, StringFormat='{0:MM/dd/yyyy}'}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <StackLayout Padding="20" VerticalOptions="Center">
+                        <Label Text="No academic terms available"   
+                               HorizontalOptions="Center"  
+                               FontSize="18"  
+                               TextColor="Gray"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
+             x:Class="C_971.Views.CourseListView"  
+             xmlns:model="clr-namespace:C_971.Models"  
+             xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
+             x:DataType="viewmodel:CourseListViewModel"
+             x:Name="CourseListPage"
+             Title="{Binding Name}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Search Bar Section -->
+        <Border Grid.Row="0"
+                Stroke="#2196F3"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                Margin="15,10,15,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+
+            <SearchBar x:Name="ContentSearchBar"
+                       Placeholder="Search terms, courses, assessments..."
+                       SearchCommand="{Binding SearchCommand}"
+                       Text="{Binding SearchText, Mode=TwoWay}"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       PlaceholderColor="Gray"
+                       FontSize="16"
+                       Margin="5"/>
+        </Border>
+
+        <!-- Buttons Section -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="10" Padding="10,5,10,5">
+            <Button Grid.Column="0"
+                    Text="Add Course"
+                    Command="{Binding AddCourseCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingCourse}"/>
+            <Button Grid.Column="1"
+                    Text="Remove Course"
+                    Command="{Binding RemoveCourseCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingCourse}"/>
+        </Grid>
+
+        <!-- Remove Mode Instructions -->
+        <Border Grid.Row="2"
+                BackgroundColor="LightCoral"
+                Stroke="Red"
+                StrokeThickness="1"
+                Padding="10"
+                Margin="15,0,15,10"
+                IsVisible="{Binding IsRemovingCourse}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5"/>
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       Text="Select a course to remove"
+                       FontAttributes="Bold"
+                       TextColor="DarkRed"
+                       VerticalOptions="Center"/>
+                <Button Grid.Column="1"
+                        Text="Cancel"
+                        Command="{Binding CancelRemoveCourseCommand}"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </Grid>
+        </Border>
+
+        <!-- Add New Course Section -->
+        <Border Grid.Row="1" 
+                Stroke="DarkBlue"
+                StrokeThickness="2"
+                Padding="10"
+                BackgroundColor="LightBlue"
+                Margin="15,0,15,10"
+                IsVisible="{Binding IsAddingCourse}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5"/>
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                <!-- Header -->
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                       Text="Add New Course" 
+                       FontAttributes="Bold" 
+                       FontSize="16" 
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+                <!-- Course Name -->
+                <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding NewCourseName}" Placeholder="Enter course name" VerticalOptions="Center"/>
+
+                <!-- Start Date -->
+                <Label Grid.Row="2" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="2" Grid.Column="1" Date="{Binding NewCourseStartDate}" VerticalOptions="Center"/>
+
+                <!-- End Date -->
+                <Label Grid.Row="3" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="3" Grid.Column="1" Date="{Binding NewCourseEndDate}" VerticalOptions="Center"/>
+
+                <!-- Status -->
+                <Label Grid.Row="4" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Picker Grid.Row="4" Grid.Column="1" 
+                        SelectedItem="{Binding NewCourseStatus}"
+                        ItemsSource="{Binding StatusOptions}"
+                        VerticalOptions="Center"/>
+
+                <!-- Save/Cancel Buttons -->
+                <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                    <Button Grid.Column="0"
+                            Text="Save"
+                            Command="{Binding SaveNewCourseCommand}"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White"/>
+                    <Button Grid.Column="1"
+                            Text="Cancel"
+                            Command="{Binding CancelAddCourseCommand}"
+                            BackgroundColor="#F44336"
+                            TextColor="White"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Course List Section -->
+        <RefreshView Grid.Row="2"
+                     Command="{Binding GetCourseListCommand}"  
+                     IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Courses}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Course">
+                        <Grid Padding="10">
+                            <Border StrokeThickness="1"   
+                                    Stroke="LightGray"   
+                                    Padding="10">
+
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCourseTapped"/>
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout Spacing="5">
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="ID:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Id}"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="Name:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Name}" LineBreakMode="TailTruncation"/>
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="Dates:" FontAttributes="Bold"/>
+                                        <Label>
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding StartDate, StringFormat='{0:MM/dd/yyyy}'}"/>
+                                                    <Span Text=" - "/>
+                                                    <Span Text="{Binding EndDate, StringFormat='{0:MM/dd/yyyy}'}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <StackLayout Padding="20" VerticalOptions="Center">
+                        <Label Text="No courses available"   
+                               HorizontalOptions="Center"  
+                               FontSize="18"  
+                               TextColor="Gray"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

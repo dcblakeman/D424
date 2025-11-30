@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.AddNoteView"
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:AddNoteViewModel"
+             Title="Add Note">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Label Text="Add a new note" 
+               FontSize="24" 
+               FontAttributes="Bold"/>
+
+        <Label Text="Note Content:" 
+               FontAttributes="Bold"/>
+
+        <Editor Text="{Binding NoteContent}"
+                Placeholder="Enter your note here..."
+                HeightRequest="200"
+                AutoSize="TextChanges"/>
+
+        <Label Text="{Binding CreatedDate, StringFormat='Date: {0:MM/dd/yyyy hh:mm tt}'}" 
+               FontSize="12" 
+               TextColor="Gray"/>
+
+        <Button Text="Save Note" 
+                Command="{Binding SaveNoteCommand}"
+                BackgroundColor="#2196F3"
+                TextColor="White"
+                Margin="0,10,0,0"/>
+
+        <Button Text="Cancel" 
+                Command="{Binding CancelCommand}"
+                BackgroundColor="Gray"
+                TextColor="White"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

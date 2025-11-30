@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.CourseDetailsView"
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:CourseDetailsViewModel"
+             x:Name="CourseDetailsPage"
+             Title="{Binding Course.Name}">
+    
+    <ScrollView>
+        <VerticalStackLayout Padding="15" Spacing="3">
+            <!-- Edit/Save Button -->
+            <Button Text="{Binding EditButtonText}"
+                    Command="{Binding ToggleEditCommand}"
+                    BackgroundColor="{Binding EditButtonColor}"
+                    TextColor="White"
+                    Margin="0,0,0,15"/>
+            
+            <!--Back Button-->
+            <Button Text="Back" Command="{Binding GoBackCommand}"/>
+            
+            <!-- Course Details Section -->
+            <Label Text="Course Details" FontAttributes="Bold" FontSize="18" Margin="0,10,0,3"/>
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+                <!-- Replace the Grid in Course Details section with this: -->
+                <VerticalStackLayout Spacing="8">
+                    
+                    <!-- Term ID -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Term ID:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.TermId}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding Course.TermId, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+                    
+                    <!-- ID -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="ID:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.Id}"/>
+                    </VerticalStackLayout>
+                    
+                    <!-- Name -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Name:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.Name}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding Course.Name, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Start Date -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Start Date:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.StartDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Date="{Binding Course.StartDate}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- End Date -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="End Date:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.EndDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Date="{Binding Course.EndDate}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Status -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Status:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.CourseStatus}" IsVisible="{Binding IsNotEditing}"/>
+                        <Picker SelectedItem="{Binding Course.CourseStatus}"
+                ItemsSource="{Binding StatusOptions}"
+                IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Course Notifications" 
+                       FontAttributes="Bold" 
+                       FontSize="18" 
+                       Margin="0,25,0,5"/>
+            
+            <!-- Notifications Section with Border -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+
+                    <!-- Start Date Notifications -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Start Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.StartDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- End Date Notifications -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="End Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.EndDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+            <!--End Notifications Section-->
+            
+            <!-- Notes Section -->
+            <Label Text="Notes" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" Margin="0,0,0,15">
+                <Button Text="Add Note"
+                        Command="{Binding AddNoteCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"/>
+
+                <Button Text="View Notes"
+                        Command="{Binding ViewNotesCommand}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"/>
+            </Grid>
+
+            <!-- Instructor Section -->
+            <!-- Instructor Information Section - REMOVE BindingContext from Border -->
+            <Label Text="Instructor Information" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                    <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Course.Instructor.Id}" VerticalOptions="Center"/>
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Course.Instructor.Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Course.Instructor.Name}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Email:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Course.Instructor.Email}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Course.Instructor.Email}" Keyboard="Email" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="3" Grid.Column="0" Text="Phone:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Course.Instructor.Phone}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Course.Instructor.Phone}" Keyboard="Telephone" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                </Grid>
+            </Border>
+            <!-- Assessment Notifications Section -->
+            <Label Text="Assessment Notifications" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+
+            <Border Stroke="DarkBlue"
+        StrokeThickness="1"
+        Padding="10"
+        BackgroundColor="AliceBlue"
+        Margin="0,5,0,15">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+                    <!-- Section Header -->
+                    <Label Text="Assessment Notifications" 
+               FontAttributes="Bold" 
+               FontSize="14" 
+               HorizontalTextAlignment="Center"
+               Margin="0,0,0,5"/>
+
+                    <!-- Assessment 1 Start Date Notifications -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Assessment 1 Start Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.Assessments[0].StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.Assessments[0].StartDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Assessment 1 End Date Notifications -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Assessment 1 End Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.Assessments[0].EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.Assessments[0].EndDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Assessment 2 Start Date Notifications -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Assessment 2 Start Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.Assessments[1].StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.Assessments[1].StartDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Assessment 2 End Date Notifications -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Assessment 2 End Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding Course.Assessments[1].EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.Assessments[1].EndDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+            
+            <!-- Assessments Section -->
+            <Label Text="Assessments" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+
+            <!-- Assessment 1 -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                    <Label Grid.Row="0" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Course.Assessments[0].Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Course.Assessments[0].Name}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Course.Assessments[0].Id}" VerticalOptions="Center"/>
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Course.Assessments[0].Type}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Picker Grid.Row="2" Grid.Column="1" 
+                SelectedItem="{Binding Course.Assessments[0].Type}"
+                ItemsSource="{Binding AssessmentTypeOptions}"
+                VerticalOptions="Center"
+                IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Course.Assessments[0].Description}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Course.Assessments[0].Description}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="4" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="4" Grid.Column="1" Text="{Binding Course.Assessments[0].StartDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <DatePicker Grid.Row="4" Grid.Column="1" Date="{Binding Course.Assessments[0].StartDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="5" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding Course.Assessments[0].EndDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <DatePicker Grid.Row="5" Grid.Column="1" Date="{Binding Course.Assessments[0].EndDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                </Grid>
+            </Border>
+
+            <!-- Assessment 2 -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                    <Label Grid.Row="0" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding Course.Assessments[1].Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Course.Assessments[1].Name}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding Course.Assessments[1].Id}" VerticalOptions="Center"/>
+
+                    <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding Course.Assessments[1].Type}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Picker Grid.Row="2" Grid.Column="1" 
+                SelectedItem="{Binding Course.Assessments[1].Type}"
+                ItemsSource="{Binding AssessmentTypeOptions}"
+                VerticalOptions="Center"
+                IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding Course.Assessments[1].Description}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Course.Assessments[1].Description}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="4" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="4" Grid.Column="1" Text="{Binding Course.Assessments[1].StartDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <DatePicker Grid.Row="4" Grid.Column="1" Date="{Binding Course.Assessments[1].StartDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                    <Label Grid.Row="5" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                    <Label Grid.Row="5" Grid.Column="1" Text="{Binding Course.Assessments[1].EndDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                    <DatePicker Grid.Row="5" Grid.Column="1" Date="{Binding Course.Assessments[1].EndDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
