@@ -8,13 +8,13 @@ namespace C_971.Services
 {
     public class DatabaseService
     {
-        private SQLiteAsyncConnection _database;
+        private SQLiteAsyncConnection? _database;
 
         public async Task InitializeAsync()
         {
             if (_database is not null) return;
 
-            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "EduTrack.db");
+            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "CollegeCourseTracker.db");
             _database = new SQLiteAsyncConnection(databasePath);
 
             await _database.CreateTableAsync<AcademicTerm>();
@@ -38,6 +38,57 @@ namespace C_971.Services
                 : await _database.InsertAsync(term);
         }
 
-        // Similar methods for Course, CourseNote, CourseAssessment...
+        // Courses
+        public async Task<List<Course>> GetCoursesAsync()
+        {
+            await InitializeAsync();
+            return await _database.Table<Course>().ToListAsync();
+        }
+
+        public async Task<List<Course>> GetCoursesByTermAsync(int termId)
+        {
+            await InitializeAsync();
+            return await _database.Table<Course>().Where(c => c.TermId == termId).ToListAsync();
+        }
+
+        public async Task<Course?> GetCourseByIdAsync(int courseId)
+        {
+            await InitializeAsync();
+            return await _database.Table<Course>().FirstOrDefaultAsync(c => c.Id == courseId);
+        }
+
+        public async Task<int> SaveCourseAsync(Course course)
+        {
+            await InitializeAsync();
+            return course.Id != 0
+                ? await _database.UpdateAsync(course)
+                : await _database.InsertAsync(course);
+        }
+
+        public async Task<int> DeleteCourseAsync(Course course)
+        {
+            await InitializeAsync();
+            return await _database.DeleteAsync(course);
+        }
+
+        // Notes
+        public async Task<List<CourseNote>> GetNotesByCourseAsync(int courseId)
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseNote>()
+                .Where(n => n.CourseId == courseId)
+                .OrderByDescending(n => n.CreatedDate)
+                .ToListAsync();
+        }
+
+        // Assessments
+        public async Task<List<CourseAssessment>> GetAssessmentsByCourseAsync(int courseId)
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseAssessment>()
+                .Where(a => a.CourseId == courseId)
+                .OrderBy(a => a.DueDate)
+                .ToListAsync();
+        }
     }
 }

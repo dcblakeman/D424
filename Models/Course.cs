@@ -22,7 +22,7 @@ namespace C_971.Models
 
         // Name
         [MaxLength(100)]
-        public required string Name { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
 
         // Description
