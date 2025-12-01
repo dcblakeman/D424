@@ -15,9 +15,6 @@ namespace C_971.ViewModels
         private readonly DatabaseService _databaseService;
 
         [ObservableProperty]
-        private AcademicTerm? currentTerm;
-
-        [ObservableProperty]
         private AcademicTerm academicTerm;
 
         [ObservableProperty]
@@ -66,6 +63,11 @@ namespace C_971.ViewModels
             _databaseService = databaseService;
         }
 
+        //private void GetCourseListAsync()
+        //{
+        //    GetCourseListAsync(_databaseService);
+        //}
+
         // Called automatically when AcademicTerm property is set via QueryProperty
         //async Task OnAcademicTermChanged(AcademicTerm value)
         //{
@@ -75,56 +77,56 @@ namespace C_971.ViewModels
         //    }
         //}
 
-        [RelayCommand]
-        private async Task GetCourseListAsync()
-        {
-            if (IsLoading)
-                return;
+        //[RelayCommand]
+        //public async Task GetCourseListAsync(DatabaseService _databaseService)
+        //{
+        //    if (IsLoading)
+        //        return;
 
-            try
-            {
-                IsLoading = true;
-                Courses.Clear();
+        //    try
+        //    {
+        //        IsLoading = true;
+        //        Courses.Clear();
 
-                // Filter courses by the academic term
-                List<Course> courses;
-                if (AcademicTerm != null)
-                {
-                    // Get only courses for this specific term
-                    courses = _databaseService.GetCoursesForTerm(AcademicTerm.Id);
-                    Name = $"{AcademicTerm.Name} - Courses";
-                }
-                else
-                {
-                    // Get all courses if no term is selected
-                    courses = _databaseService.GetAllCourses();
-                    Name = "All Courses";
-                }
+        //        // Filter courses by the academic term
+        //        List<Task> courses;
+        //        if (AcademicTerm != null)
+        //        {
+        //            // Get only courses for this specific term
+        //            courses = await _databaseService.GetCoursesForTerm(AcademicTerm.Id);
+        //            Name = $"{AcademicTerm.Name} - Courses";
+        //        }
+        //        else
+        //        {
+        //            // Get all courses if no term is selected
+        //            await _databaseService.GetAllCourses();
+        //            Name = "All Courses";
+        //        }
 
-                foreach (var course in courses)
-                {
-                    Courses.Add(course);
-                }
+        //        foreach (var course in courses)
+        //        {
+        //            Courses.Add(course);
+        //        }
 
-                // If no courses found, show helpful message
-                if (!courses.Any())
-                {
-                    emptyStateMessage = "No courses found. Tap 'Add Course' to get started.";
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions (e.g., log them)
-                System.Diagnostics.Debug.WriteLine(ex);
-                emptyStateMessage = "An error occurred while loading courses.";
-                //Shell.Current.DisplayAlertAsync("Alert", "No courses added yet", ex.Message);
-            }
-            finally
-            {
-                IsLoading = false;
-                IsRefreshing = false;
-            }
-        }
+        //        // If no courses found, show helpful message
+        //        if (!courses.Any())
+        //        {
+        //            emptyStateMessage = "No courses found. Tap 'Add Course' to get started.";
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle exceptions (e.g., log them)
+        //        System.Diagnostics.Debug.WriteLine(ex);
+        //        emptyStateMessage = "An error occurred while loading courses.";
+        //        //Shell.Current.DisplayAlertAsync("Alert", "No courses added yet", ex.Message);
+        //    }
+        //    finally
+        //    {
+        //        IsLoading = false;
+        //        IsRefreshing = false;
+        //    }
+        //}
 
         [RelayCommand]
         async Task GetCourseDetails(Course course)
@@ -147,16 +149,16 @@ namespace C_971.ViewModels
                 IsLoading = true;
 
                 // Check if we have a current term
-                if (CurrentTerm == null)
+                if (AcademicTerm == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("CurrentTerm is null!");
+                    System.Diagnostics.Debug.WriteLine("AcademicTerm is null!");
                     return;
                 }
 
                 // Use CurrentTerm.Id (instance property)
-                var courses = await _databaseService.GetCoursesByTermAsync(CurrentTerm.Id);
+                var courses = await _databaseService.GetCoursesByTermAsync(AcademicTerm.Id);
 
-                System.Diagnostics.Debug.WriteLine($"Loaded {courses.Count} courses for term: {CurrentTerm.Name}");
+                System.Diagnostics.Debug.WriteLine($"Loaded {courses.Count} courses for term: {AcademicTerm.Name}");
 
                 Courses.Clear();
                 foreach (var course in courses)
@@ -179,12 +181,6 @@ namespace C_971.ViewModels
         {
             IsAddingCourse = true;
             OnPropertyChanged(nameof(IsNotAddingCourse));
-
-            // Reset form fields
-            NewCourseName = string.Empty;
-            NewCourseStartDate = DateTime.Now;
-            NewCourseEndDate = DateTime.Now.AddMonths(3);
-            NewCourseStatus = "Planned";
         }
 
         [RelayCommand]
@@ -230,16 +226,112 @@ namespace C_971.ViewModels
                     StartDate = NewCourseStartDate,
                     EndDate = NewCourseEndDate,
                     Status = status,
+                    TermId = AcademicTerm.Id
                 };
 
-                // Add to collection
-                Courses.Add(newCourse);
+                //Add to database
+                await _databaseService.AddCourse(newCourse);
 
                 // Exit editing mode
                 IsAddingCourse = false;
                 OnPropertyChanged(nameof(IsNotAddingCourse));
 
                 await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
+
+                // Refresh Screen
+                await LoadCoursesAsync();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             }
             else
             {

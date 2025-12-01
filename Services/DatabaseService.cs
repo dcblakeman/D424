@@ -1,4 +1,5 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -98,39 +99,56 @@ namespace C_971.Services
                 .ToListAsync();
         }
 
-        internal async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
+        public async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            return await _database.Table<CourseNote>()
+                .Where(n => n.CourseId == id)
+                .OrderByDescending(n => n.CreatedDate)
+                .ToListAsync();
         }
 
-        internal async Task DeleteCourseNoteAsync(CourseNote note)
+        public async Task DeleteCourseNoteAsync(CourseNote note)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            await _database.DeleteAsync(note);
+            return;
         }
 
-        internal void UpdateCourse(Course course)
+        public async Task UpdateCourse(Course course)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            await _database.UpdateAsync(course);
+            return;
         }
 
-        internal List<Course> GetAllCourses()
+        public async Task GetAllCourses()
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            await _database.Table<Course>().ToListAsync();
+            return;
         }
 
-        internal List<Course> GetCoursesForTerm(int id)
+        public async Task GetCoursesForTerm(int id)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            await _database.Table<Course>().Where(c => c.TermId == id).ToListAsync();
+            return;
         }
 
-        internal async Task<IEnumerable<object>> GetNotesForCourseAsync(int id)
+        public async Task<IEnumerable<object>> GetNotesForCourseAsync(int id)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            return await _database.Table<CourseNote>()
+                .Where(n => n.CourseId == id)
+                .OrderByDescending(n => n.CreatedDate)
+                .ToListAsync();
         }
 
-        internal async Task LoadNotes()
+        public async Task LoadNotes()
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            await _database.Table<CourseNote>().ToListAsync();
         }
 
         public async Task<int> DeleteTermAsync(AcademicTerm term)
@@ -142,6 +160,13 @@ namespace C_971.Services
         Task IDatabaseService.DeleteTermAsync(AcademicTerm term)
         {
             return DeleteTermAsync(term);
+        }
+
+        public async Task AddCourse(Course newCourse)
+        {
+            await InitializeAsync();
+            await _database.InsertAsync(newCourse);
+            await _database.UpdateAsync(newCourse);
         }
     }
 }
