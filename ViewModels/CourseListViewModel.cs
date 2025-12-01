@@ -15,6 +15,9 @@ namespace C_971.ViewModels
         private readonly DatabaseService _databaseService;
 
         [ObservableProperty]
+        private AcademicTerm? currentTerm;
+
+        [ObservableProperty]
         private AcademicTerm academicTerm;
 
         [ObservableProperty]
@@ -41,13 +44,22 @@ namespace C_971.ViewModels
         private bool isLoading = false;
 
         [ObservableProperty]
-        private string name = "Courses";
+        private string name = "                  Courses";
 
         [ObservableProperty]
         private bool isRefreshing;
 
-        public ObservableCollection<string> StatusOptions { get; private set; } =
-            ["In Progress", "Completed", "Dropped", "Planned"];
+        [ObservableProperty]
+        private string emptyStateMessage = string.Empty;
+
+        public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
+        {
+            "Not Enrolled",
+            "In Progress",
+            "Completed",
+            "Dropped",
+            "Planned"
+        };
 
         public CourseListViewModel(DatabaseService databaseService)
         {
@@ -55,16 +67,16 @@ namespace C_971.ViewModels
         }
 
         // Called automatically when AcademicTerm property is set via QueryProperty
-        partial void OnAcademicTermChanged(AcademicTerm value)
-        {
-            if (value != null)
-            {
-                GetCourseList();
-            }
-        }
+        //async Task OnAcademicTermChanged(AcademicTerm value)
+        //{
+        //    if (value != null)
+        //    {
+        //        await GetCourseListAsync();
+        //    }
+        //}
 
         [RelayCommand]
-        public void GetCourseList()
+        private async Task GetCourseListAsync()
         {
             if (IsLoading)
                 return;
@@ -93,12 +105,19 @@ namespace C_971.ViewModels
                 {
                     Courses.Add(course);
                 }
+
+                // If no courses found, show helpful message
+                if (!courses.Any())
+                {
+                    emptyStateMessage = "No courses found. Tap 'Add Course' to get started.";
+                }
             }
             catch (Exception ex)
             {
                 // Handle exceptions (e.g., log them)
                 System.Diagnostics.Debug.WriteLine(ex);
-                Shell.Current.DisplayAlertAsync("Error", "Failed to load courses", ex.Message);
+                emptyStateMessage = "An error occurred while loading courses.";
+                //Shell.Current.DisplayAlertAsync("Alert", "No courses added yet", ex.Message);
             }
             finally
             {
@@ -120,20 +139,40 @@ namespace C_971.ViewModels
             });
         }
 
-        //[RelayCommand]
-        //async Task AddNewCourse()
-        //{
-        //    if (AcademicTerm == null)
-        //    {
-        //        await Shell.Current.DisplayAlertAsync("Error", "Please select an academic term first", "OK");
-        //        return;
-        //    }
+        [RelayCommand]
+        private async Task LoadCoursesAsync()
+        {
+            try
+            {
+                IsLoading = true;
 
-        //    await Shell.Current.GoToAsync("AddCourseView", new Dictionary<string, object>
-        //    {
-        //        { "term", AcademicTerm }
-        //    });
-        //}
+                // Check if we have a current term
+                if (CurrentTerm == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("CurrentTerm is null!");
+                    return;
+                }
+
+                // Use CurrentTerm.Id (instance property)
+                var courses = await _databaseService.GetCoursesByTermAsync(CurrentTerm.Id);
+
+                System.Diagnostics.Debug.WriteLine($"Loaded {courses.Count} courses for term: {CurrentTerm.Name}");
+
+                Courses.Clear();
+                foreach (var course in courses)
+                {
+                    Courses.Add(course);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load courses: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
 
         [RelayCommand]
         void AddCourse()
@@ -223,6 +262,20 @@ namespace C_971.ViewModels
         partial void OnIsRemovingCourseChanged(bool value)
         {
             OnPropertyChanged(nameof(IsNotAddingCourse));
+        }
+
+        [RelayCommand]
+        private async Task SaveCourseAsync(Course course)
+        {
+            try
+            {
+                await _databaseService.SaveCourseAsync(course);
+                await LoadCoursesAsync(); // Refresh the list
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to save course: {ex.Message}");
+            }
         }
     }
 }

@@ -12,6 +12,15 @@ namespace C_971.Views
             BindingContext = courseListViewModel;
         }
 
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (BindingContext is CourseListViewModel viewModel)
+            {
+                await viewModel.LoadCoursesCommand.ExecuteAsync(null);
+            }
+        }
         private async void OnCourseTapped(object sender, EventArgs e)
         {
             var border = (Border)sender;

@@ -27,7 +27,8 @@ namespace C_971
                 });
 
             // Register database service and interface
-            builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
+            builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddSingleton<IDatabaseService>(provider => provider.GetRequiredService<DatabaseService>());
 
             builder.Services.AddTransient<AcademicTermListView>();
             builder.Services.AddTransient<AcademicTermListViewModel>();
@@ -44,7 +45,11 @@ namespace C_971
             builder.Services.AddTransient<ViewNotesView>();
             builder.Services.AddTransient<ViewNotesViewModel>();
 
-            return builder.Build();
+            var app = builder.Build();
+
+            Routing.RegisterRoute("CourseListView", typeof(CourseListView));
+
+            return app;
         }
     }
 }

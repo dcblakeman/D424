@@ -7,7 +7,7 @@
              x:DataType="vm:CourseDetailsViewModel"
              x:Name="CourseDetailsPage"
              Title="{Binding Course.Name}">
-    
+
     <ScrollView>
         <VerticalStackLayout Padding="15" Spacing="3">
             <!-- Edit/Save Button -->
@@ -16,10 +16,10 @@
                     BackgroundColor="{Binding EditButtonColor}"
                     TextColor="White"
                     Margin="0,0,0,15"/>
-            
+
             <!--Back Button-->
             <Button Text="Back" Command="{Binding GoBackCommand}"/>
-            
+
             <!-- Course Details Section -->
             <Label Text="Course Details" FontAttributes="Bold" FontSize="18" Margin="0,10,0,3"/>
             <Border Stroke="DarkBlue"
@@ -30,22 +30,22 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
-                
+
                 <VerticalStackLayout Spacing="8">
-                    
+
                     <!-- Term ID -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Term ID:" FontAttributes="Bold"/>
                         <Label Text="{Binding Course.TermId}" IsVisible="{Binding IsNotEditing}"/>
                         <Entry Text="{Binding Course.TermId, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
-                    
+
                     <!-- ID -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="ID:" FontAttributes="Bold"/>
                         <Label Text="{Binding Course.Id}"/>
                     </VerticalStackLayout>
-                    
+
                     <!-- Name -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Name:" FontAttributes="Bold"/>
@@ -104,7 +104,7 @@
                 </VerticalStackLayout>
             </Border>
             <!--End Notifications Section-->
-            
+
             <!-- Notes Section -->
             <Label Text="Notes" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
 
@@ -127,11 +127,7 @@
             <!-- Instructor Section -->
             <Label Text="Instructor Information" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
 
-            <Border Stroke="DarkBlue"
-                StrokeThickness="1"
-                Padding="10"
-                BackgroundColor="AliceBlue"
-                Margin="0,5,0,0">
+            <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="0,5,0,0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
@@ -156,22 +152,14 @@
             <!-- Assessment Notifications Section -->
             <Label Text="Assessment Notifications" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
 
-            <Border Stroke="DarkBlue"
-                StrokeThickness="1"
-                Padding="10"
-                BackgroundColor="AliceBlue"
-                Margin="0,5,0,15">
+            <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="0,5,0,15">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="8">
                     <!-- Section Header -->
-                    <Label Text="Assessment Notifications" 
-               FontAttributes="Bold" 
-               FontSize="14" 
-               HorizontalTextAlignment="Center"
-               Margin="0,0,0,5"/>
+                    <Label Text="Assessment Notifications" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" Margin="0,0,0,5"/>
 
                     <!-- Assessment 1 Start Date Notifications -->
                     <VerticalStackLayout Spacing="3">
@@ -202,7 +190,7 @@
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>
-            
+
             <!-- Assessments Section -->
             <Label Text="Assessments" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
 
@@ -243,11 +231,7 @@
             </Border>
 
             <!-- Assessment 2 -->
-            <Border Stroke="DarkBlue"
-                StrokeThickness="1"
-                Padding="10"
-                BackgroundColor="AliceBlue"
-                Margin="0,5,0,0">
+            <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="0,5,0,0">
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
@@ -262,11 +246,7 @@
 
                     <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding Assessment[1].Type}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                    <Picker Grid.Row="2" Grid.Column="1" 
-                SelectedItem="{Binding Assessment[1].Type}"
-                ItemsSource="{Binding AssessmentTypeOptions}"
-                VerticalOptions="Center"
-                IsVisible="{Binding IsEditing}"/>
+                    <Picker Grid.Row="2" Grid.Column="1" SelectedItem="{Binding Assessment[1].Type}" ItemsSource="{Binding AssessmentTypeOptions}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
                     <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
                     <Label Grid.Row="3" Grid.Column="1" Text="{Binding Assessment[1].Description}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
@@ -283,5 +263,4 @@
             </Border>
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>

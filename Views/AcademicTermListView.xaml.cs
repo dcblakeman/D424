@@ -11,6 +11,15 @@ public partial class AcademicTermListView : ContentPage
         BindingContext = viewModel;
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is AcademicTermListViewModel viewModel)
+        {
+            await viewModel.LoadAcademicTermsCommand.ExecuteAsync(null);
+        }
+    }
     private async void OnTermTapped(object sender, TappedEventArgs e)
     {
         var border = (Border)sender;

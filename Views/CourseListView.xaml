@@ -8,7 +8,7 @@
              x:Name="CourseListPage"
              Title="{Binding Name}">
 
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
 
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
@@ -129,7 +129,7 @@
         </Border>
 
         <!-- Course List Section -->
-        <RefreshView Grid.Row="2"
+        <RefreshView Grid.Row="3"
                      Command="{Binding GetCourseListCommand}"  
                      IsRefreshing="{Binding IsRefreshing}">
             <CollectionView ItemsSource="{Binding Courses}">
