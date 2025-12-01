@@ -23,8 +23,16 @@ namespace C_971.ViewModels
         public ObservableCollection<string> AssessmentTypeOptions { get; private set; }
         public string Title => IsEditing ? "Edit Course Details" : "Course Details"; // Dynamic title based on mode
         public Course Course { get; set; }
-        private CourseInstructor CourseInstructor => CourseInstructor ?? new CourseInstructor();
-        private CourseAssessment CourseAssessment => CourseAssessment ?? new CourseAssessment();
+
+        [ObservableProperty]
+        private CourseInstructor instructor = new CourseInstructor();
+
+        public ObservableCollection<CourseAssessment> Assessment { get; set; } = new ObservableCollection<CourseAssessment>();
+
+        [ObservableProperty]
+        private bool isEditing;
+
+        public bool IsNotEditing => !IsEditing;
 
         [ObservableProperty]
         private int termId;
@@ -32,10 +40,6 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string id;
 
-        [ObservableProperty]
-        private bool isEditing;
-
-        public bool IsNotEditing => !IsEditing;
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
 
@@ -88,39 +92,39 @@ namespace C_971.ViewModels
             }
 
             // Validate Instructor Information
-            if (CourseInstructor.Id > 0)
+            if (Instructor.Id > 0)
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor Id is required.", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(CourseInstructor.Name))
+            if (string.IsNullOrWhiteSpace(Instructor.Name))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor name is required.", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(CourseInstructor.Email))
+            if (string.IsNullOrWhiteSpace(Instructor.Email))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor email is required.", "OK");
                 return false;
             }
 
             // Validate email format
-            if (!IsValidEmail(CourseInstructor.Email))
+            if (!IsValidEmail(Instructor.Email))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid email address for the instructor.", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(CourseInstructor.Phone))
+            if (string.IsNullOrWhiteSpace(Instructor.Phone))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor phone number is required.", "OK");
                 return false;
             }
 
             // Validate phone format (basic validation)
-            if (!IsValidPhone(CourseInstructor.Phone))
+            if (!IsValidPhone(Instructor.Phone))
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number for the instructor.", "OK");
                 return false;
@@ -193,32 +197,31 @@ namespace C_971.ViewModels
             }
 
             // Handle assessment notifications
-            if (CourseAssessment.Id <0)
             {
-                for (int i = 0; i < CourseAssessment.Id && i < 2; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     // Cancel existing assessment notifications
-                    CancelNotification($"assessment_start_{CourseAssessment.Id}");
-                    CancelNotification($"assessment_end_{CourseAssessment.Id}");
+                    CancelNotification($"assessment_start_{Assessment[i].Id}");
+                    CancelNotification($"assessment_end_{Assessment[i].Id}");
 
                     // Schedule new assessment notifications if enabled
-                    if (CourseAssessment.StartDateNotifications && CourseAssessment.StartDate > DateTime.Now)
+                    if (Assessment[i].StartDateNotifications && Assessment[i].StartDate > DateTime.Now)
                     {
                         await ScheduleNotification(
-                            $"assessment_start_{CourseAssessment.Id}",
-                            $"Assessment Starting: {CourseAssessment.Name}",
-                            $"Your assessment '{CourseAssessment.Name}' starts today!",
-                            CourseAssessment.StartDate
+                            $"assessment_start_{Assessment[i].Id}",
+                            $"Assessment Starting: {Assessment[i].Name}",
+                            $"Your assessment '{Assessment[i].Name}' starts today!",
+                            Assessment[i].StartDate
                         );
                     }
 
-                    if (CourseAssessment.EndDateNotifications && CourseAssessment.EndDate > DateTime.Now)
+                    if (Assessment[i].EndDateNotifications && Assessment[i].EndDate > DateTime.Now)
                     {
                         await ScheduleNotification(
-                            $"assessment_end_{CourseAssessment.Id}",
-                            $"Assessment Due: {CourseAssessment.Name}",
-                            $"Your assessment '{CourseAssessment.Name}' is due today!",
-                            CourseAssessment.EndDate
+                            $"assessment_end_{Assessment[i].Id}",
+                            $"Assessment Due: {Assessment[i].Name}",
+                            $"Your assessment '{Assessment[i].Name}' is due today!",
+                            Assessment[i].EndDate
                         );
                     }
                 }

@@ -9,12 +9,11 @@ using System.Threading.Tasks;
 namespace C_971.Models
 {
     [SQLite.Table("CourseInstructors")]
-    public class CourseInstructor
+    public partial class CourseInstructor
     {
         // Primary Key
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-
 
         // Instructor Name
         [MaxLength(100)]

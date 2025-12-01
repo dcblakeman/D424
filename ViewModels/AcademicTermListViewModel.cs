@@ -36,7 +36,7 @@ namespace C_971.ViewModels
         private DateTime newTermStartDate = DateTime.Now;
 
         [ObservableProperty]
-        DateTime newTermEndDate = DateTime.Now.AddMonths(6);
+        private DateTime newTermEndDate = DateTime.Now.AddMonths(6);
 
         // Computed Property
         public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
@@ -114,7 +114,7 @@ namespace C_971.ViewModels
 
 
         [RelayCommand]
-        private async Task Search()
+        private async Task SearchAsync()
         {
             var allTerms = await _database.GetTermsAsync();
 
@@ -130,16 +130,17 @@ namespace C_971.ViewModels
             }
         }
 
+        partial void OnSearchTextChanged(string value)
+        {
+            // Auto-search when text changes
+            SearchCommand.Execute(null);
+        }
+
         [RelayCommand]
         void AddTerm()
         {
             IsAddingTerm = true;
             OnPropertyChanged(nameof(IsNotAddingTerm));
-
-            // Reset form fields
-            NewTermName = string.Empty;
-            NewTermStartDate = DateTime.Now;
-            NewTermEndDate = DateTime.Now.AddMonths(6);
         }
 
         [RelayCommand]
@@ -189,6 +190,7 @@ namespace C_971.ViewModels
         {
             IsAddingTerm = false;
             OnPropertyChanged(nameof(IsNotAddingTerm));
+
         }
 
         partial void OnIsAddingTermChanged(bool value)
@@ -216,7 +218,7 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private async Task ExitApp()
+        public async Task ExitApp()
         {
             bool confirm = await Shell.Current.DisplayAlertAsync(
                 "Exit Application",
@@ -227,6 +229,23 @@ namespace C_971.ViewModels
             if (confirm)
             {
                 Application.Current?.Quit();
+            }
+        }
+
+        [RelayCommand]
+        public async Task DeleteTermAsync(AcademicTerm term)
+        {
+            if (term == null) return;
+
+            try
+            {
+                // Delete from database
+                await _database.DeleteTermAsync(term);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to delete term: {ex.Message}", "OK");
+                throw; // Re-throw so the UI doesn't update if database delete failed
             }
         }
     }

@@ -11,7 +11,7 @@ public partial class AcademicTermListView : ContentPage
         BindingContext = viewModel;
     }
 
-    private async void OnTermTapped(object sender, EventArgs e)
+    private async void OnTermTapped(object sender, TappedEventArgs e)
     {
         var border = (Border)sender;
         var term = (AcademicTerm)border.BindingContext;
@@ -36,13 +36,21 @@ public partial class AcademicTermListView : ContentPage
 
             if (confirm)
             {
-                // Remove from collection
-                viewModel.AcademicTerms.Remove(term);
+                try
+                {
+                    // Delete from database
+                    await viewModel.DeleteTermCommand.ExecuteAsync(term);
 
-                // Exit remove mode
-                viewModel.IsRemovingTerm = false;
+                    // Remove from UI
+                    viewModel.AcademicTerms.Remove(term);
+                    viewModel.IsRemovingTerm = false;
 
-                await Shell.Current.DisplayAlertAsync("Success", "Term removed successfully!", "OK");
+                    await Shell.Current.DisplayAlertAsync("Success", "Term removed successfully!", "OK");
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", "Failed to remove term. Please try again.", "OK");
+                }
             }
         }
         else

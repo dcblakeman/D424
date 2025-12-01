@@ -25,5 +25,6 @@ namespace C_971.Services
 
         // Assessments
         Task<List<CourseAssessment>> GetAssessmentsByCourseAsync(int courseId);
+        Task DeleteTermAsync(AcademicTerm term);
     }
 }

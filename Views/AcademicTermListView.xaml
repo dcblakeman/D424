@@ -8,7 +8,7 @@
              x:Name="AcademicTermListPage"
              Title="{Binding Name}">
 
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
 
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
@@ -101,15 +101,15 @@
 
                 <!-- Term Name -->
                 <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding NewTermName}" Placeholder="Enter term name" VerticalOptions="Center"/>
+                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding NewTermName, Mode=TwoWay}" Placeholder="Enter term name" VerticalOptions="Center"/>
 
                 <!-- Start Date -->
                 <Label Grid.Row="2" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <DatePicker Grid.Row="2" Grid.Column="1" Date="{Binding NewTermStartDate}" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="2" Grid.Column="1" Date="{Binding NewTermStartDate, Mode=TwoWay}" VerticalOptions="Center"/>
 
                 <!-- End Date -->
                 <Label Grid.Row="3" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <DatePicker Grid.Row="3" Grid.Column="1" Date="{Binding NewTermEndDate}" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="3" Grid.Column="1" Date="{Binding NewTermEndDate, Mode=TwoWay}" VerticalOptions="Center"/>
 
                 <!-- Save/Cancel Buttons -->
                 <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">

@@ -132,5 +132,16 @@ namespace C_971.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<int> DeleteTermAsync(AcademicTerm term)
+        {
+            await InitializeAsync();
+            return await _database.DeleteAsync(term);
+        }
+
+        Task IDatabaseService.DeleteTermAsync(AcademicTerm term)
+        {
+            return DeleteTermAsync(term);
+        }
     }
 }
