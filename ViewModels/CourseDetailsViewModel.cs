@@ -21,6 +21,7 @@ namespace C_971.ViewModels
 
         public ObservableCollection<string> StatusOptions { get; private set; }
         public ObservableCollection<string> AssessmentTypeOptions { get; private set; }
+        
         public string Title => IsEditing ? "Edit Course Details" : "Course Details"; // Dynamic title based on mode
         public Course Course { get; set; }
 
@@ -43,6 +44,56 @@ namespace C_971.ViewModels
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
 
+        public async Task InitializeNewCourse(int termId)
+        {
+            Course = new Course
+            {
+                TermId = termId,
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now.AddDays(90)
+            };
+
+            // Auto-generate instructor ID for new course
+            await GenerateInstructorIdAsync();
+
+            IsEditing = true;
+        }
+        private async Task CreateNewInstructorAsync()
+        {
+            var newInstructor = new CourseInstructor
+            {
+                Name = "New Instructor",
+                Email = "",
+                Phone = ""
+            };
+
+            await _databaseService.SaveInstructorAsync(newInstructor);
+            Course.InstructorId = newInstructor.Id; // Auto-incremented by SQLite
+        }
+
+        public async Task LoadCourseAsync(int courseId)
+        {
+            if (courseId == 0) // New course
+            {
+                Course = new Course();
+                await GenerateInstructorIdAsync(); // Auto-generate ID
+            }
+            else // Existing course
+            {
+                Course = await _databaseService.GetCourseByIdAsync(courseId) ?? new Course();
+            }
+        }
+
+        private async Task GenerateInstructorIdAsync()
+        {
+            // Get the highest instructor ID from all courses
+            var allCourses = await _databaseService.GetCoursesAsync();
+            var maxInstructorId = allCourses.Any() ? allCourses.Max(c => c.InstructorId) : 0;
+
+            Course.InstructorId = maxInstructorId + 1;
+
+            System.Diagnostics.Debug.WriteLine($"Generated Instructor ID: {Course.InstructorId}");
+        }
         [RelayCommand]
         async Task ToggleEdit()
         {
@@ -160,7 +211,7 @@ namespace C_971.ViewModels
             // Save changes to the course via the service
             if (_databaseService != null && Course != null)
             {
-                _databaseService.UpdateCourse(Course);
+                await _databaseService.UpdateCourse(Course);
 
                 // Schedule or cancel course date notifications
                 await ScheduleCourseNotifications();

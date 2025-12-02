@@ -168,5 +168,18 @@ namespace C_971.Services
             await _database.InsertAsync(newCourse);
             await _database.UpdateAsync(newCourse);
         }
+
+        public async Task SaveInstructorAsync(CourseInstructor newInstructor)
+        {
+            await InitializeAsync();
+            await _database.InsertAsync(newInstructor);
+            await _database.UpdateAsync(newInstructor);
+        }
+
+        public async Task<CourseInstructor> GetInstructorByIdAsync(int? instructorId)
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseInstructor>().FirstOrDefaultAsync(i => i.Id == instructorId);
+        }
     }
 }

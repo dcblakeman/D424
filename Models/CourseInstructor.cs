@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -12,19 +13,19 @@ namespace C_971.Models
     public partial class CourseInstructor
     {
         // Primary Key
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey, AutoIncrement, Unique, NotNull]
+        public int Id { get; set; } = 1;
 
         // Instructor Name
-        [MaxLength(100)]
-        public string Name { get; set; } = string.Empty;
+        [SQLite.MaxLength(100), NotNull]
+        public string Name { get; set; } = "Instructor Name";
 
         // Instructor Email
-        [MaxLength(100)]
-        public string Email { get; set; } = string.Empty;
+        [SQLite.MaxLength(100)]
+        public string Email { get; set; } = "instructor@example.com";
 
         // Instructor Phone
-        [MaxLength(20)]
+        [RegularExpression(@"^[\d\s\-\(\)\+\.]+$", ErrorMessage = "Invalid phone number format")]
         public string Phone { get; set; } = string.Empty;
     }
 }
