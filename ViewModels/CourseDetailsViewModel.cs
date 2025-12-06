@@ -34,7 +34,7 @@ namespace C_971.ViewModels
             "Objective",
             "Performance"
         };
-        
+
         public string Title => IsEditing ? "Edit Course Details" : "Course Details"; // Dynamic title based on mode
 
         [ObservableProperty]
@@ -58,49 +58,6 @@ namespace C_971.ViewModels
 
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
-        private async Task LoadCourseDetails()
-        {
-            // Load course-related data like notes, assessments
-            await _databaseService.GetCourseNotesAsync(Course.Id);
-            // Update UI properties
-        }
-        public async Task InitializeNewCourse(int termId)
-        {
-            Course = new Course
-            {
-                TermId = termId,
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now.AddDays(90)
-            };
-
-            // Auto-generate instructor ID for new course
-            await GenerateInstructorIdAsync();
-
-            IsEditing = true;
-        }
-        public async Task LoadCourseAsync(int courseId)
-        {
-            if (courseId == 0) // New course
-            {
-                Course = new Course();
-                await GenerateInstructorIdAsync(); // Auto-generate ID
-            }
-            else // Existing course
-            {
-                Course = await _databaseService.GetCourseByIdAsync(courseId) ?? new Course();
-            }
-        }
-
-        private async Task GenerateInstructorIdAsync()
-        {
-            // Get the highest instructor ID from all courses
-            var allCourses = await _databaseService.GetCoursesAsync();
-            var maxInstructorId = allCourses.Any() ? allCourses.Max(c => c.InstructorId) : 0;
-
-            Course.InstructorId = maxInstructorId + 1;
-
-            System.Diagnostics.Debug.WriteLine($"Generated Instructor ID: {Course.InstructorId}");
-        }
         [RelayCommand]
         async Task ToggleEdit()
         {
@@ -114,7 +71,6 @@ namespace C_971.ViewModels
 
                 // Save changes
                 await SaveCourseDetails();
-                await Shell.Current.DisplayAlertAsync("Success", "Changes saved!", "OK");
             }
 
             // Only toggle if we're entering edit mode OR if validation passed
@@ -150,7 +106,7 @@ namespace C_971.ViewModels
             }
 
             // Validate Instructor Information
-            if (Instructor.Id > 0)
+            if (Instructor.Id <= 0)
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor Id is required.", "OK");
                 return false;
@@ -214,19 +170,25 @@ namespace C_971.ViewModels
         }
         private async Task SaveCourseDetails()
         {
-
-            // Save changes to the course via the service
-            if (_databaseService != null && Course != null)
+            try
             {
-                await _databaseService.UpdateCourse(Course);
+                // Save changes to the course via the service
+                if (_databaseService != null && Course != null)
+                {
+                    await _databaseService.UpdateCourse(Course);
 
-                // Schedule or cancel course date notifications
-                await ScheduleCourseNotifications();
+                    // Schedule or cancel course date notifications
+                    await ScheduleCourseNotifications();
 
-                await Shell.Current.DisplayAlertAsync("Success", "Course updated successfully!", "OK");
+                    await Shell.Current.DisplayAlertAsync("Success", "Course updated successfully!", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to save course details: {ex.Message}", "OK");
+
             }
         }
-
         private async Task ScheduleCourseNotifications()
         {
             // Cancel existing course notifications
@@ -371,6 +333,32 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
             }
+        }
+
+        //Add Ids for assessments
+        public void AddAssessmentIds(int assessment1Id, int assessment2Id)
+        {
+            if (Assessment.Count >= 2)
+            {
+                Assessment[0].Id = assessment1Id;
+                Assessment[1].Id = assessment2Id;
+            }
+
+        }
+
+        //Generate Ids for assessments based off the max existing assessment Id in the database
+        public async Task GenerateAssessmentIds()
+        {
+            if (_databaseService != null)
+            {
+                int maxId = await _databaseService.GetMaxAssessmentIdAsync();
+                if (Assessment.Count >= 2)
+                {
+                    Assessment[0].Id = maxId + 1;
+                    Assessment[1].Id = maxId + 2;
+                }
+            }
+
         }
     }
 }

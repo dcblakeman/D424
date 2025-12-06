@@ -49,6 +49,7 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private string emptyStateMessage = string.Empty;
+
         [ObservableProperty]
         private int termId;
 

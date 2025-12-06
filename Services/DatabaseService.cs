@@ -1,5 +1,4 @@
-﻿
-using C_971.Models;
+﻿using C_971.Models;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -198,6 +197,13 @@ namespace C_971.Services
         internal async Task GetTermByIdAsync(int termId)
         {
             throw new NotImplementedException();
+        }
+
+        internal async Task<int> GetMaxAssessmentIdAsync()
+        {
+            await InitializeAsync();
+            var assessments = await _database.Table<CourseAssessment>().OrderByDescending(a => a.Id).ToListAsync();
+            return assessments.Count > 0 ? assessments[0].Id : 0;
         }
     }
 }

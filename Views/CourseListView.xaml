@@ -164,12 +164,16 @@
                                             </Label.FormattedText>
                                         </Label>
                                     </HorizontalStackLayout>
+                                    <HorizontalStackLayout HorizontalOptions="End" VerticalOptions="Center">
+                                        <Label Text="{Binding Status}" 
+                                           FontAttributes="Bold" 
+                                           TextColor="DarkBlue"/>
+                                    </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-
                 <CollectionView.EmptyView>
                     <StackLayout Padding="20" VerticalOptions="Center">
                         <Label Text="No courses available"   

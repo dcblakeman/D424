@@ -70,9 +70,14 @@
                     <VerticalStackLayout Spacing="3">
                         <!-- Status -->
                         <Label Grid.Row="4" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Row="4" Grid.Column="1" 
+                               Text="{Binding Course.Status}" 
+                               VerticalOptions="Center"
+                               IsVisible="{Binding IsNotEditing}"/>
                         <Picker Grid.Row="4" Grid.Column="1" 
-                        SelectedItem="{Binding NewCourseStatus}"
+                        SelectedIndex="{Binding Course.Status}"
                         ItemsSource="{Binding StatusOptions}"
+                        IsVisible="{Binding IsEditing}"        
                         VerticalOptions="Center"/>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
