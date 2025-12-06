@@ -14,16 +14,31 @@ using System.Threading.Tasks;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), ("course"))]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(TermId), "termId")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private DatabaseService _databaseService;
 
-        public ObservableCollection<string> StatusOptions { get; private set; }
-        public ObservableCollection<string> AssessmentTypeOptions { get; private set; }
+        public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
+        {
+            "Not Enrolled",
+            "In Progress",
+            "Completed",
+            "Dropped",
+            "Planned"
+        };
+
+        public ObservableCollection<string> AssessmentTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "Objective",
+            "Performance"
+        };
         
         public string Title => IsEditing ? "Edit Course Details" : "Course Details"; // Dynamic title based on mode
-        public Course Course { get; set; }
+
+        [ObservableProperty]
+        Course course;
 
         [ObservableProperty]
         private CourseInstructor instructor = new CourseInstructor();
@@ -36,14 +51,19 @@ namespace C_971.ViewModels
         public bool IsNotEditing => !IsEditing;
 
         [ObservableProperty]
-        private int termId;
+        int termId;
 
         [ObservableProperty]
-        private string id;
+        string id;
 
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
-
+        private async Task LoadCourseDetails()
+        {
+            // Load course-related data like notes, assessments
+            await _databaseService.GetCourseNotesAsync(Course.Id);
+            // Update UI properties
+        }
         public async Task InitializeNewCourse(int termId)
         {
             Course = new Course
@@ -58,19 +78,6 @@ namespace C_971.ViewModels
 
             IsEditing = true;
         }
-        private async Task CreateNewInstructorAsync()
-        {
-            var newInstructor = new CourseInstructor
-            {
-                Name = "New Instructor",
-                Email = "",
-                Phone = ""
-            };
-
-            await _databaseService.SaveInstructorAsync(newInstructor);
-            Course.InstructorId = newInstructor.Id; // Auto-incremented by SQLite
-        }
-
         public async Task LoadCourseAsync(int courseId)
         {
             if (courseId == 0) // New course
@@ -318,8 +325,6 @@ namespace C_971.ViewModels
         {
             // Initialize properties
             Course = new Course(); // Ensure Course is not null
-            StatusOptions = ["In Progress", "Completed", "Dropped", "Planned"];
-            AssessmentTypeOptions = ["Objective", "Performance"];
             IsEditing = false; // Start in display mode
 
             // Request notification permissions
@@ -355,9 +360,17 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private async Task GoBack()
+        public async Task GoBack()
         {
-            await Shell.Current.GoToAsync("..");
+            try
+            {
+                // Go back to courselistview with the term context
+                await Shell.Current.GoToAsync($"//CourseListView?termid={TermId}");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+            }
         }
     }
 }

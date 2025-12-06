@@ -13,18 +13,5 @@ public partial class CourseDetailsView : ContentPage
     {
         Shell.Current.GoToAsync("..");
         return true; // Prevents default back behavior
-    }
-    //protected override async void OnAppearing()
-    //{
-    //    base.OnAppearing();
-
-    //    if (BindingContext is CourseDetailsViewModel viewModel)
-    //    {
-    //        // Check if this is a new course that needs instructor ID
-    //        if (viewModel.Course.Id == 0 && viewModel.Course.InstructorId == 0)
-    //        {
-    //            await viewModel.GenerateInstructorIdAsync();
-    //        }
-    //    }
-    //}
+    } 
 }

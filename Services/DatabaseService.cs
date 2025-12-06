@@ -189,5 +189,15 @@ namespace C_971.Services
             await InitializeAsync();
             return await _database.Table<CourseInstructor>().FirstOrDefaultAsync(i => i.Id == instructorId);
         }
+
+        internal async Task GetCourseNotesAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task GetTermByIdAsync(int termId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

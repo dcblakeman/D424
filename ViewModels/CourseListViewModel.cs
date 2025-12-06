@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(AcademicTerm), "term")]
+    [QueryProperty(nameof(TermId), "termId")]
     public partial class CourseListViewModel : ObservableObject
     {
         public ObservableCollection<Course> Courses { get; private set; } = [];
@@ -48,6 +49,8 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private string emptyStateMessage = string.Empty;
+        [ObservableProperty]
+        private int termId;
 
         public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
         {

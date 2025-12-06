@@ -10,4 +10,17 @@
     <ShellContent
             ContentTemplate="{DataTemplate views:AcademicTermListView}"
             Route="AcademicTermListView"/>
+    <!-- Additional routes for navigation -->
+    <ShellContent
+        ContentTemplate="{DataTemplate views:CourseListView}"
+        Route="CourseListView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:CourseDetailsView}"
+        Route="CourseDetailsView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:AddNoteView}"
+        Route="AddNoteView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:ViewNotesView}"
+        Route="ViewNotesView"/>
 </Shell>

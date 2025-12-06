@@ -47,8 +47,6 @@ namespace C_971
 
             var app = builder.Build();
 
-            Routing.RegisterRoute("CourseListView", typeof(CourseListView));
-
             return app;
         }
     }

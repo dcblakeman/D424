@@ -5,7 +5,6 @@
              xmlns:vm="clr-namespace:C_971.ViewModels"
              xmlns:models="clr-namespace:C_971.Models"
              x:DataType="vm:CourseDetailsViewModel"
-             x:Name="CourseDetailsPage"
              Title="{Binding Course.Name}">
 
     <ScrollView>
@@ -69,9 +68,12 @@
 
                     <!-- Status -->
                     <VerticalStackLayout Spacing="3">
-                        <Label Text="Status:" FontAttributes="Bold"/>
-                        <Label Text="{Binding Course.Status}" IsVisible="{Binding IsNotEditing}"/>
-                        <Picker SelectedItem="{Binding Course.Status}" ItemsSource="{Binding StatusOptions}" IsVisible="{Binding IsEditing}"/>
+                        <!-- Status -->
+                        <Label Grid.Row="4" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Picker Grid.Row="4" Grid.Column="1" 
+                        SelectedItem="{Binding NewCourseStatus}"
+                        ItemsSource="{Binding StatusOptions}"
+                        VerticalOptions="Center"/>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>

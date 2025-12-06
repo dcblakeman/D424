@@ -5,7 +5,6 @@
              xmlns:model="clr-namespace:C_971.Models"  
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
              x:DataType="viewmodel:CourseListViewModel"
-             x:Name="CourseListPage"
              Title="{Binding Name}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*">
