@@ -26,6 +26,6 @@ namespace C_971.Models
 
         // Instructor Phone
         [RegularExpression(@"^[\d\s\-\(\)\+\.]+$", ErrorMessage = "Invalid phone number format")]
-        public string Phone { get; set; } = string.Empty;
+        public string Phone { get; set; } = "999-999-9999";
     }
 }

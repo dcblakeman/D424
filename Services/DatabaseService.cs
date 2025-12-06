@@ -15,15 +15,23 @@ namespace C_971.Services
         {
             if (_database is not null) return;
 
-            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "CollegeCourseTracker.db");
-            _database = new SQLiteAsyncConnection(databasePath);
+            try
+            {
+                var databasePath = Path.Combine(FileSystem.AppDataDirectory, "CollegeCourseTracker.db");
+                _database = new SQLiteAsyncConnection(databasePath);
 
-            await _database.CreateTableAsync<AcademicTerm>();
-            await _database.CreateTableAsync<Course>();
-            await _database.CreateTableAsync<CourseNote>();
-            await _database.CreateTableAsync<CourseAssessment>();
+                await _database.CreateTableAsync<AcademicTerm>();
+                await _database.CreateTableAsync<Course>();
+                await _database.CreateTableAsync<CourseNote>();
+                await _database.CreateTableAsync<CourseAssessment>();
+                await _database.CreateTableAsync<CourseInstructor>();
+            }
+            catch (Exception ex)
+            {
+                // Handle initialization exceptions
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to initialize database: {ex.Message}", "OK");
+            }
         }
-
         // Terms
         public async Task<List<AcademicTerm>> GetTermsAsync()
         {
