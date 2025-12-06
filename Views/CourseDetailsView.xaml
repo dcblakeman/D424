@@ -75,7 +75,7 @@
                                VerticalOptions="Center"
                                IsVisible="{Binding IsNotEditing}"/>
                         <Picker Grid.Row="4" Grid.Column="1" 
-                        SelectedIndex="{Binding Course.Status}"
+                        SelectedItem="{Binding Course.Status, Mode=TwoWay}"
                         ItemsSource="{Binding StatusOptions}"
                         IsVisible="{Binding IsEditing}"        
                         VerticalOptions="Center"/>
