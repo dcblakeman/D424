@@ -43,8 +43,8 @@ namespace C_971.Models
         public bool StartDateNotifications { get; set; } = true;
         public bool EndDateNotifications { get; set; }  = true;
 
-
         // Foreign Keys
+        [Indexed]
         public int TermId { get; set; }
         public int? InstructorId { get; set; }  
     }

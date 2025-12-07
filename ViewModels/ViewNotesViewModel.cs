@@ -15,10 +15,9 @@ namespace C_971.ViewModels
         private bool _isLoading;
 
         [ObservableProperty]
-        private ObservableCollection<CourseNote> notes = [];
+        public Course course;
 
-        [ObservableProperty]
-        private Course course;
+        public ObservableCollection<CourseNote> CourseNotesList { get; private set; } = new ObservableCollection<CourseNote>();
 
         [ObservableProperty]
         private string name = "Course Notes";
@@ -31,22 +30,27 @@ namespace C_971.ViewModels
             _databaseService = databaseService;
         }
 
-        [RelayCommand]
-        public async Task LoadNotesAsync()
+        partial void OnCourseChanged(Course value)
         {
-            if (Course == null)
+            // Called automatically when Course property changes
+            if (value?.Id > 0)
             {
-                Debug.WriteLine("Course is null in LoadNotesAsync");
-                return;
+                _ = LoadCourseNotes();
             }
-            _isLoading = true;
-            Notes.Clear();
-            var notesFromDb = await _databaseService.GetCourseNotesByCourseIdAsync(Course.Id);
-            foreach (var note in notesFromDb)
+        }
+
+        [RelayCommand]
+        private async Task LoadCourseNotes()
+        {
+            if (Course?.Id > 0)
             {
-                Notes.Add((CourseNote)note);
+                var notes = await _databaseService.GetCourseNotesByCourseIdAsync(Course.Id);
+                CourseNotesList.Clear();
+
+                // Add all notes at once
+                foreach (var note in notes)
+                    CourseNotesList.Add(note);
             }
-            _isLoading = false;
         }
     }
 }

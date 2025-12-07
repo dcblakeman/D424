@@ -106,13 +106,12 @@ namespace C_971.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
+        public async Task<List<CourseNote>> GetCourseNotesByCourseIdAsync(int id)
         {
             await InitializeAsync();
             return await _database.Table<CourseNote>()
-                .Where(n => n.CourseId == id)
-                .OrderByDescending(n => n.CreatedDate)
-                .ToListAsync();
+                         .Where(n => n.CourseId == id)
+                         .ToListAsync();
         }
 
         public async Task DeleteCourseNoteAsync(CourseNote note)
@@ -204,6 +203,20 @@ namespace C_971.Services
             await InitializeAsync();
             var assessments = await _database.Table<CourseAssessment>().OrderByDescending(a => a.Id).ToListAsync();
             return assessments.Count > 0 ? assessments[0].Id : 0;
+        }
+
+        internal async Task<int> GetNextCourseNoteIdAsync()
+        {
+            await InitializeAsync();
+            var notes = await _database.Table<CourseNote>().OrderByDescending(n => n.Id).ToListAsync();
+            return notes.Count > 0 ? notes[0].Id + 1 : 1;
+        }
+
+        internal async Task SaveCourseNoteAsync(CourseNote newNote)
+        {
+            await InitializeAsync();
+            await _database.InsertAsync(newNote);
+            await _database.UpdateAsync(newNote);
         }
     }
 }

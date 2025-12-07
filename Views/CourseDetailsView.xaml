@@ -71,11 +71,11 @@
                         <!-- Status -->
                         <Label Grid.Row="4" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
                         <Label Grid.Row="4" Grid.Column="1" 
-                               Text="{Binding Course.Status}" 
+                               Text="{Binding Course.Status, Mode=TwoWay}" 
                                VerticalOptions="Center"
                                IsVisible="{Binding IsNotEditing}"/>
                         <Picker Grid.Row="4" Grid.Column="1" 
-                        SelectedItem="{Binding Course.Status, Mode=TwoWay}"
+                        SelectedIndex="{Binding Course.Status, Mode=TwoWay}"
                         ItemsSource="{Binding StatusOptions}"
                         IsVisible="{Binding IsEditing}"        
                         VerticalOptions="Center"/>

@@ -12,86 +12,20 @@ namespace C_971.ViewModels
         private readonly DatabaseService _database = databaseService;
 
         [ObservableProperty]
-        private ObservableCollection<CourseNote> courseNote = [];
+        private int newNoteId;
+
+        [ObservableProperty]
+        private CourseNote newNote;
+
+        [ObservableProperty]
+        private string newNoteContent = string.Empty;
 
         [ObservableProperty]
         private Course course;
 
         [ObservableProperty]
-        private string noteContent = string.Empty;
-
-        [ObservableProperty]
         private DateTime createdDate = DateTime.Now;
 
-        [RelayCommand]
-        async Task LoadCourseNotes()
-        {
-            if (Course == null)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Course not found", "OK");
-                return;
-            }
-
-            var notes = await _database.GetCourseNotesByCourseIdAsync(Course.Id);
-            CourseNote.Clear();
-            foreach (var note in notes)
-            {
-                CourseNote.Add((CourseNote)note);
-            }
-        }
-
-        [RelayCommand]
-        async Task Clear()
-        {
-            NoteContent = string.Empty;
-            CreatedDate = DateTime.Now;
-        }
-
-        [RelayCommand]
-        async Task RefreshNotes()
-        {
-            await LoadCourseNotes();
-        }
-
-        [RelayCommand]
-        async Task DeleteNote(CourseNote note)
-        {
-            if (note == null)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Note not found", "OK");
-                return;
-            }
-            await _database.DeleteCourseNoteAsync(note);
-            CourseNote.Remove(note);
-            await Shell.Current.DisplayAlertAsync("Success", "Note deleted", "OK");
-        }
-
-        [RelayCommand]
-        async Task EditNote(CourseNote note)
-        {
-            if (note == null)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Note not found", "OK");
-                return;
-            }
-            // Navigate to edit note page with the selected note
-            await Shell.Current.GoToAsync(nameof(ViewNotesView), true, new Dictionary<string, object>
-            {
-                { "note", note }
-            });
-        }
-
-        async Task LoadNotesForCourse()
-        {
-            if (Course == null)
-                return;
-            var notes = await _database.GetCourseNotesByCourseIdAsync(Course.Id);
-            CourseNote.Clear();
-            foreach (var note in notes)
-            {
-                CourseNote.Add((CourseNote)note);
-            }
-        }
         partial void OnCourseChanged(Course value)
         {
             if (value != null)
@@ -103,7 +37,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         async Task SaveNote()
         {
-            if (string.IsNullOrWhiteSpace(NoteContent))
+            if (string.IsNullOrWhiteSpace(NewNoteContent))
             {
                 await Shell.Current.DisplayAlertAsync("Error", "Please enter a note", "OK");
                 return;
@@ -115,29 +49,42 @@ namespace C_971.ViewModels
                 return;
             }
 
-            _ = new CourseNote
+            //Generate new note Id
+            NewNoteId = await _database.GetNextCourseNoteIdAsync();
+
+
+            // Save to database
+            NewNote = new CourseNote
             {
-                NoteContent = NoteContent,
-                CreatedDate = CreatedDate,
-                CourseId = Course.Id,
+                Id = NewNoteId,
+                CreatedDate = DateTime.Now,
+                NoteContent = NewNoteContent,
+                CourseId = Course.Id
             };
 
-            System.Diagnostics.Debug.WriteLine($"Note added. Total notes for course {Course.Name}: {CourseNote.Count}");
+            //Add new note to Course Notes list by Id
+            if(NewNote == null) 
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Note creation failed", "OK");
+                return;
+            } else
+            {
+                try
+                {
+                    await _database.SaveCourseNoteAsync(NewNote);
+                } catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to save note: {ex.Message}", "OK");
+                    return;
+                }
 
-            await Shell.Current.DisplayAlertAsync("Success", "Note saved!", "OK");
+                await Shell.Current.DisplayAlertAsync("Success", "Note saved!", "OK");
+            }
 
-            NoteContent = string.Empty;
-            CreatedDate = DateTime.Now;
-
-            await Shell.Current.GoToAsync("..");
-        }
-
-        [RelayCommand]
-        async Task Cancel()
-        {
-            NoteContent = string.Empty;
-            CreatedDate = DateTime.Now;
-            await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync($"{nameof(CourseDetailsView)}", true, new Dictionary<string, object>
+            {
+                { "course", Course }
+            });
         }
     }
 }

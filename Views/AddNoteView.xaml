@@ -16,7 +16,7 @@
         <Label Text="Note Content:" 
                FontAttributes="Bold"/>
 
-        <Editor Text="{Binding NoteContent}"
+        <Editor Text="{Binding NewNoteContent}"
                 Placeholder="Enter your note here..."
                 HeightRequest="200"
                 AutoSize="TextChanges"/>

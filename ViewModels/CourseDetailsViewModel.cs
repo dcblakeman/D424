@@ -22,8 +22,8 @@ namespace C_971.ViewModels
 
         public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
         {
-            "Not Enrolled",
-            "In Progress",
+            "NotEnrolled",
+            "InProgress",
             "Completed",
             "Dropped",
             "Planned"
@@ -215,40 +215,10 @@ namespace C_971.ViewModels
                     Course.EndDate
                 );
             }
-
-            // Handle assessment notifications
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    // Cancel existing assessment notifications
-                    CancelNotification($"assessment_start_{Assessment[i].Id}");
-                    CancelNotification($"assessment_end_{Assessment[i].Id}");
-
-                    // Schedule new assessment notifications if enabled
-                    if (Assessment[i].StartDateNotifications && Assessment[i].StartDate > DateTime.Now)
-                    {
-                        await ScheduleNotification(
-                            $"assessment_start_{Assessment[i].Id}",
-                            $"Assessment Starting: {Assessment[i].Name}",
-                            $"Your assessment '{Assessment[i].Name}' starts today!",
-                            Assessment[i].StartDate
-                        );
-                    }
-
-                    if (Assessment[i].EndDateNotifications && Assessment[i].EndDate > DateTime.Now)
-                    {
-                        await ScheduleNotification(
-                            $"assessment_end_{Assessment[i].Id}",
-                            $"Assessment Due: {Assessment[i].Name}",
-                            $"Your assessment '{Assessment[i].Name}' is due today!",
-                            Assessment[i].EndDate
-                        );
-                    }
-                }
-            }
         }
 
-        private async Task ScheduleNotification(string id, string title, string message, DateTime scheduleTime)
+        // Schedule assignment notifications
+        private async Task ScheduleNotification(string id, string title, string message, DateTime notifyTime)
         {
             try
             {
@@ -257,12 +227,11 @@ namespace C_971.ViewModels
                     NotificationId = id.GetHashCode(),
                     Title = title,
                     Description = message,
-                    Schedule = new NotificationRequestSchedule
+                    Schedule =
                     {
-                        NotifyTime = scheduleTime
+                        NotifyTime = notifyTime
                     }
                 };
-
                 await LocalNotificationCenter.Current.Show(notification);
             }
             catch (Exception ex)

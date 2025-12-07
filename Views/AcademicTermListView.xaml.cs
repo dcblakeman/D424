@@ -56,7 +56,7 @@ public partial class AcademicTermListView : ContentPage
 
                     await Shell.Current.DisplayAlertAsync("Success", "Term removed successfully!", "OK");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     await Shell.Current.DisplayAlertAsync("Error", "Failed to remove term. Please try again.", "OK");
                 }
