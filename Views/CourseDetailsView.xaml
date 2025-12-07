@@ -5,8 +5,12 @@
              xmlns:vm="clr-namespace:C_971.ViewModels"
              xmlns:models="clr-namespace:C_971.Models"
              x:DataType="vm:CourseDetailsViewModel"
-             Title="{Binding Course.Name}">
-
+             Title="{Binding Name}">
+    
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    
     <ScrollView>
         <VerticalStackLayout Padding="15" Spacing="3">
             <!-- Edit/Save Button -->

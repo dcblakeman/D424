@@ -42,7 +42,7 @@ namespace C_971.ViewModels
         private bool isLoading = false;
 
         [ObservableProperty]
-        private string name = "                  Courses";
+        private string name = "                            Courses";
 
         [ObservableProperty]
         private bool isRefreshing;
@@ -213,6 +213,23 @@ namespace C_971.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to save course: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task GoBack()
+        {
+            try
+            {
+                // Use relative navigation (no leading slash)
+                await Shell.Current.GoToAsync("AcademicTermListView", new Dictionary<string, object>
+                {
+                    ["termId"] = TermId
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
             }
         }
     }

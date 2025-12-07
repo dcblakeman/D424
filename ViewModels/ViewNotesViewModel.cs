@@ -52,5 +52,21 @@ namespace C_971.ViewModels
                     CourseNotesList.Add(note);
             }
         }
+        [RelayCommand]
+        private async Task GoBack()
+        {
+            try
+            {
+                // Use relative navigation (no leading slash)
+                await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+            }
+        }
     }
 }

@@ -7,6 +7,10 @@
              x:DataType="vm:AddNoteViewModel"
              Title="Add Note">
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
     <VerticalStackLayout Padding="20" Spacing="15">
 
         <Label Text="Add a new note" 

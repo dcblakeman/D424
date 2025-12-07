@@ -5,17 +5,20 @@
              xmlns:model="clr-namespace:C_971.Models"  
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
              x:DataType="viewmodel:AcademicTermListViewModel"
-             x:Name="AcademicTermListPage"
              Title="{Binding Name}">
 
     <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <Shell.BackButtonBehavior>
+            <BackButtonBehavior IsVisible="False" />
+        </Shell.BackButtonBehavior>
 
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
                 Stroke="#2196F3"
                 StrokeThickness="1"
                 BackgroundColor="White"
-                Margin="15,10,15,10">
+                Margin="15,0,15,10">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="8"/>
             </Border.StrokeShape>
@@ -32,7 +35,7 @@
         </Border>
 
         <!-- Buttons Section -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="10" Padding="15">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="10" Padding="10,5,10,5">
             <Button Grid.Column="0"
                     Text="Add Term"
                     Command="{Binding AddTermCommand}"

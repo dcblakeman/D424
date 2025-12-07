@@ -9,9 +9,4 @@ public partial class CourseDetailsView : ContentPage
 		InitializeComponent();
 		BindingContext = courseDetailsViewModel;
     }
-    protected override bool OnBackButtonPressed()
-    {
-        Shell.Current.GoToAsync("..");
-        return true; // Prevents default back behavior
-    } 
 }

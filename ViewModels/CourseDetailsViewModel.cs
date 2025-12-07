@@ -56,6 +56,9 @@ namespace C_971.ViewModels
         [ObservableProperty]
         string id;
 
+        [ObservableProperty]
+        string name="                         Course Details";
+
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
         [RelayCommand]

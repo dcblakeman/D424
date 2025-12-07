@@ -6,6 +6,7 @@ using C_971.Services;
 
 namespace C_971.ViewModels
 {
+    [QueryProperty(nameof(TermId), "termId")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
         private readonly IDatabaseService _database;
@@ -37,6 +38,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private DateTime newTermEndDate = DateTime.Now.AddMonths(6);
+
+        [ObservableProperty]
+        private int termId;
 
         // Computed Property
         public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;

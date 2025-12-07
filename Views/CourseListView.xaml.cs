@@ -18,9 +18,11 @@ namespace C_971.Views
 
             if (BindingContext is CourseListViewModel viewModel)
             {
+                // Fix: Pass the instance property, not the type
                 await viewModel.LoadCoursesCommand.ExecuteAsync(null);
             }
         }
+
         private async void OnCourseTapped(object sender, EventArgs e)
         {
             var border = (Border)sender;

@@ -7,14 +7,20 @@
              x:DataType="viewmodel:CourseListViewModel"
              Title="{Binding Name}">
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
     <Grid RowDefinitions="Auto,Auto,Auto,*">
 
+
+        
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
                 Stroke="#2196F3"
                 StrokeThickness="1"
                 BackgroundColor="White"
-                Margin="15,10,15,10">
+                Margin="15,0,15,10">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="8"/>
             </Border.StrokeShape>
@@ -31,7 +37,7 @@
         </Border>
 
         <!-- Buttons Section -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="10" Padding="10,5,10,5">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="10" Padding="10,5,10,5">
             <Button Grid.Column="0"
                     Text="Add Course"
                     Command="{Binding AddCourseCommand}"
@@ -42,6 +48,13 @@
                     Text="Remove Course"
                     Command="{Binding RemoveCourseCommand}"
                     BackgroundColor="#F44336"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingCourse}"/>
+            <!--Back Button-->
+            <Button Grid.Column="2"
+                    Text="Back"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="LightGrey"
                     TextColor="White"
                     IsVisible="{Binding IsNotAddingCourse}"/>
         </Grid>
@@ -129,7 +142,7 @@
 
         <!-- Course List Section -->
         <RefreshView Grid.Row="3"
-                     Command="{Binding GetCourseListCommand}"  
+                     Command="{Binding LoadCoursesCommand}"  
                      IsRefreshing="{Binding IsRefreshing}">
             <CollectionView ItemsSource="{Binding Courses}">
                 <CollectionView.ItemTemplate>

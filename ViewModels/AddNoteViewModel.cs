@@ -81,10 +81,24 @@ namespace C_971.ViewModels
                 await Shell.Current.DisplayAlertAsync("Success", "Note saved!", "OK");
             }
 
-            await Shell.Current.GoToAsync($"{nameof(CourseDetailsView)}", true, new Dictionary<string, object>
+            await GoBack();
+        }
+
+        [RelayCommand]
+        private async Task GoBack()
+        {
+            try
             {
-                { "course", Course }
-            });
+                // Use relative navigation (no leading slash)
+                await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+            }
         }
     }
 }

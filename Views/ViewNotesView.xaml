@@ -6,13 +6,20 @@
              xmlns:models="clr-namespace:C_971.Models"
              x:DataType="vm:ViewNotesViewModel"
              Title="Course Notes">
-
+    
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    
     <VerticalStackLayout Padding="20" Spacing="10">
 
         <Label Text="Course Notes" 
                FontSize="24" 
                FontAttributes="Bold"
                Margin="0,0,0,10"/>
+
+        <!--Back Button-->
+        <Button Text="Back" Command="{Binding GoBackCommand}"/>
 
         <CollectionView ItemsSource="{Binding CourseNotesList}">
             <CollectionView.ItemTemplate>
