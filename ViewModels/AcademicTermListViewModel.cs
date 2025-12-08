@@ -112,27 +112,30 @@ namespace C_971.ViewModels
             }
         }
 
+        private List<AcademicTerm> _allTerms = new(); // Cache all terms
+
         [RelayCommand]
-        private async Task NavigateToTermCourses(AcademicTerm term)
+        private async Task LoadTermsAsync()
         {
-            if (term == null) return;
-            await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
-            {
-                { "termId", term.Id }
-            });
+            // Load all terms once
+            _allTerms = await _database.GetTermsAsync();
+            ApplySearchFilter();
         }
 
-
         [RelayCommand]
-        private async Task SearchAsync()
+        private void Search()
         {
-            var allTerms = await _database.GetTermsAsync();
+            // Filter in memory instead of hitting database
+            ApplySearchFilter();
+        }
 
+        private void ApplySearchFilter()
+        {
             AcademicTerms.Clear();
 
             var filteredTerms = string.IsNullOrWhiteSpace(SearchText)
-                ? allTerms
-                : allTerms.Where(t => t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                ? _allTerms
+                : _allTerms.Where(t => t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
             foreach (var term in filteredTerms)
             {
@@ -142,7 +145,7 @@ namespace C_971.ViewModels
 
         partial void OnSearchTextChanged(string value)
         {
-            // Auto-search when text changes
+            // Now this is fast since it's in-memory filtering
             SearchCommand.Execute(null);
         }
 
