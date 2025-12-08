@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
-    [QueryProperty(nameof(TermId), "termId")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private DatabaseService _databaseService;
@@ -299,7 +298,10 @@ namespace C_971.ViewModels
             try
             {
                 // Go back to courselistview with the term context
-                await Shell.Current.GoToAsync($"//CourseListView?termid={TermId}");
+                await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
+                {
+                    ["course"] = Course       // Pass the actual Course object
+                });
             }
             catch (Exception ex)
             {

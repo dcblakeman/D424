@@ -39,8 +39,7 @@
                     <!-- Term ID -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Term ID:" FontAttributes="Bold"/>
-                        <Label Text="{Binding Course.TermId}" IsVisible="{Binding IsNotEditing}"/>
-                        <Entry Text="{Binding Course.TermId, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                        <Label Text="{Binding Course.TermId}"/>
                     </VerticalStackLayout>
 
                     <!-- ID -->

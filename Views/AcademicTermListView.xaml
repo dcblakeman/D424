@@ -35,7 +35,7 @@
         </Border>
 
         <!-- Buttons Section -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="10" Padding="10,5,10,5">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="10,5,10,5">
             <Button Grid.Column="0"
                     Text="Add Term"
                     Command="{Binding AddTermCommand}"
@@ -134,28 +134,40 @@
         <RefreshView Grid.Row="3"
                      Command="{Binding LoadAcademicTermsCommand}"
                      IsRefreshing="{Binding IsRefreshing}">
+            
             <CollectionView ItemsSource="{Binding AcademicTerms}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:AcademicTerm">
+                        
                         <Grid Padding="10">
+                            
                             <Border StrokeThickness="1"   
-                                    Stroke="{Binding Source={x:Reference AcademicTermListPage}, Path=BindingContext.IsRemovingTerm, Converter={StaticResource BoolToRemoveColorConverter}}"
+                                    Stroke="LightGray"
                                     Padding="10"
                                     BackgroundColor="{Binding Source={x:Reference AcademicTermListPage}, Path=BindingContext.IsRemovingTerm, Converter={StaticResource BoolToRemoveBgColorConverter}}">
+                                
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+                                
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnTermTapped"/>
                                 </Border.GestureRecognizers>
 
                                 <VerticalStackLayout Spacing="5">
+                                    
                                     <HorizontalStackLayout Spacing="10">
                                         <Label Text="ID:" FontAttributes="Bold"/>
                                         <Label Text="{Binding Id}"/>
                                     </HorizontalStackLayout>
+                                    
                                     <HorizontalStackLayout Spacing="10">
                                         <Label Text="Name:" FontAttributes="Bold"/>
                                         <Label Text="{Binding Name}" LineBreakMode="TailTruncation"/>
                                     </HorizontalStackLayout>
+                                    
                                     <HorizontalStackLayout Spacing="10">
+                                        
                                         <Label Text="Dates:" FontAttributes="Bold"/>
                                         <Label>
                                             <Label.FormattedText>
@@ -166,9 +178,13 @@
                                                 </FormattedString>
                                             </Label.FormattedText>
                                         </Label>
+                                    
                                     </HorizontalStackLayout>
+                                
                                 </VerticalStackLayout>
+                            
                             </Border>
+                        
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

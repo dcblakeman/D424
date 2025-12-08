@@ -6,7 +6,9 @@ using C_971.Services;
 
 namespace C_971.ViewModels
 {
+    [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(TermId), "termId")]
+    [QueryProperty(nameof(Course), "course")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
         private readonly IDatabaseService _database;
@@ -41,6 +43,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private int termId;
+
+        [ObservableProperty]
+        private AcademicTerm term;
 
         // Computed Property
         public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
@@ -113,7 +118,7 @@ namespace C_971.ViewModels
             if (term == null) return;
             await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
             {
-                { "term", term }
+                { "termId", term.Id }
             });
         }
 

@@ -8,6 +8,9 @@
     Title="C_971"
     FlyoutBehavior="Disabled">
     
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
 
     <ShellContent
             ContentTemplate="{DataTemplate views:AcademicTermListView}"

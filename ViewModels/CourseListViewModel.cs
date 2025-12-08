@@ -7,8 +7,9 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(AcademicTerm), "term")]
+    [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(TermId), "termId")]
+    [QueryProperty(nameof(Course), "course")]
     public partial class CourseListViewModel : ObservableObject
     {
         public ObservableCollection<Course> Courses { get; private set; } = [];
@@ -16,7 +17,7 @@ namespace C_971.ViewModels
         private readonly DatabaseService _databaseService;
 
         [ObservableProperty]
-        private AcademicTerm academicTerm;
+        private AcademicTerm term;
 
         [ObservableProperty]
         private bool isAddingCourse;
@@ -53,6 +54,9 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private int termId;
 
+        [ObservableProperty]
+        private Course course;
+
         public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
         {
             "Not Enrolled",
@@ -66,6 +70,16 @@ namespace C_971.ViewModels
         {
             _databaseService = databaseService;
         }
+
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            if (value != null)
+            {
+                TermId = value.Id; // NOW Term is available!
+                _ = LoadCoursesAsync();
+            }
+        }
+
         [RelayCommand]
         async Task GetCourseDetails(Course course)
         {
@@ -85,19 +99,15 @@ namespace C_971.ViewModels
             try
             {
                 IsLoading = true;
+                IsRefreshing = true;
 
-                // Check if we have a current term
-                if (AcademicTerm == null)
-                {
-                    System.Diagnostics.Debug.WriteLine("AcademicTerm is null!");
-                    return;
-                }
+                // Get the term ID from either source
+                int termId = Course?.TermId ?? TermId;
 
-                // Use CurrentTerm.Id (instance property)
-                var courses = await _databaseService.GetCoursesByTermAsync(AcademicTerm.Id);
+                // Load courses for the term
+                var courses = await _databaseService.GetCoursesByTermAsync(termId);
 
-                System.Diagnostics.Debug.WriteLine($"Loaded {courses.Count} courses for term: {AcademicTerm.Name}");
-
+                // Update the collection
                 Courses.Clear();
                 foreach (var course in courses)
                 {
@@ -106,11 +116,14 @@ namespace C_971.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to load courses: {ex.Message}");
+                // Handle errors
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load courses: {ex.Message}", "OK");
             }
             finally
             {
+                // Always reset loading states at the END
                 IsLoading = false;
+                IsRefreshing = false;
             }
         }
 
@@ -164,7 +177,7 @@ namespace C_971.ViewModels
                     StartDate = NewCourseStartDate,
                     EndDate = NewCourseEndDate,
                     Status = status,
-                    TermId = AcademicTerm.Id
+                    TermId = Term.Id
                 };
 
                 //Add to database
@@ -222,7 +235,7 @@ namespace C_971.ViewModels
             try
             {
                 // Use relative navigation (no leading slash)
-                await Shell.Current.GoToAsync("AcademicTermListView", new Dictionary<string, object>
+                await Shell.Current.GoToAsync("//AcademicTermListView", new Dictionary<string, object>
                 {
                     ["termId"] = TermId
                 });
