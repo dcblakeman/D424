@@ -50,6 +50,9 @@ namespace C_971.ViewModels
         // Computed Property
         public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
 
+        // Load terms from database
+        private List<AcademicTerm> _allTerms = new(); // Cache all terms
+
         public AcademicTermListViewModel(IDatabaseService database)
         {
             _database = database;
@@ -58,7 +61,7 @@ namespace C_971.ViewModels
         private async Task InitializeAsync()
         {
             await _database.InitializeAsync();
-            await LoadAcademicTermsAsync();
+            await LoadTermsAsync(); // Use LoadTermsAsync instead of LoadAcademicTermsAsync
         }
 
         private async Task EnsureInitializedAsync()
@@ -69,57 +72,27 @@ namespace C_971.ViewModels
             }
         }
 
-        private async Task OnSearchTextChangedAsync(string oldValue, string newValue)
-        {
-            await EnsureInitializedAsync();
-            if (string.IsNullOrWhiteSpace(newValue))
-            {
-                await LoadAcademicTermsAsync();
-            }
-            else
-            {
-                var filteredTerms = await _database.SearchTermsByNameAsync(newValue);
-                AcademicTerms.Clear();
-                foreach (var term in filteredTerms)
-                {
-                    AcademicTerms.Add(term);
-                }
-            }
-        }
-
         public async Task OnAppearingAsync()
         {
             await EnsureInitializedAsync();
         }
 
-        // Load terms from database
+
+
         [RelayCommand]
-        private async Task LoadAcademicTermsAsync()
+        private async Task LoadTermsAsync()
         {
             IsRefreshing = true;
             try
             {
-                var terms = await _database.GetTermsAsync();
-                AcademicTerms.Clear();
-                foreach (var term in terms)
-                {
-                    AcademicTerms.Add(term);
-                }
+                // Load all terms and cache them
+                _allTerms = await _database.GetTermsAsync();
+                ApplySearchFilter(); // This will show all terms when SearchText is empty
             }
             finally
             {
                 IsRefreshing = false;
             }
-        }
-
-        private List<AcademicTerm> _allTerms = new(); // Cache all terms
-
-        [RelayCommand]
-        private async Task LoadTermsAsync()
-        {
-            // Load all terms once
-            _allTerms = await _database.GetTermsAsync();
-            ApplySearchFilter();
         }
 
         [RelayCommand]
@@ -252,13 +225,16 @@ namespace C_971.ViewModels
 
             try
             {
-                // Delete from database
                 await _database.DeleteTermAsync(term);
+
+                // Remove from cache too
+                _allTerms.Remove(term);
+                AcademicTerms.Remove(term);
             }
             catch (Exception ex)
             {
                 await Shell.Current.DisplayAlertAsync("Error", $"Failed to delete term: {ex.Message}", "OK");
-                throw; // Re-throw so the UI doesn't update if database delete failed
+                throw;
             }
         }
     }

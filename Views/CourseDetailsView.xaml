@@ -134,6 +134,13 @@
                         Grid.ColumnSpan="2"/>
             </Grid>
 
+            <!-- Edit/Save Button -->
+            <Button Text="{Binding EditButtonText}"
+                    Command="{Binding ToggleEditCommand}"
+                    BackgroundColor="{Binding EditButtonColor}"
+                    TextColor="White"
+                    Margin="0,0,0,15"/>
+
             <!-- Instructor Section -->
             <Label Text="Instructor Information" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
 

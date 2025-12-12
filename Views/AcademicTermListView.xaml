@@ -24,7 +24,7 @@
             </Border.StrokeShape>
 
             <SearchBar x:Name="ContentSearchBar"
-                       Placeholder="Search terms, courses, assessments..."
+                       Placeholder="Search by term name..."
                        SearchCommand="{Binding SearchCommand}"
                        Text="{Binding SearchText, Mode=TwoWay}"
                        BackgroundColor="Transparent"

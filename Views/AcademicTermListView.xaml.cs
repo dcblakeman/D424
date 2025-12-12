@@ -17,7 +17,7 @@ public partial class AcademicTermListView : ContentPage
 
         if (BindingContext is AcademicTermListViewModel viewModel)
         {
-            await viewModel.LoadAcademicTermsCommand.ExecuteAsync(null);
+            await viewModel.LoadTermsCommand.ExecuteAsync(null);
         }
     }
     private async void OnTermTapped(object sender, TappedEventArgs e)
