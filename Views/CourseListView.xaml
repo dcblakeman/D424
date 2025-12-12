@@ -13,8 +13,6 @@
 
     <Grid RowDefinitions="Auto,Auto,Auto,*">
 
-
-        
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
                 Stroke="#2196F3"

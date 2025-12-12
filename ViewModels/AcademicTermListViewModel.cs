@@ -77,8 +77,6 @@ namespace C_971.ViewModels
             await EnsureInitializedAsync();
         }
 
-
-
         [RelayCommand]
         private async Task LoadTermsAsync()
         {

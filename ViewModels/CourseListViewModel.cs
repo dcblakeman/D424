@@ -12,9 +12,7 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Course), "course")]
     public partial class CourseListViewModel : ObservableObject
     {
-        public ObservableCollection<Course> Courses { get; private set; } = [];
-
-        private readonly DatabaseService _databaseService;
+        private readonly IDatabaseService _database;
 
         [ObservableProperty]
         private AcademicTerm term;
@@ -57,6 +55,14 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private Course course;
 
+        [ObservableProperty]
+        private string searchText = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<Course> courses = new(); // Add this
+
+        private List<Course> _allCourses = new(); // Cache for course search
+
         public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
         {
             "Not Enrolled",
@@ -66,10 +72,45 @@ namespace C_971.ViewModels
             "Planned"
         };
 
-        public CourseListViewModel(DatabaseService databaseService)
+        public CourseListViewModel(DatabaseService database)
         {
-            _databaseService = databaseService;
+            _database = database;
         }
+
+        private async Task InitializeAsync()
+        {
+            await _database.InitializeAsync();
+            await LoadCoursesAsync(); // Load courses instead of terms
+        }
+
+        [RelayCommand]
+        private void Search()
+        {
+            // Filter in memory instead of hitting database
+            ApplySearchFilter();
+        }
+
+        private void ApplySearchFilter()
+        {
+            Courses.Clear();
+
+            var filteredCourses = string.IsNullOrWhiteSpace(SearchText)
+                ? _allCourses
+                : _allCourses.Where(c =>
+                    c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var course in filteredCourses)
+            {
+                Courses.Add(course);
+            }
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            // Now this is fast since it's in-memory filtering
+            SearchCommand.Execute(null);
+        }
+
 
         partial void OnTermChanged(AcademicTerm value)
         {
@@ -96,33 +137,17 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task LoadCoursesAsync()
         {
+            if (TermId == 0) return; // Need a valid term ID
+
+            IsRefreshing = true;
             try
             {
-                IsLoading = true;
-                IsRefreshing = true;
-
-                // Get the term ID from either source
-                int termId = Course?.TermId ?? TermId;
-
-                // Load courses for the term
-                var courses = await _databaseService.GetCoursesByTermAsync(termId);
-
-                // Update the collection
-                Courses.Clear();
-                foreach (var course in courses)
-                {
-                    Courses.Add(course);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle errors
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load courses: {ex.Message}", "OK");
+                // Load all courses for the current term
+                _allCourses = await _database.GetCoursesByTermIdAsync(TermId);
+                ApplySearchFilter();
             }
             finally
             {
-                // Always reset loading states at the END
-                IsLoading = false;
                 IsRefreshing = false;
             }
         }
@@ -181,7 +206,7 @@ namespace C_971.ViewModels
                 };
 
                 //Add to database
-                await _databaseService.AddCourse(newCourse);
+                await _database.AddCourse(newCourse);
 
                 // Exit editing mode
                 IsAddingCourse = false;
@@ -220,7 +245,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await _databaseService.SaveCourseAsync(course);
+                await _database.SaveCourseAsync(course);
                 await LoadCoursesAsync(); // Refresh the list
             }
             catch (Exception ex)

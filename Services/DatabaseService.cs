@@ -135,12 +135,17 @@ namespace C_971.Services
             return;
         }
 
-        public async Task GetCoursesForTerm(int id)
+        //Get courses by term id async
+        public async Task<List<Course>> GetCoursesByTermIdAsync(int termId)
         {
             await InitializeAsync();
-            await _database.Table<Course>().Where(c => c.TermId == id).ToListAsync();
-            return;
+            return await _database.Table<Course>()
+                .Where(c => c.TermId == termId)
+                .ToListAsync();
         }
+
+
+
 
         public async Task<IEnumerable<object>> GetNotesForCourseAsync(int id)
         {

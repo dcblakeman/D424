@@ -15,7 +15,7 @@ namespace C_971.Services
 
         // Courses
         Task<List<Course>> GetCoursesAsync();
-        Task<List<Course>> GetCoursesByTermAsync(int termId);
+        Task<List<Course>> GetCoursesByTermIdAsync(int termId);
         Task<Course?> GetCourseByIdAsync(int courseId);
         Task<int> SaveCourseAsync(Course course);
         Task<int> DeleteCourseAsync(Course course);
@@ -26,5 +26,6 @@ namespace C_971.Services
         // Assessments
         Task<List<CourseAssessment>> GetAssessmentsByCourseAsync(int courseId);
         Task DeleteTermAsync(AcademicTerm term);
+        Task AddCourse(Course newCourse);
     }
 }
