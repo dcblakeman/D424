@@ -12,17 +12,44 @@
     </Shell.BackButtonBehavior>
     
     <ScrollView>
-        <VerticalStackLayout Padding="15" Spacing="3">
-            <!-- Edit/Save Button -->
+        <VerticalStackLayout Padding="15,0,15,15" Spacing="3">
+            <!-- Edit/Save Button --><!--
             <Button Text="{Binding EditButtonText}"
                     Command="{Binding ToggleEditCommand}"
                     BackgroundColor="{Binding EditButtonColor}"
                     TextColor="White"
                     Margin="0,0,0,15"/>
 
-            <!--Back Button-->
-            <Button Text="Back" Command="{Binding GoBackCommand}"/>
+            --><!--Back Button--><!--
+            <Button Text="Back" Command="{Binding GoBackCommand}"/>-->
 
+            <!-- Buttons Section -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="10,5,10,5">
+
+                <Button Text="{Binding EditButtonText}"
+                    Command="{Binding ToggleEditCommand}"
+                    BackgroundColor="{Binding EditButtonColor}"
+                    TextColor="White"
+                    Margin="0,0,0,15"/>
+
+                <Button Grid.Column="1"
+                    Text="Reset"
+                    Command="{Binding RemoveCourseCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingCourse}"
+                    Margin="0,0,0,15"/>
+
+                <!--Back Button-->
+                <Button Grid.Column="2"
+                    Text="Back"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Grey"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotAddingCourse}"
+                    Margin="0,0,0,15"/>
+            </Grid>
+            
             <!-- Course Details Section -->
             <Label Text="Course Details" FontAttributes="Bold" FontSize="18" Margin="0,20,0,3"/>
             <Border Stroke="DarkBlue"
