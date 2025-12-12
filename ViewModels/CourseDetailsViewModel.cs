@@ -65,11 +65,11 @@ namespace C_971.ViewModels
         {
             if (IsEditing)
             {
-                // Validate before saving
-                if (!await ValidateCourse())
-                {
-                    return; // Don't toggle edit mode if validation fails
-                }
+                //// Validate before saving
+                //if (!await ValidateCourse())
+                //{
+                //    return; // Don't toggle edit mode if validation fails
+                //}
 
                 // Save changes
                 await SaveCourseDetails();
@@ -104,13 +104,6 @@ namespace C_971.ViewModels
             if (Course.EndDate <= Course.StartDate)
             {
                 await Shell.Current.DisplayAlertAsync("Validation Error", "End date must be after start date.", "OK");
-                return false;
-            }
-
-            // Validate Instructor Information
-            if (Instructor.Id <= 0)
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor Id is required.", "OK");
                 return false;
             }
 

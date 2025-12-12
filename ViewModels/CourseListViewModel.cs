@@ -65,8 +65,8 @@ namespace C_971.ViewModels
 
         public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
         {
-            "Not Enrolled",
-            "In Progress",
+            "NotEnrolled",
+            "InProgress",
             "Completed",
             "Dropped",
             "Planned"
