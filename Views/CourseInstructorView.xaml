@@ -66,5 +66,18 @@
                 <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone, Mode=TwoWay}" Keyboard="Telephone" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
             </Grid>
         </Border>
+
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="*,*" ColumnSpacing="10" RowSpacing="5">
+            <Button Text="Save Course Instructor" 
+                Command="{Binding SaveCourseInstructorCommand}"
+                BackgroundColor="#2196F3"
+                TextColor="White"
+                Margin="0,10,0,0"/>
+
+            <Button Text="Cancel" 
+                Command="{Binding GoBackCommand}"
+                BackgroundColor="Gray"
+                TextColor="White"/>
+        </Grid>
     </VerticalStackLayout>
 </ContentPage>

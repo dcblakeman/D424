@@ -7,9 +7,9 @@ using System.Collections.ObjectModel;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
-    public partial class AddNoteViewModel(DatabaseService databaseService) : ObservableObject
+    public partial class AddNoteViewModel : ObservableObject
     {
-        private readonly DatabaseService _database = databaseService;
+        private DatabaseService _database;
 
         [ObservableProperty]
         private int newNoteId;
@@ -26,6 +26,13 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private DateTime createdDate = DateTime.Now;
 
+        [ObservableProperty]
+        private string name = "Add Note";
+
+        public AddNoteViewModel(DatabaseService database)
+        {
+            _database = database;  
+        }
         partial void OnCourseChanged(Course value)
         {
             if (value != null)

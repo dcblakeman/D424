@@ -6,19 +6,18 @@
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
              x:DataType="viewmodel:AcademicTermListViewModel">
 
-
-        <Shell.TitleView>
-            <Label Text="{Binding Name}" 
-               FontSize="24" 
-               FontAttributes="Bold"
-               TextColor="Black"
-               VerticalOptions="Center"
-               HorizontalOptions="Center" />
-        </Shell.TitleView>
+    <Shell.TitleView>
+        <Label Text="{Binding Name}" 
+            FontSize="24" 
+            FontAttributes="Bold"
+            TextColor="Black"
+            VerticalOptions="Center"
+            HorizontalOptions="Center" />
+    </Shell.TitleView>
         
-        <Shell.BackButtonBehavior>
-            <BackButtonBehavior IsVisible="False" />
-        </Shell.BackButtonBehavior>
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
     
     <Grid RowDefinitions="Auto,Auto,Auto,*">
         <!-- Search Bar Section -->
@@ -27,6 +26,7 @@
                 StrokeThickness="1"
                 BackgroundColor="White"
                 Margin="15,0,15,10">
+            
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="8"/>
             </Border.StrokeShape>

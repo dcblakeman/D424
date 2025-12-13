@@ -7,18 +7,24 @@
              x:DataType="vm:AddNoteViewModel"
              Title="Add Note">
 
+    <Shell.TitleView>
+        <Label Text="{Binding Name}" 
+            FontSize="24" 
+            FontAttributes="Bold"
+            TextColor="Black"
+            VerticalOptions="Center"
+            HorizontalOptions="Center" />
+    </Shell.TitleView>
+
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
     <VerticalStackLayout Padding="20" Spacing="15">
 
-        <Label Text="Add a new note" 
-               FontSize="24" 
-               FontAttributes="Bold"/>
-
-        <Label Text="Note Content:" 
-               FontAttributes="Bold"/>
+        <Label Text="Note Content" 
+               FontSize="22"
+               TextDecorations="Underline"/>
 
         <Editor Text="{Binding NewNoteContent}"
                 Placeholder="Enter your note here..."
@@ -29,16 +35,27 @@
                FontSize="12" 
                TextColor="Gray"/>
 
-        <Button Text="Save Note" 
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" RowSpacing="10">
+            <Button Text="Save Note"
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="1"
                 Command="{Binding SaveNoteCommand}"
                 BackgroundColor="#2196F3"
                 TextColor="White"
-                Margin="0,10,0,0"/>
+                Margin="0,10,0,0"
+                Padding="10"/>
 
-        <Button Text="Cancel" 
-                Command="{Binding CancelCommand}"
+            <Button Text="Back"
+                Grid.Row="0"
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Command="{Binding GoBackCommand}"
                 BackgroundColor="Gray"
-                TextColor="White"/>
+                TextColor="White"
+                Margin="0,10,0,0"/>
+        </Grid>
+
 
     </VerticalStackLayout>
 

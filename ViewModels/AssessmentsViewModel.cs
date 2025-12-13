@@ -34,9 +34,10 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isRefreshing;
 
+        [ObservableProperty]
+        private string name = "Assessments";
 
         public ObservableCollection<CourseAssessment> Assessment { get; set; } = new ObservableCollection<CourseAssessment>();
-
 
         public AssessmentsViewModel(DatabaseService database) 
         { 

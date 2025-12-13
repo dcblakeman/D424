@@ -12,7 +12,7 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Course), "course")]
     public partial class CourseListViewModel : ObservableObject
     {
-        private readonly IDatabaseService _database;
+        private readonly DatabaseService _database;
 
         [ObservableProperty]
         private AcademicTerm term;
