@@ -168,10 +168,6 @@
                         BackgroundColor="#4CAF50"
                         TextColor="White"
                         Grid.Column="2"/>
-
-
-
-
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

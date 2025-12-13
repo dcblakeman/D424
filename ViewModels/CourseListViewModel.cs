@@ -253,7 +253,6 @@ namespace C_971.ViewModels
         {
             try
             {
-                // Use relative navigation (no leading slash)
                 await Shell.Current.GoToAsync("//AcademicTermListView", new Dictionary<string, object>
                 {
                     ["termId"] = TermId

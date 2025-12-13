@@ -43,15 +43,6 @@ namespace C_971.ViewModels
             _database = database;
         }
 
-        private void Initialize()
-        {
-            _course = Course;
-            IsEditing = false; // Start in display mode
-
-            // Request notification permissions
-            _ = RequestNotificationPermissions();
-        }
-
         partial void OnIsEditingChanged(bool value)
         {
             OnPropertyChanged(nameof(IsNotEditing));
@@ -101,8 +92,8 @@ namespace C_971.ViewModels
         {
             try
             {
-                // Go back to courselistview with the term context
-                await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
+                // Go back to coursedetailsview with the course context
+                await Shell.Current.GoToAsync($"{nameof(CourseDetailsView)}", true, new Dictionary<string, object>
                 {
                     ["course"] = Course       // Pass the actual Course object
                 });
