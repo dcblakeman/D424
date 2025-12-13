@@ -15,13 +15,76 @@ namespace C_971.ViewModels
         public string name = "Course Instructor";
 
         private DatabaseService _databaseService;
+
+        [ObservableProperty]
         private bool _isLoading;
+
+        [ObservableProperty]
+        private bool isRefreshing;
+
+        [ObservableProperty]
+        private bool isAddingCourseInstructor;
+
+        [ObservableProperty]
+        private bool isRemovingCourseInstructor;
+
+        [ObservableProperty]
+        private int instructorId;
+
+        [ObservableProperty]
+        private string instructorName;
+
+        [ObservableProperty]
+        private string instructorPhone;
+
+        [ObservableProperty]
+        private string instructorEmail;
+
+        public bool IsNotAddingCourseInstructor => !IsAddingCourseInstructor && !IsRemovingCourseInstructor;
+
         [ObservableProperty]
         public Course course;
 
         public CourseInstructorViewModel(DatabaseService databaseService)
         {
             _databaseService = databaseService;
+        }
+
+        [RelayCommand]
+        private async Task AddCourseInstructor()
+        {
+            if (string.IsNullOrWhiteSpace(InstructorName) ||
+                string.IsNullOrWhiteSpace(InstructorPhone) ||
+                string.IsNullOrWhiteSpace(InstructorEmail))
+            {
+                await Shell.Current.DisplayAlertAsync("Input Error", "All fields are required.", "OK");
+                return;
+            }
+            IsAddingCourseInstructor = true;
+
+            //Generate the next available ID
+            InstructorId = await _databaseService.GetNextCourseInstructorIdAsync();
+
+            var newInstructor = new CourseInstructor
+            {
+                Id = InstructorId,
+                Name = InstructorName,
+                Phone = InstructorPhone,
+                Email = InstructorEmail
+            };
+            try
+            {
+                await _databaseService.AddCourseInstructorAsync(newInstructor);
+                await Shell.Current.DisplayAlertAsync("Success", "Course instructor added successfully.", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to add course instructor: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsAddingCourseInstructor = false;
+            }
         }
 
         [RelayCommand]

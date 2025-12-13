@@ -223,5 +223,15 @@ namespace C_971.Services
             await _database.InsertAsync(newNote);
             await _database.UpdateAsync(newNote);
         }
+
+        internal async Task AddCourseInstructorAsync(CourseInstructor newInstructor)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task<int> GetNextCourseInstructorIdAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

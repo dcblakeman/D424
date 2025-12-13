@@ -31,7 +31,7 @@
         </Border.StrokeShape>
 
         <SearchBar x:Name="ContentSearchBar"
-                       Placeholder="Search by course name..."
+                       Placeholder="Search by instructor name..."
                        SearchCommand="{Binding SearchCommand}"
                        Text="{Binding SearchText, Mode=TwoWay}"
                        BackgroundColor="Transparent"
@@ -39,33 +39,103 @@
                        PlaceholderColor="Gray"
                        FontSize="16"/>
     </Border>
+        <Grid ColumnDefinitions="Auto,Auto,*">
+            <Button Grid.Column="0"
+                    Text="Add Instructor"
+                    Command="{Binding AddCourseInstructorCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotEditing}"
+                    Margin="10,10,5,5"/>
 
-        <!-- Instructor Section -->
-        <Label Text="Instructor Information"  HorizontalOptions="Center" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+            <Button Grid.Column="1"
+                    Text="Remove Instructor"
+                    Command="{Binding RemoveCourseInstructorCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotEditing}"
+                    Margin="5,10,5,5"/>
 
-        <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="10">
+            <Button Grid.Column="2"
+                    Text="Back"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Grey"
+                    TextColor="White"
+                    IsVisible="{Binding IsNotEditing}"
+                    Margin="5,10,10,5"/>
+        </Grid>
+
+        <!-- Remove Mode Instructions -->
+        <Border Grid.Row="2"
+                BackgroundColor="LightCoral"
+                Stroke="Red"
+                StrokeThickness="1"
+                Padding="10"
+                Margin="15,0,15,10"
+                IsVisible="{Binding IsRemovingCourseInstructor}">
+            
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5"/>
+            </Border.StrokeShape>
+            
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       Text="Select a course instructor to remove"
+                       FontAttributes="Bold"
+                       TextColor="DarkRed"
+                       VerticalOptions="Center"/>
+                <Button Grid.Column="1"
+                        Text="Cancel"
+                        Command="{Binding CancelRemoveCourseInstructorCommand}"
+                        BackgroundColor="Gray"
+                        TextColor="White"/>
+            </Grid>
+        </Border>
+        
+        <!-- Add Instructor Section -->
+        <Label Text="Instructor Information"  
+               HorizontalOptions="Center" 
+               FontAttributes="Bold" 
+               FontSize="18" 
+               Margin="0,25,0,3"
+               IsVisible="IsAddingCourseInstructor"/>
+
+        <Border Grid.Row="1" 
+                Stroke="DarkBlue" 
+                StrokeThickness="2" 
+                Padding="10" 
+                BackgroundColor="AliceBlue" 
+                Margin="10"
+                IsVisible="IsAddingCourseInstructor">
+            
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="5"/>
             </Border.StrokeShape>
 
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
-                <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id}" VerticalOptions="Center"/>
-
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" IsVisible="IsAddingCourseInstructor">
+                
+                <!-- ID -->
+                <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center" IsVisible="IsAddingCourseInstructor"/>
+                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id}" VerticalOptions="Center" IsVisible="IsAddingCourseInstructor"/>
+                
+                <!-- Name -->
                 <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
                 <Label Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
                 <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name, Mode=TwoWay}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
+                <!-- Email -->
                 <Label Grid.Row="2" Grid.Column="0" Text="Email:" FontAttributes="Bold" VerticalOptions="Center"/>
                 <Label Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
                 <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email, Mode=TwoWay}" Keyboard="Email" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
-
+                
+                <!-- Phone Number -->
                 <Label Grid.Row="3" Grid.Column="0" Text="Phone:" FontAttributes="Bold" VerticalOptions="Center"/>
                 <Label Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
                 <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone, Mode=TwoWay}" Keyboard="Telephone" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
             </Grid>
         </Border>
 
+        <!-- Save Course Instructor and Cancel Buttons -->
         <Grid ColumnDefinitions="*,*" RowDefinitions="*,*" ColumnSpacing="10" RowSpacing="5" Padding="10,0">
             <Button Text="Save Course Instructor" 
                     Grid.Column="0"
@@ -81,5 +151,94 @@
                     BackgroundColor="Gray"
                     TextColor="White"/>
         </Grid>
+        
+        <!-- Instructor List Section -->
+        <RefreshView Grid.Row="3"
+             Command="{Binding LoadCourseInstructorsCommand}"  
+             IsRefreshing="{Binding IsRefreshing}">
+
+            <CollectionView ItemsSource="{Binding Instructor}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:CourseInstructor">
+
+                        <Grid Padding="10">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border StrokeThickness="1"   
+                            Stroke="LightGray"   
+                            Padding="10">
+
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnInstructorTapped"/>
+                                </Border.GestureRecognizers>
+
+                                <VerticalStackLayout Spacing="5">
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="ID:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Id}"/>
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Label Text="Name:" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Name}" LineBreakMode="TailTruncation"/>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Replace this HorizontalStackLayout with a Grid -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <HorizontalStackLayout Grid.Column="0" Spacing="10">
+                                            <Label Text="Instructor Name:" FontAttributes="Bold"/>
+                                            <Label>
+                                                <Label.FormattedText>
+                                                    <FormattedString>
+                                                        <Span Text="{Binding InstructorName}" />
+                                                        <Span Text=" " />
+                                                        <Span Text="(" />
+                                                        <Span Text="{Binding InstructorEmail}" />
+                                                        <Span Text=")" />
+                                                        <Span Text=")" />
+                                                        <Span Text="{Binding InstructorPhone}" />
+                                                    </FormattedString>
+                                                </Label.FormattedText>
+                                            </Label>
+                                        </HorizontalStackLayout>
+
+                                        <!-- Status Column -->
+                                        <Label Grid.Column="1"
+                                       Text="{Binding Status}" 
+                                       FontAttributes="Bold" 
+                                       TextColor="DarkBlue"/>
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                            </Border>
+
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <CollectionView.EmptyView>
+                    <StackLayout Padding="20" VerticalOptions="Center">
+                        <Label Text="No courses available"   
+                       HorizontalOptions="Center"  
+                       FontSize="18"  
+                       TextColor="Gray"/>
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+        </RefreshView>
     </VerticalStackLayout>
 </ContentPage>
