@@ -14,6 +14,8 @@ namespace C_971
             Routing.RegisterRoute("CourseDetailsView", typeof(CourseDetailsView));
             Routing.RegisterRoute("AddNoteView", typeof(AddNoteView));
             Routing.RegisterRoute("ViewNotesView", typeof(ViewNotesView));
+            Routing.RegisterRoute("CourseInstructorView", typeof(CourseInstructorView));
+            Routing.RegisterRoute("AssessmentsView", typeof(AssessmentsView));
         }
     }
 }

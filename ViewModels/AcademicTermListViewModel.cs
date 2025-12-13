@@ -15,7 +15,7 @@ namespace C_971.ViewModels
 
         // Observable Properties
         [ObservableProperty]
-        private string name = "                     Academic Terms";
+        private string name = "Academic Terms";
 
         [ObservableProperty]
         private ObservableCollection<AcademicTerm> academicTerms = new();

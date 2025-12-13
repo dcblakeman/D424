@@ -41,7 +41,7 @@ namespace C_971.ViewModels
         private bool isLoading = false;
 
         [ObservableProperty]
-        private string name = "                            Courses";
+        private string name = "Courses";
 
         [ObservableProperty]
         private bool isRefreshing;

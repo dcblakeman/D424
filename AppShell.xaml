@@ -13,8 +13,8 @@
     </Shell.BackButtonBehavior>
 
     <ShellContent
-            ContentTemplate="{DataTemplate views:AcademicTermListView}"
-            Route="AcademicTermListView"/>
+        ContentTemplate="{DataTemplate views:AcademicTermListView}"
+        Route="AcademicTermListView"/>
     <!-- Additional routes for navigation -->
     <ShellContent
         ContentTemplate="{DataTemplate views:CourseListView}"
@@ -28,4 +28,10 @@
     <ShellContent
         ContentTemplate="{DataTemplate views:ViewNotesView}"
         Route="ViewNotesView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:CourseInstructorView}"
+        Route="CourseInstructorView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:AssessmentsView}"
+        Route="AssessmentsView"/>
 </Shell>

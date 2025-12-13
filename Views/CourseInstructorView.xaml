@@ -2,11 +2,69 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="C_971.Views.CourseInstructorView"
-             Title="CourseInstructorView">
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:CourseInstructorViewModel">
+
+    <Shell.TitleView>
+        <Label Text="{Binding Name}" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+    </Shell.TitleView>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+    <!-- Search Bar Section -->
+    <Border Grid.Row="0"
+                Stroke="#2196F3"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                Margin="15,0,15,10">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="8"/>
+        </Border.StrokeShape>
+
+        <SearchBar x:Name="ContentSearchBar"
+                       Placeholder="Search by course name..."
+                       SearchCommand="{Binding SearchCommand}"
+                       Text="{Binding SearchText, Mode=TwoWay}"
+                       BackgroundColor="Transparent"
+                       TextColor="Black"
+                       PlaceholderColor="Gray"
+                       FontSize="16"
+                       Margin="5"/>
+    </Border>
+
+        <!-- Instructor Section -->
+        <Label Text="Instructor Information" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+
+        <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="0,5,0,0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="5"/>
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id}" VerticalOptions="Center"/>
+
+                <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name, Mode=TwoWay}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                <Label Grid.Row="2" Grid.Column="0" Text="Email:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Label Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email, Mode=TwoWay}" Keyboard="Email" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                <Label Grid.Row="3" Grid.Column="0" Text="Phone:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Label Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone, Mode=TwoWay}" Keyboard="Telephone" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+            </Grid>
+        </Border>
     </VerticalStackLayout>
 </ContentPage>

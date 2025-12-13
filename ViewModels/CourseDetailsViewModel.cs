@@ -56,7 +56,7 @@ namespace C_971.ViewModels
         string id;
 
         [ObservableProperty]
-        string name="                         Course Details";
+        string name = "Course Details";
 
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
@@ -85,6 +85,57 @@ namespace C_971.ViewModels
         {
             OnPropertyChanged(nameof(IsNotEditing));
         }
+
+        //Get Instructor Command
+        //Use search bar to see if Insturctor exists in database
+        [RelayCommand]
+        //Go to the CourseInstructorView
+        async Task GetInstructor()
+        {
+            try
+            {
+                if (IsEditing)
+                {
+                    await SaveCourseDetails();
+                }
+                else
+                {
+                    IsEditing = false;
+                    OnPropertyChanged(nameof(IsNotEditing));
+                }
+            }
+            catch
+            {
+                await Shell.Current.DisplayAlertAsync("Unable to change screens", "Make sure values are correct", "OK");
+            }
+            finally
+            {
+                //Go to CourseInstructorview
+                await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", true, new Dictionary<string, object>
+                {
+                    { "course", Course }
+                });
+            }
+        }
+
+        //View Assessments Command
+        [RelayCommand]
+        private async Task ViewAssessments()
+        {
+            try
+            {
+                // Go back to courselistview with the term context
+                await Shell.Current.GoToAsync("AssessmentsView", new Dictionary<string, object>
+                {
+                    ["course"] = Course       // Pass the actual Course object
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+            }
+        }
+
         private async Task<bool> ValidateCourse()
         {
             // Validate TermId

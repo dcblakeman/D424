@@ -7,6 +7,15 @@
              x:DataType="viewmodel:CourseListViewModel"
              Title="{Binding Name}">
 
+    <Shell.TitleView>
+        <Label Text="{Binding Name}" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+    </Shell.TitleView>
+    
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
@@ -35,7 +44,7 @@
         </Border>
 
         <!-- Buttons Section -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="10,5,10,5">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="10,0,10,5">
             
             <Button Grid.Column="0"
                     Text="Add Course"

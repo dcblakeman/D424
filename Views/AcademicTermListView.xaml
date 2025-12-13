@@ -4,15 +4,23 @@
              x:Class="C_971.Views.AcademicTermListView"
              xmlns:model="clr-namespace:C_971.Models"  
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
-             x:DataType="viewmodel:AcademicTermListViewModel"
-             Title="{Binding Name}">
+             x:DataType="viewmodel:AcademicTermListViewModel">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*">
 
+        <Shell.TitleView>
+            <Label Text="{Binding Name}" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+        </Shell.TitleView>
+        
         <Shell.BackButtonBehavior>
             <BackButtonBehavior IsVisible="False" />
         </Shell.BackButtonBehavior>
-
+    
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
                 Stroke="#2196F3"
