@@ -47,7 +47,6 @@
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Grey"
                     TextColor="White"
-                    IsVisible="{Binding IsNotAddingCourse}"
                     Margin="0,0,0,15"/>
             </Grid>
             
@@ -147,29 +146,31 @@
             <!-- Notes Section -->
             <Label Text="Notes / Assessments" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3" HorizontalOptions="Center"/>
 
-            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" Margin="0,5,0,15">
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" Margin="0,5,0,15">
                 <Button Text="Add Note"
                         Command="{Binding AddNoteCommand}"
                         BackgroundColor="#2196F3"
                         TextColor="White"
-                        Grid.Column="0"/>
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"/>
 
                 <Button Text="View Notes"
                         Command="{Binding ViewNotesCommand}"
                         BackgroundColor="#F44336"
                         TextColor="White"
-                        Grid.Column="1"/>
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"/>
 
-                <Button Text="Assessments"
+
+            </Grid>
+            <Button Text="Assessments"
                         Command="{Binding ViewAssessmentsCommand}"
                         BackgroundColor="#4CAF50"
                         TextColor="White"
                         Grid.Column="2"/>
-            </Grid>
 
 
-            
-            
+
 
         </VerticalStackLayout>
     </ScrollView>

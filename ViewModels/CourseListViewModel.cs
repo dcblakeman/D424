@@ -77,12 +77,6 @@ namespace C_971.ViewModels
             _database = database;
         }
 
-        private async Task InitializeAsync()
-        {
-            await _database.InitializeAsync();
-            await LoadCoursesAsync(); // Load courses instead of terms
-        }
-
         [RelayCommand]
         private void Search()
         {

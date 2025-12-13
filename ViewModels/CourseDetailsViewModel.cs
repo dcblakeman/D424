@@ -353,30 +353,6 @@ namespace C_971.ViewModels
             }
         }
 
-        //Add Ids for assessments
-        public void AddAssessmentIds(int assessment1Id, int assessment2Id)
-        {
-            if (Assessment.Count >= 2)
-            {
-                Assessment[0].Id = assessment1Id;
-                Assessment[1].Id = assessment2Id;
-            }
 
-        }
-
-        //Generate Ids for assessments based off the max existing assessment Id in the database
-        public async Task GenerateAssessmentIds()
-        {
-            if (_databaseService != null)
-            {
-                int maxId = await _databaseService.GetMaxAssessmentIdAsync();
-                if (Assessment.Count >= 2)
-                {
-                    Assessment[0].Id = maxId + 1;
-                    Assessment[1].Id = maxId + 2;
-                }
-            }
-
-        }
     }
 }
