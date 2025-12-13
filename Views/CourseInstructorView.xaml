@@ -25,9 +25,9 @@
                 Stroke="#2196F3"
                 StrokeThickness="1"
                 BackgroundColor="White"
-                Margin="15,0,15,10">
+                Margin="10,0,10,0">
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="8"/>
+            <RoundRectangle CornerRadius="5"/>
         </Border.StrokeShape>
 
         <SearchBar x:Name="ContentSearchBar"
@@ -37,14 +37,13 @@
                        BackgroundColor="Transparent"
                        TextColor="Black"
                        PlaceholderColor="Gray"
-                       FontSize="16"
-                       Margin="5"/>
+                       FontSize="16"/>
     </Border>
 
         <!-- Instructor Section -->
-        <Label Text="Instructor Information" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
+        <Label Text="Instructor Information"  HorizontalOptions="Center" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3"/>
 
-        <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="0,5,0,0">
+        <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="10">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="5"/>
             </Border.StrokeShape>
@@ -67,17 +66,20 @@
             </Grid>
         </Border>
 
-        <Grid ColumnDefinitions="Auto,*" RowDefinitions="*,*" ColumnSpacing="10" RowSpacing="5">
+        <Grid ColumnDefinitions="*,*" RowDefinitions="*,*" ColumnSpacing="10" RowSpacing="5" Padding="10,0">
             <Button Text="Save Course Instructor" 
-                Command="{Binding SaveCourseInstructorCommand}"
-                BackgroundColor="#2196F3"
-                TextColor="White"
-                Margin="0,10,0,0"/>
+                    Grid.Column="0"
+                    Grid.ColumnSpan="1"
+                    Command="{Binding SaveCourseInstructorCommand}"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"/>
 
             <Button Text="Cancel" 
-                Command="{Binding GoBackCommand}"
-                BackgroundColor="Gray"
-                TextColor="White"/>
+                    Grid.Column="1"
+                    Grid.ColumnSpan="1"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Gray"
+                    TextColor="White"/>
         </Grid>
     </VerticalStackLayout>
 </ContentPage>
