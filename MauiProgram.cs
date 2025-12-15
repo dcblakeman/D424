@@ -45,11 +45,11 @@ namespace C_971
             builder.Services.AddTransient<ViewNotesView>();
             builder.Services.AddTransient<ViewNotesViewModel>();
 
-            builder.Services.AddTransient<CourseInstructorView>();
-            builder.Services.AddTransient<CourseInstructorViewModel>();
+            builder.Services.AddSingleton<CourseInstructorView>();
+            builder.Services.AddSingleton<CourseInstructorViewModel>();
 
-            builder.Services.AddTransient<AssessmentsView>();
-            builder.Services.AddTransient < AssessmentsViewModel>();
+            builder.Services.AddSingleton<AssessmentsView>();
+            builder.Services.AddSingleton<AssessmentsViewModel>();
 
             var app = builder.Build();
 
