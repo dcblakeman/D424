@@ -10,6 +10,7 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(TermId), "termId")]
     [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(RefreshView), "refresh")]
     public partial class CourseListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;

@@ -333,7 +333,8 @@ namespace C_971.ViewModels
                 // Go back to courselistview with the term context
                 await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
                 {
-                    ["course"] = Course       // Pass the actual Course object
+                    ["course"] = Course,
+                    ["refresh"] = true
                 });
             }
             catch (Exception ex)

@@ -33,11 +33,11 @@ namespace C_971
             builder.Services.AddTransient<AcademicTermListView>();
             builder.Services.AddTransient<AcademicTermListViewModel>();
 
-            builder.Services.AddTransient<CourseListView>();
-            builder.Services.AddTransient<CourseListViewModel>();
+            builder.Services.AddSingleton<CourseListView>();
+            builder.Services.AddSingleton<CourseListViewModel>();
 
-            builder.Services.AddTransient<CourseDetailsView>();
-            builder.Services.AddTransient<CourseDetailsViewModel>();
+            builder.Services.AddSingleton<CourseDetailsView>();
+            builder.Services.AddSingleton<CourseDetailsViewModel>();
 
             builder.Services.AddTransient<AddNoteView>();
             builder.Services.AddTransient<AddNoteViewModel>();

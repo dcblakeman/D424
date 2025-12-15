@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="C_971.Views.CourseInstructorView"
              xmlns:vm="clr-namespace:C_971.ViewModels"
-             xmlns:models="clr-namespace:C_971.Models"
+             xmlns:model="clr-namespace:C_971.Models"
              x:DataType="vm:CourseInstructorViewModel">
 
     <Shell.TitleView>
@@ -19,53 +19,62 @@
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
-    <VerticalStackLayout>
-    <!-- Search Bar Section -->
-    <Border Grid.Row="0"
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <!-- Search Bar Border -->
+        <Border Grid.Row="0"
                 Stroke="#2196F3"
                 StrokeThickness="1"
                 BackgroundColor="White"
-                Margin="10,0,10,0">
-        <Border.StrokeShape>
-            <RoundRectangle CornerRadius="5"/>
-        </Border.StrokeShape>
+                Margin="10,0,10,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
 
-        <SearchBar x:Name="ContentSearchBar"
-                       Placeholder="Search by instructor name..."
-                       SearchCommand="{Binding SearchCommand}"
-                       Text="{Binding SearchText, Mode=TwoWay}"
-                       BackgroundColor="Transparent"
-                       TextColor="Black"
-                       PlaceholderColor="Gray"
-                       FontSize="16"/>
-    </Border>
-        <Grid ColumnDefinitions="Auto,Auto,*">
+            <!-- Search Bar -->
+            <SearchBar x:Name="ContentSearchBar"
+                        Placeholder="Search by instructor name..."
+                        SearchCommand="{Binding SearchCommand}"
+                        Text="{Binding SearchText, Mode=TwoWay}"
+                        BackgroundColor="Transparent"
+                        TextColor="Black"
+                        PlaceholderColor="Gray"
+                        FontSize="16"
+                        Margin="5"/>
+        </Border>
+        <!-- End Search Bar Border -->
+
+        <!-- Buttons Section -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,*" ColumnSpacing="8" Padding="10,0,10,5">
+            <!-- Add Course Button -->
             <Button Grid.Column="0"
                     Text="Add Instructor"
                     Command="{Binding AddCourseInstructorCommand}"
                     BackgroundColor="#2196F3"
                     TextColor="White"
-                    IsVisible="{Binding IsNotEditing}"
-                    Margin="10,10,5,5"/>
+                    IsVisible="{Binding IsNotAddingCourseInstructor}"
+                    Padding="17"/>
 
+            <!-- Remove Instructor Button -->
             <Button Grid.Column="1"
                     Text="Remove Instructor"
                     Command="{Binding RemoveCourseInstructorCommand}"
                     BackgroundColor="#F44336"
                     TextColor="White"
-                    IsVisible="{Binding IsNotEditing}"
-                    Margin="5,10,5,5"/>
+                    IsVisible="{Binding IsNotAddingCourseInstructor}"/>
 
+            <!-- Back Button -->
             <Button Grid.Column="2"
                     Text="Back"
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Grey"
                     TextColor="White"
-                    IsVisible="{Binding IsNotEditing}"
-                    Margin="5,10,10,5"/>
+                    IsVisible="{Binding IsNotAddingCourseInstructor}"/>
         </Grid>
+        <!-- End Buttons Section -->
 
         <!-- Remove Mode Instructions -->
+        <!-- Remove Mode Border -->
         <Border Grid.Row="2"
                 BackgroundColor="LightCoral"
                 Stroke="Red"
@@ -73,17 +82,19 @@
                 Padding="10"
                 Margin="15,0,15,10"
                 IsVisible="{Binding IsRemovingCourseInstructor}">
-            
+
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="5"/>
             </Border.StrokeShape>
-            
+
+            <!-- Remove Mode View -->
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                 <Label Grid.Column="0"
-                       Text="Select a course instructor to remove"
-                       FontAttributes="Bold"
-                       TextColor="DarkRed"
-                       VerticalOptions="Center"/>
+                           Text="Select a course instructor to remove"
+                           FontAttributes="Bold"
+                           TextColor="DarkRed"
+                           VerticalOptions="Center"/>
+
                 <Button Grid.Column="1"
                         Text="Cancel"
                         Command="{Binding CancelRemoveCourseInstructorCommand}"
@@ -91,75 +102,83 @@
                         TextColor="White"/>
             </Grid>
         </Border>
-        
-        <!-- Add Instructor Section -->
-        <Label Text="Instructor Information"  
-               HorizontalOptions="Center" 
-               FontAttributes="Bold" 
-               FontSize="18" 
-               Margin="0,25,0,3"
-               IsVisible="IsAddingCourseInstructor"/>
+        <!-- End Remove Mode Border -->
 
+        <!-- Add New Course Section -->
         <Border Grid.Row="1" 
                 Stroke="DarkBlue" 
                 StrokeThickness="2" 
                 Padding="10" 
                 BackgroundColor="AliceBlue" 
                 Margin="10"
-                IsVisible="IsAddingCourseInstructor">
-            
+                IsVisible="{Binding IsAddingCourseInstructor}">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="5"/>
             </Border.StrokeShape>
 
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" IsVisible="IsAddingCourseInstructor">
-                
+            <!-- New Course Instructor View Row Defitions-->
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" IsVisible="{Binding IsAddingCourseInstructor}">
+
+                <!-- Header -->
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                       Text="Add New Course Instructor" 
+                       FontAttributes="Bold" 
+                       FontSize="16" 
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+                <!-- New Course Instructor Entries -->
                 <!-- ID -->
-                <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center" IsVisible="IsAddingCourseInstructor"/>
-                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id}" VerticalOptions="Center" IsVisible="IsAddingCourseInstructor"/>
-                
+                <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center" IsVisible="{Binding IsAddingCourseInstructor}"/>
+                <Label Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id}" VerticalOptions="Center" IsVisible="{Binding IsAddingCourseInstructor}"/>
+
                 <!-- Name -->
                 <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name, Mode=TwoWay}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name}" VerticalOptions="Center" IsVisible="{Binding IsAddingCourseInstructor}"/>
+                <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name, Mode=TwoWay}" VerticalOptions="Center" IsVisible="{Binding IsAddingCourseInstructor}"/>
 
                 <!-- Email -->
                 <Label Grid.Row="2" Grid.Column="0" Text="Email:" FontAttributes="Bold" VerticalOptions="Center"/>
                 <Label Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email, Mode=TwoWay}" Keyboard="Email" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
-                
+                <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Email, Mode=TwoWay}" Keyboard="Email" VerticalOptions="Center" IsVisible="{Binding IsAddingCourseInstructor}"/>
+
                 <!-- Phone Number -->
                 <Label Grid.Row="3" Grid.Column="0" Text="Phone:" FontAttributes="Bold" VerticalOptions="Center"/>
                 <Label Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone, Mode=TwoWay}" Keyboard="Telephone" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Phone, Mode=TwoWay}" Keyboard="Telephone" VerticalOptions="Center" IsVisible="{Binding IsAddingCourseInstructor}"/>
+                <!-- End New Course Instructor Entries -->
+
+                <!-- Save/Cancel Button Grid Definitions -->
+                <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+
+                    <!-- Save Course Instructor Button -->
+                    <Button Text="Save" 
+                            Grid.Column="0"
+                            Command="{Binding SaveNewCourseInstructorCommand}"
+                            BackgroundColor="#2196F3"
+                            TextColor="White"/>
+
+                    <!-- Cancel Course Instructor Button -->
+                    <Button Text="Cancel" 
+                            Grid.Column="1"
+                            Command="{Binding CancelAddCourseInstructorCommand}"
+                            BackgroundColor="Gray"
+                            TextColor="White"/>
+                </Grid>
+                <!-- End Save/Cancel Button Grid Section -->
             </Grid>
         </Border>
+        <!-- End Add New Course Instructor Section -->
 
-        <!-- Save Course Instructor and Cancel Buttons -->
-        <Grid ColumnDefinitions="*,*" RowDefinitions="*,*" ColumnSpacing="10" RowSpacing="5" Padding="10,0">
-            <Button Text="Save Course Instructor" 
-                    Grid.Column="0"
-                    Grid.ColumnSpan="1"
-                    Command="{Binding SaveCourseInstructorCommand}"
-                    BackgroundColor="#2196F3"
-                    TextColor="White"/>
-
-            <Button Text="Cancel" 
-                    Grid.Column="1"
-                    Grid.ColumnSpan="1"
-                    Command="{Binding GoBackCommand}"
-                    BackgroundColor="Gray"
-                    TextColor="White"/>
-        </Grid>
-        
         <!-- Instructor List Section -->
         <RefreshView Grid.Row="3"
-             Command="{Binding LoadCourseInstructorsCommand}"  
-             IsRefreshing="{Binding IsRefreshing}">
+                         Command="{Binding LoadCourseInstructorsCommand}"  
+                         IsRefreshing="{Binding IsRefreshing}">
 
-            <CollectionView ItemsSource="{Binding Instructor}">
+            <!-- Calls Instructors List -->
+            <CollectionView ItemsSource="{Binding Instructors}">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:CourseInstructor">
+                    <DataTemplate x:DataType="model:CourseInstructor">
 
                         <Grid Padding="10">
 
@@ -180,18 +199,21 @@
                                     <TapGestureRecognizer Tapped="OnInstructorTapped"/>
                                 </Border.GestureRecognizers>
 
+                                <!-- Instructor Entries -->
                                 <VerticalStackLayout Spacing="5">
+                                    
+                                    <!-- ID -->
                                     <HorizontalStackLayout Spacing="10">
                                         <Label Text="ID:" FontAttributes="Bold"/>
                                         <Label Text="{Binding Id}"/>
                                     </HorizontalStackLayout>
 
+                                    <!-- Name -->
                                     <HorizontalStackLayout Spacing="10">
                                         <Label Text="Name:" FontAttributes="Bold"/>
                                         <Label Text="{Binding Name}" LineBreakMode="TailTruncation"/>
                                     </HorizontalStackLayout>
 
-                                    <!-- Replace this HorizontalStackLayout with a Grid -->
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -203,42 +225,42 @@
                                             <Label>
                                                 <Label.FormattedText>
                                                     <FormattedString>
-                                                        <Span Text="{Binding InstructorName}" />
+                                                        <Span Text="{Binding Name}" />
                                                         <Span Text=" " />
                                                         <Span Text="(" />
-                                                        <Span Text="{Binding InstructorEmail}" />
+                                                        <Span Text="{Binding Email}" />
                                                         <Span Text=")" />
                                                         <Span Text=")" />
-                                                        <Span Text="{Binding InstructorPhone}" />
+                                                        <Span Text="{Binding Phone}" />
                                                     </FormattedString>
                                                 </Label.FormattedText>
                                             </Label>
                                         </HorizontalStackLayout>
 
-                                        <!-- Status Column -->
-                                        <Label Grid.Column="1"
-                                       Text="{Binding Status}" 
-                                       FontAttributes="Bold" 
-                                       TextColor="DarkBlue"/>
+
+                                        
+                                        
+                                        
+                                        
                                     </Grid>
                                 </VerticalStackLayout>
-
                             </Border>
-
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
 
+                <!-- Empty Course Instructor Section -->
                 <CollectionView.EmptyView>
                     <StackLayout Padding="20" VerticalOptions="Center">
                         <Label Text="No courses available"   
-                       HorizontalOptions="Center"  
-                       FontSize="18"  
-                       TextColor="Gray"/>
+                               HorizontalOptions="Center"  
+                               FontSize="18"  
+                               TextColor="Gray"/>
                     </StackLayout>
                 </CollectionView.EmptyView>
+                <!-- End Empty Course Instructor Section -->
+                
             </CollectionView>
-
         </RefreshView>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>
