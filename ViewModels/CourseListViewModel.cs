@@ -10,22 +10,42 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(TermId), "termId")]
     [QueryProperty(nameof(Course), "course")]
-    [QueryProperty(nameof(RefreshView), "refresh")]
     public partial class CourseListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
+        // Core Properties
         [ObservableProperty]
         private AcademicTerm term;
 
+        [ObservableProperty]
+        private int termId;
+
+        [ObservableProperty]
+        private Course course;
+
+        // UI State
         [ObservableProperty]
         private bool isAddingCourse;
 
         [ObservableProperty]
         private bool isRemovingCourse;
 
-        public bool IsNotAddingCourse => !IsAddingCourse && !IsRemovingCourse;
+        [ObservableProperty]
+        private bool isRefreshing;
 
+        public bool IsNotAddingCourse => !IsAddingCourse;
+
+        // Search
+        [ObservableProperty]
+        private string searchText = string.Empty;
+
+        [ObservableProperty]
+        private ObservableCollection<Course> courses = new();
+
+        private List<Course> _allCourses = new();
+
+        // New Course Form
         [ObservableProperty]
         private string newCourseName = string.Empty;
 
@@ -36,41 +56,19 @@ namespace C_971.ViewModels
         private DateTime newCourseEndDate = DateTime.Now.AddMonths(3);
 
         [ObservableProperty]
-        private string newCourseStatus = "Planned";
+        private CourseStatus newCourseStatus = CourseStatus.Planned;
 
         [ObservableProperty]
-        private bool isLoading = false;
+        private string name = "Course List";
 
-        [ObservableProperty]
-        private string name = "Courses";
-
-        [ObservableProperty]
-        private bool isRefreshing;
-
-        [ObservableProperty]
-        private string emptyStateMessage = string.Empty;
-
-        [ObservableProperty]
-        private int termId;
-
-        [ObservableProperty]
-        private Course course;
-
-        [ObservableProperty]
-        private string searchText = string.Empty;
-
-        [ObservableProperty]
-        private ObservableCollection<Course> courses = new(); // Add this
-
-        private List<Course> _allCourses = new(); // Cache for course search
-
-        public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
+        // Static Collections
+        public ObservableCollection<CourseStatus> StatusOptions { get; } = new ObservableCollection<CourseStatus>
         {
-            "NotEnrolled",
-            "InProgress",
-            "Completed",
-            "Dropped",
-            "Planned"
+            CourseStatus.NotEnrolled,
+            CourseStatus.InProgress,
+            CourseStatus.Completed,
+            CourseStatus.Dropped,
+            CourseStatus.Planned
         };
 
         public CourseListViewModel(DatabaseService database)
@@ -78,10 +76,39 @@ namespace C_971.ViewModels
             _database = database;
         }
 
+        // Property Change Handlers
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            if (value != null)
+            {
+                TermId = value.Id;
+                _ = LoadCoursesAsync();
+            }
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            // Refresh when returning from course details
+            if (value != null)
+            {
+                _ = LoadCoursesAsync();
+            }
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            ApplySearchFilter();
+        }
+
+        partial void OnIsAddingCourseChanged(bool value)
+        {
+            OnPropertyChanged(nameof(IsNotAddingCourse));
+        }
+
+        // Search and Filter
         [RelayCommand]
         private void Search()
         {
-            // Filter in memory instead of hitting database
             ApplySearchFilter();
         }
 
@@ -91,8 +118,7 @@ namespace C_971.ViewModels
 
             var filteredCourses = string.IsNullOrWhiteSpace(SearchText)
                 ? _allCourses
-                : _allCourses.Where(c =>
-                    c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+                : _allCourses.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
             foreach (var course in filteredCourses)
             {
@@ -100,44 +126,15 @@ namespace C_971.ViewModels
             }
         }
 
-        partial void OnSearchTextChanged(string value)
-        {
-            // Now this is fast since it's in-memory filtering
-            SearchCommand.Execute(null);
-        }
-
-
-        partial void OnTermChanged(AcademicTerm value)
-        {
-            if (value != null)
-            {
-                TermId = value.Id; // NOW Term is available!
-                _ = LoadCoursesAsync();
-            }
-        }
-
-        [RelayCommand]
-        async Task GetCourseDetails(Course course)
-        {
-            if (course == null)
-                return;
-
-            // Navigate to the details page
-            await Shell.Current.GoToAsync($"{nameof(CourseDetailsView)}", true, new Dictionary<string, object>
-            {
-                { "course", course }
-            });
-        }
-
+        // Data Loading
         [RelayCommand]
         private async Task LoadCoursesAsync()
         {
-            if (TermId == 0) return; // Need a valid term ID
+            if (TermId == 0) return;
 
             IsRefreshing = true;
             try
             {
-                // Load all courses for the current term
                 _allCourses = await _database.GetCoursesByTermIdAsync(TermId);
                 ApplySearchFilter();
             }
@@ -147,106 +144,16 @@ namespace C_971.ViewModels
             }
         }
 
+        // Navigation
         [RelayCommand]
-        void AddCourse()
+        private async Task GetCourseDetails(Course course)
         {
-            IsAddingCourse = true;
-            OnPropertyChanged(nameof(IsNotAddingCourse));
-        }
+            if (course == null) return;
 
-        [RelayCommand]
-        void RemoveCourse()
-        {
-            IsRemovingCourse = true;
-            OnPropertyChanged(nameof(IsNotAddingCourse));
-        }
-
-        [RelayCommand]
-        void CancelRemoveCourse()
-        {
-            IsRemovingCourse = false;
-            OnPropertyChanged(nameof(IsNotAddingCourse));
-        }
-
-        [RelayCommand]
-        async Task SaveNewCourse()
-        {
-            if (string.IsNullOrWhiteSpace(NewCourseName))
+            await Shell.Current.GoToAsync($"{nameof(CourseDetailsView)}", true, new Dictionary<string, object>
             {
-                await Shell.Current.DisplayAlertAsync("Error", "Please enter a course name", "OK");
-                return;
-            }
-
-            if (NewCourseEndDate <= NewCourseStartDate)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "End date must be after start date", "OK");
-                return;
-            }
-
-            // Parse the string to enum
-            if (Enum.TryParse<CourseStatus>(NewCourseStatus.Replace(" ", ""), out var status))
-            {
-                // Generate the next ID
-                int nextId = Courses.Any() ? Courses.Max(c => c.Id) + 1 : 1;
-
-                // Create new course
-                var newCourse = new Course
-                {
-                    Id = nextId,
-                    Name = NewCourseName,
-                    StartDate = NewCourseStartDate,
-                    EndDate = NewCourseEndDate,
-                    Status = status,
-                    TermId = Term.Id
-                };
-
-                //Add to database
-                await _database.AddCourse(newCourse);
-
-                // Exit editing mode
-                IsAddingCourse = false;
-                OnPropertyChanged(nameof(IsNotAddingCourse));
-
-                await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
-
-                // Refresh Screen
-                await LoadCoursesAsync();
-            }
-            else
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Invalid course status selected", "OK");
-            }
-        }
-
-        [RelayCommand]
-        void CancelAddCourse()
-        {
-            IsAddingCourse = false;
-            OnPropertyChanged(nameof(IsNotAddingCourse));
-        }
-
-        partial void OnIsAddingCourseChanged(bool value)
-        {
-            OnPropertyChanged(nameof(IsNotAddingCourse));
-        }
-
-        partial void OnIsRemovingCourseChanged(bool value)
-        {
-            OnPropertyChanged(nameof(IsNotAddingCourse));
-        }
-
-        [RelayCommand]
-        private async Task SaveCourseAsync(Course course)
-        {
-            try
-            {
-                await _database.SaveCourseAsync(course);
-                await LoadCoursesAsync(); // Refresh the list
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to save course: {ex.Message}");
-            }
+                { "course", course }
+            });
         }
 
         [RelayCommand]
@@ -263,6 +170,77 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
             }
+        }
+
+        // Course Management
+        [RelayCommand]
+        private void AddCourse()
+        {
+            IsAddingCourse = true;
+        }
+
+        [RelayCommand]
+        private void CancelAddCourse()
+        {
+            IsAddingCourse = false;
+            ClearForm();
+        }
+
+        [RelayCommand]
+        private async Task SaveNewCourse()
+        {
+            if (!ValidateNewCourse()) return;
+
+            try
+            {
+                var newCourse = new Course
+                {
+                    Name = NewCourseName,
+                    StartDate = NewCourseStartDate,
+                    EndDate = NewCourseEndDate,
+                    Status = NewCourseStatus,
+                    TermId = TermId
+                };
+
+                await _database.SaveCourseAsync(newCourse);
+
+                ClearForm();
+                IsAddingCourse = false;
+
+                await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
+                await LoadCoursesAsync();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to add course: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Add course error: {ex}");
+            }
+        }
+
+        // Helper Methods
+        private bool ValidateNewCourse()
+        {
+            if (string.IsNullOrWhiteSpace(NewCourseName))
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "Please enter a course name", "OK");
+                return false;
+            }
+
+            if (NewCourseEndDate <= NewCourseStartDate)
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "End date must be after start date", "OK");
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ClearForm()
+        {
+            NewCourseName = string.Empty;
+            NewCourseStartDate = DateTime.Now;
+            NewCourseEndDate = DateTime.Now.AddMonths(3);
+            NewCourseStatus = CourseStatus.Planned;
         }
     }
 }

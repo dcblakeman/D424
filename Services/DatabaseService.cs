@@ -6,7 +6,7 @@ using System.Text;
 
 namespace C_971.Services
 {
-    public class DatabaseService : IDatabaseService
+    public class DatabaseService
     {
         private SQLiteAsyncConnection? _database;
 
@@ -27,15 +27,22 @@ namespace C_971.Services
             }
             catch (Exception ex)
             {
-                // Handle initialization exceptions
                 await Shell.Current.DisplayAlertAsync("Error", $"Failed to initialize database: {ex.Message}", "OK");
             }
         }
-        // Terms
+
+        #region Academic Terms
         public async Task<List<AcademicTerm>> GetTermsAsync()
         {
             await InitializeAsync();
             return await _database.Table<AcademicTerm>().ToListAsync();
+        }
+
+        public async Task<AcademicTerm?> GetTermByIdAsync(int termId)
+        {
+            await InitializeAsync();
+            return await _database.Table<AcademicTerm>()
+                .FirstOrDefaultAsync(t => t.Id == termId);
         }
 
         public async Task<int> SaveTermAsync(AcademicTerm term)
@@ -46,96 +53,28 @@ namespace C_971.Services
                 : await _database.InsertAsync(term);
         }
 
-        public async Task<IEnumerable<AcademicTerm>> SearchTermsByNameAsync(string newValue)
+        public async Task<int> DeleteTermAsync(AcademicTerm term)
+        {
+            await InitializeAsync();
+            return await _database.DeleteAsync(term);
+        }
+
+        public async Task<List<AcademicTerm>> SearchTermsByNameAsync(string searchText)
         {
             await InitializeAsync();
             return await _database.Table<AcademicTerm>()
-                .Where(t => t.Name.Contains(newValue))
+                .Where(t => t.Name.Contains(searchText))
                 .ToListAsync();
         }
+        #endregion
 
-        // Courses
-        public async Task<List<Course>> GetCoursesAsync()
+        #region Courses
+        public async Task<List<Course>> GetAllCoursesAsync()
         {
             await InitializeAsync();
             return await _database.Table<Course>().ToListAsync();
         }
 
-        public async Task<List<Course>> GetCoursesByTermAsync(int termId)
-        {
-            await InitializeAsync();
-            return await _database.Table<Course>().Where(c => c.TermId == termId).ToListAsync();
-        }
-
-        public async Task<Course?> GetCourseByIdAsync(int courseId)
-        {
-            await InitializeAsync();
-            return await _database.Table<Course>().FirstOrDefaultAsync(c => c.Id == courseId);
-        }
-
-        public async Task<int> SaveCourseAsync(Course course)
-        {
-            await InitializeAsync();
-            return course.Id != 0
-                ? await _database.UpdateAsync(course)
-                : await _database.InsertAsync(course);
-        }
-
-        public async Task<int> DeleteCourseAsync(Course course)
-        {
-            await InitializeAsync();
-            return await _database.DeleteAsync(course);
-        }
-
-        // Notes
-        public async Task<List<CourseNote>> GetNotesByCourseAsync(int courseId)
-        {
-            await InitializeAsync();
-            return await _database.Table<CourseNote>()
-                .Where(n => n.CourseId == courseId)
-                .OrderByDescending(n => n.CreatedDate)
-                .ToListAsync();
-        }
-
-        // Assessments
-        public async Task<List<CourseAssessment>> GetAssessmentsByCourseAsync(int courseId)
-        {
-            await InitializeAsync();
-            return await _database.Table<CourseAssessment>()
-                .Where(a => a.CourseId == courseId)
-                .ToListAsync();
-        }
-
-        public async Task<List<CourseNote>> GetCourseNotesByCourseIdAsync(int id)
-        {
-            await InitializeAsync();
-            return await _database.Table<CourseNote>()
-                         .Where(n => n.CourseId == id)
-                         .ToListAsync();
-        }
-
-        public async Task DeleteCourseNoteAsync(CourseNote note)
-        {
-            await InitializeAsync();
-            await _database.DeleteAsync(note);
-            return;
-        }
-
-        public async Task UpdateCourse(Course course)
-        {
-            await InitializeAsync();
-            await _database.UpdateAsync(course);
-            return;
-        }
-
-        public async Task GetAllCourses()
-        {
-            await InitializeAsync();
-            await _database.Table<Course>().ToListAsync();
-            return;
-        }
-
-        //Get courses by term id async
         public async Task<List<Course>> GetCoursesByTermIdAsync(int termId)
         {
             await InitializeAsync();
@@ -144,84 +83,149 @@ namespace C_971.Services
                 .ToListAsync();
         }
 
+        public async Task<Course?> GetCourseByIdAsync(int courseId)
+        {
+            await InitializeAsync();
+            return await _database.Table<Course>()
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+        }
 
+        public async Task<int> SaveCourseAsync(Course course)
+        {
+            await InitializeAsync();
 
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"Database saving course: {course.Id}, Status: {course.Status}");
 
-        public async Task<IEnumerable<object>> GetNotesForCourseAsync(int id)
+                int result = course.Id != 0
+                    ? await _database.UpdateAsync(course)
+                    : await _database.InsertAsync(course);
+
+                System.Diagnostics.Debug.WriteLine($"Database save complete: {result} rows affected");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Database save error: {ex}");
+                throw;
+            }
+        }
+
+        public async Task<int> DeleteCourseAsync(Course course)
+        {
+            await InitializeAsync();
+            return await _database.DeleteAsync(course);
+        }
+        #endregion
+
+        #region Course Notes
+        public async Task<List<CourseNote>> GetCourseNotesAsync(int courseId)
         {
             await InitializeAsync();
             return await _database.Table<CourseNote>()
-                .Where(n => n.CourseId == id)
+                .Where(n => n.CourseId == courseId)
                 .OrderByDescending(n => n.CreatedDate)
                 .ToListAsync();
         }
 
-        public async Task LoadNotes()
+        public async Task<int> SaveCourseNoteAsync(CourseNote note)
         {
             await InitializeAsync();
-            await _database.Table<CourseNote>().ToListAsync();
+            return note.Id != 0
+                ? await _database.UpdateAsync(note)
+                : await _database.InsertAsync(note);
         }
 
-        public async Task<int> DeleteTermAsync(AcademicTerm term)
+        public async Task<int> DeleteCourseNoteAsync(CourseNote note)
         {
             await InitializeAsync();
-            return await _database.DeleteAsync(term);
+            return await _database.DeleteAsync(note);
         }
 
-        Task IDatabaseService.DeleteTermAsync(AcademicTerm term)
-        {
-            return DeleteTermAsync(term);
-        }
-
-        public async Task AddCourse(Course newCourse)
+        public async Task<int> GetNextCourseNoteIdAsync()
         {
             await InitializeAsync();
-            await _database.InsertAsync(newCourse);
-            await _database.UpdateAsync(newCourse);
+            var notes = await _database.Table<CourseNote>()
+                .OrderByDescending(n => n.Id)
+                .ToListAsync();
+            return notes.Count > 0 ? notes[0].Id + 1 : 1;
         }
+        #endregion
 
-        public async Task SaveInstructorAsync(CourseInstructor newInstructor)
+        #region Course Assessments
+        public async Task<List<CourseAssessment>> GetCourseAssessmentsAsync(int courseId)
         {
             await InitializeAsync();
-            await _database.InsertAsync(newInstructor);
-            await _database.UpdateAsync(newInstructor);
+            return await _database.Table<CourseAssessment>()
+                .Where(a => a.CourseId == courseId)
+                .ToListAsync();
         }
 
-        public async Task<CourseInstructor> GetInstructorByIdAsync(int? instructorId)
+        public async Task<int> SaveCourseAssessmentAsync(CourseAssessment assessment)
         {
             await InitializeAsync();
-            return await _database.Table<CourseInstructor>().FirstOrDefaultAsync(i => i.Id == instructorId);
+            return assessment.Id != 0
+                ? await _database.UpdateAsync(assessment)
+                : await _database.InsertAsync(assessment);
         }
 
-        internal async Task GetCourseNotesAsync(int id)
+        public async Task<int> DeleteCourseAssessmentAsync(CourseAssessment assessment)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            return await _database.DeleteAsync(assessment);
         }
 
-        internal async Task GetTermByIdAsync(int termId)
+        public async Task<int> GetNextAssessmentIdAsync()
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            var assessments = await _database.Table<CourseAssessment>()
+                .OrderByDescending(a => a.Id)
+                .ToListAsync();
+            return assessments.Count > 0 ? assessments[0].Id + 1 : 1;
+        }
+        #endregion
+
+        #region Course Instructors
+        public async Task<List<CourseInstructor>> GetCourseInstructorsAsync()
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseInstructor>().ToListAsync();
+        }
+
+        public async Task<CourseInstructor?> GetCourseInstructorByIdAsync(int instructorId)
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseInstructor>()
+                .FirstOrDefaultAsync(i => i.Id == instructorId);
+        }
+
+        public async Task<int> SaveCourseInstructorAsync(CourseInstructor instructor)
+        {
+            await InitializeAsync();
+            return instructor.Id != 0
+                ? await _database.UpdateAsync(instructor)
+                : await _database.InsertAsync(instructor);
+        }
+
+        public async Task<int> DeleteCourseInstructorAsync(CourseInstructor instructor)
+        {
+            await InitializeAsync();
+            return await _database.DeleteAsync(instructor);
+        }
+
+        public async Task<int> GetNextCourseInstructorIdAsync()
+        {
+            await InitializeAsync();
+            var instructors = await _database.Table<CourseInstructor>()
+                .OrderByDescending(i => i.Id)
+                .ToListAsync();
+            return instructors.Count > 0 ? instructors[0].Id + 1 : 1;
         }
 
         internal async Task<int> GetMaxAssessmentIdAsync()
         {
-            await InitializeAsync();
-            var assessments = await _database.Table<CourseAssessment>().OrderByDescending(a => a.Id).ToListAsync();
-            return assessments.Count > 0 ? assessments[0].Id : 0;
-        }
-
-        internal async Task<int> GetNextCourseNoteIdAsync()
-        {
-            await InitializeAsync();
-            var notes = await _database.Table<CourseNote>().OrderByDescending(n => n.Id).ToListAsync();
-            return notes.Count > 0 ? notes[0].Id + 1 : 1;
-        }
-
-        internal async Task SaveCourseNoteAsync(CourseNote newNote)
-        {
-            await InitializeAsync();
-            await _database.InsertAsync(newNote);
-            await _database.UpdateAsync(newNote);
+            throw new NotImplementedException();
         }
 
         internal async Task AddCourseInstructorAsync(CourseInstructor newInstructor)
@@ -229,9 +233,10 @@ namespace C_971.Services
             throw new NotImplementedException();
         }
 
-        internal async Task<int> GetNextCourseInstructorIdAsync()
+        internal async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }

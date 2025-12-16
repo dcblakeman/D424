@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ using static C_971.Models.CourseStatus;
 
 namespace C_971.Models
 {
-    [SQLite.Table("Courses")]
+    [Table("Course")]
     public partial class Course
     {
         // Primary Key

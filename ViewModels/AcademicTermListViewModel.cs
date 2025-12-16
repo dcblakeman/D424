@@ -6,20 +6,18 @@ using C_971.Services;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Term), "term")]
-    [QueryProperty(nameof(TermId), "termId")]
-    [QueryProperty(nameof(Course), "course")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
-        private readonly IDatabaseService _database;
+        private readonly DatabaseService _database;
 
-        // Observable Properties
+        // Core Properties
         [ObservableProperty]
         private string name = "Academic Terms";
 
         [ObservableProperty]
         private ObservableCollection<AcademicTerm> academicTerms = new();
 
+        // UI State
         [ObservableProperty]
         private bool isAddingTerm;
 
@@ -29,9 +27,15 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isRefreshing;
 
+        public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
+
+        // Search
         [ObservableProperty]
         private string searchText = string.Empty;
 
+        private List<AcademicTerm> _allTerms = new();
+
+        // New Term Form
         [ObservableProperty]
         private string newTermName = string.Empty;
 
@@ -41,62 +45,40 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private DateTime newTermEndDate = DateTime.Now.AddMonths(6);
 
-        [ObservableProperty]
-        private int termId;
-
-        [ObservableProperty]
-        private AcademicTerm term;
-
-        // Computed Property
-        public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
-
-        // Load terms from database
-        private List<AcademicTerm> _allTerms = new(); // Cache all terms
-
-        public AcademicTermListViewModel(IDatabaseService database)
+        public AcademicTermListViewModel(DatabaseService database)
         {
             _database = database;
         }
 
-        private async Task InitializeAsync()
-        {
-            await _database.InitializeAsync();
-            await LoadTermsAsync(); // Use LoadTermsAsync instead of LoadAcademicTermsAsync
-        }
-
-        private async Task EnsureInitializedAsync()
+        // Initialization
+        public async Task OnAppearingAsync()
         {
             if (AcademicTerms.Count == 0)
             {
-                await InitializeAsync();
+                await LoadTermsAsync();
             }
         }
 
-        public async Task OnAppearingAsync()
+        // Property Change Handlers
+        partial void OnSearchTextChanged(string value)
         {
-            await EnsureInitializedAsync();
+            ApplySearchFilter();
         }
 
-        [RelayCommand]
-        private async Task LoadTermsAsync()
+        partial void OnIsAddingTermChanged(bool value)
         {
-            IsRefreshing = true;
-            try
-            {
-                // Load all terms and cache them
-                _allTerms = await _database.GetTermsAsync();
-                ApplySearchFilter(); // This will show all terms when SearchText is empty
-            }
-            finally
-            {
-                IsRefreshing = false;
-            }
+            OnPropertyChanged(nameof(IsNotAddingTerm));
         }
 
+        partial void OnIsRemovingTermChanged(bool value)
+        {
+            OnPropertyChanged(nameof(IsNotAddingTerm));
+        }
+
+        // Search and Filter
         [RelayCommand]
         private void Search()
         {
-            // Filter in memory instead of hitting database
             ApplySearchFilter();
         }
 
@@ -114,36 +96,47 @@ namespace C_971.ViewModels
             }
         }
 
-        partial void OnSearchTextChanged(string value)
+        // Data Loading
+        [RelayCommand]
+        private async Task LoadTermsAsync()
         {
-            // Now this is fast since it's in-memory filtering
-            SearchCommand.Execute(null);
+            IsRefreshing = true;
+            try
+            {
+                _allTerms = await _database.GetTermsAsync();
+                ApplySearchFilter();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load terms: {ex.Message}", "OK");
+            }
+            finally
+            {
+                IsRefreshing = false;
+            }
         }
 
+        // Term Management
         [RelayCommand]
-        void AddTerm()
+        private void AddTerm()
         {
             IsAddingTerm = true;
-            OnPropertyChanged(nameof(IsNotAddingTerm));
         }
 
         [RelayCommand]
-        async Task SaveNewTerm()
+        private void CancelAddTerm()
         {
-            if (string.IsNullOrWhiteSpace(NewTermName))
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Please enter a term name", "OK");
-                return;
-            }
-            if (NewTermEndDate <= NewTermStartDate)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "End date must be after start date", "OK");
-                return;
-            }
+            IsAddingTerm = false;
+            ClearForm();
+        }
+
+        [RelayCommand]
+        private async Task SaveNewTerm()
+        {
+            if (!ValidateNewTerm()) return;
 
             try
             {
-                // Create new term
                 var newTerm = new AcademicTerm
                 {
                     Name = NewTermName,
@@ -151,15 +144,14 @@ namespace C_971.ViewModels
                     EndDate = NewTermEndDate
                 };
 
-                // Save to database
                 await _database.SaveTermAsync(newTerm);
 
-                // Add to collection
-                AcademicTerms.Add(newTerm);
+                // Add to cache and refresh display
+                _allTerms.Add(newTerm);
+                ApplySearchFilter();
 
-                // Exit editing mode
+                ClearForm();
                 IsAddingTerm = false;
-                OnPropertyChanged(nameof(IsNotAddingTerm));
 
                 await Shell.Current.DisplayAlertAsync("Success", "Term added successfully!", "OK");
             }
@@ -170,70 +162,95 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        void CancelAddTerm()
-        {
-            IsAddingTerm = false;
-            OnPropertyChanged(nameof(IsNotAddingTerm));
-
-        }
-
-        partial void OnIsAddingTermChanged(bool value)
-        {
-            OnPropertyChanged(nameof(IsNotAddingTerm));
-        }
-
-        [RelayCommand]
-        void RemoveTerm()
+        private void RemoveTerm()
         {
             IsRemovingTerm = true;
-            OnPropertyChanged(nameof(IsNotAddingTerm));
         }
 
         [RelayCommand]
-        void CancelRemoveTerm()
+        private void CancelRemoveTerm()
         {
             IsRemovingTerm = false;
-            OnPropertyChanged(nameof(IsNotAddingTerm));
-        }
-
-        partial void OnIsRemovingTermChanged(bool value)
-        {
-            OnPropertyChanged(nameof(IsNotAddingTerm));
         }
 
         [RelayCommand]
-        public async Task ExitApp()
-        {
-            bool confirm = await Shell.Current.DisplayAlertAsync(
-                "Exit Application",
-                "Are you sure you want to exit the application?",
-                "Yes",
-                "No");
-
-            if (confirm)
-            {
-                Application.Current?.Quit();
-            }
-        }
-
-        [RelayCommand]
-        public async Task DeleteTermAsync(AcademicTerm term)
+        private async Task DeleteTerm(AcademicTerm term)
         {
             if (term == null) return;
 
             try
             {
+                bool confirmed = await Shell.Current.DisplayAlertAsync(
+                    "Delete Term",
+                    $"Are you sure you want to delete '{term.Name}'? This action cannot be undone.",
+                    "Delete",
+                    "Cancel");
+
+                if (!confirmed) return;
+
                 await _database.DeleteTermAsync(term);
 
-                // Remove from cache too
+                // Remove from cache and UI
                 _allTerms.Remove(term);
                 AcademicTerms.Remove(term);
+
+                // Exit remove mode
+                IsRemovingTerm = false;
+
+                await Shell.Current.DisplayAlertAsync("Success", "Term deleted successfully.", "OK");
             }
             catch (Exception ex)
             {
                 await Shell.Current.DisplayAlertAsync("Error", $"Failed to delete term: {ex.Message}", "OK");
-                throw;
             }
+        }
+
+        // Application Management
+        [RelayCommand]
+        private async Task ExitApp()
+        {
+            bool confirmed = await Shell.Current.DisplayAlertAsync(
+                "Exit Application",
+                "Are you sure you want to exit the application?",
+                "Yes",
+                "No");
+
+            if (confirmed)
+            {
+                Application.Current?.Quit();
+            }
+        }
+
+        // Helper Methods
+        private bool ValidateNewTerm()
+        {
+            if (string.IsNullOrWhiteSpace(NewTermName))
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "Please enter a term name", "OK");
+                return false;
+            }
+
+            if (NewTermEndDate <= NewTermStartDate)
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "End date must be after start date", "OK");
+                return false;
+            }
+
+            // Check for duplicate names
+            if (_allTerms.Any(t => t.Name.Equals(NewTermName, StringComparison.OrdinalIgnoreCase)))
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "A term with this name already exists", "OK");
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ClearForm()
+        {
+            NewTermName = string.Empty;
+            NewTermStartDate = DateTime.Now;
+            NewTermEndDate = DateTime.Now.AddMonths(6);
         }
     }
 }

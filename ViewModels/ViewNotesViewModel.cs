@@ -11,15 +11,22 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Course), "course")]
     public partial class ViewNotesViewModel : ObservableObject
     {
-        private readonly DatabaseService _databaseService;
+        private readonly DatabaseService _database;
         private bool _isLoading;
 
         [ObservableProperty]
+        private bool isRefreshing;
+
+		[ObservableProperty]
         public Course course;
 
-        public ObservableCollection<CourseNote> CourseNotesList { get; private set; } = new ObservableCollection<CourseNote>();
+        public ObservableCollection<CourseNote> CourseNotesList { get; private set; } = [];
 
+		// Backing field for all notes
         [ObservableProperty]
+		private List<CourseNote> notes = [];
+
+		[ObservableProperty]
         private string name = "Course Notes";
 
         [ObservableProperty]
@@ -27,7 +34,7 @@ namespace C_971.ViewModels
 
         public ViewNotesViewModel(DatabaseService databaseService)
         {
-            _databaseService = databaseService;
+            _database = databaseService;
         }
 
         partial void OnCourseChanged(Course value)
@@ -42,15 +49,16 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task LoadCourseNotes()
         {
-            if (Course?.Id > 0)
-            {
-                var notes = await _databaseService.GetCourseNotesByCourseIdAsync(Course.Id);
-                CourseNotesList.Clear();
+            if (Course?.Id <= 0) return;
 
-                // Add all notes at once
-                foreach (var note in notes)
-                    CourseNotesList.Add(note);
-            }
+            IsRefreshing = true;
+            {
+                Notes = (List<CourseNote>)await _database.GetCourseNotesByCourseIdAsync(Course.Id);
+
+				// Add all notes at once
+				CourseNotesList = new ObservableCollection<CourseNote>(Notes);
+				OnPropertyChanged(nameof(CourseNotesList));
+			}
         }
         [RelayCommand]
         private async Task GoBack()
@@ -58,7 +66,7 @@ namespace C_971.ViewModels
             try
             {
                 // Use relative navigation (no leading slash)
-                await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
+                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = Course
                 });

@@ -85,14 +85,14 @@
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Start Date:" FontAttributes="Bold"/>
                         <Label Text="{Binding Course.StartDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
-                        <DatePicker Date="{Binding Course.StartDate}" IsVisible="{Binding IsEditing}"/>
+                        <DatePicker Date="{Binding Course.StartDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- End Date -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="End Date:" FontAttributes="Bold"/>
                         <Label Text="{Binding Course.EndDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
-                        <DatePicker Date="{Binding Course.EndDate}" IsVisible="{Binding IsEditing}"/>
+                        <DatePicker Date="{Binding Course.EndDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}" />
                     </VerticalStackLayout>
 
                     <!-- Status -->
@@ -104,7 +104,7 @@
                                VerticalOptions="Center"
                                IsVisible="{Binding IsNotEditing}"/>
                         <Picker Grid.Row="4" Grid.Column="1" 
-                        SelectedIndex="{Binding Course.Status, Mode=TwoWay}"
+                        SelectedItem="{Binding Course.Status, Mode=TwoWay}"
                         ItemsSource="{Binding StatusOptions}"
                         IsVisible="{Binding IsEditing}"        
                         VerticalOptions="Center"/>

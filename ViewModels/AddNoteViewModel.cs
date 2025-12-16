@@ -1,91 +1,85 @@
 ﻿using C_971.Models;
 using C_971.Services;
-using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
+
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
     public partial class AddNoteViewModel : ObservableObject
     {
-        private DatabaseService _database;
+        private readonly DatabaseService _database;
 
-        [ObservableProperty]
-        private int newNoteId;
-
-        [ObservableProperty]
-        private CourseNote newNote;
-
-        [ObservableProperty]
-        private string newNoteContent = string.Empty;
-
+        // Core Properties
         [ObservableProperty]
         private Course course;
 
         [ObservableProperty]
-        private DateTime createdDate = DateTime.Now;
+        private string name = "Add Note";
+
+        // Form Properties
+        [ObservableProperty]
+        private string noteContent = string.Empty;
 
         [ObservableProperty]
-        private string name = "Add Note";
+        private DateTime createdDate = DateTime.Now;
 
         public AddNoteViewModel(DatabaseService database)
         {
-            _database = database;  
+            _database = database;
         }
+
+        // Property Change Handlers
         partial void OnCourseChanged(Course value)
         {
             if (value != null)
             {
+                Name = $"Add Note - {value.Name}";
                 System.Diagnostics.Debug.WriteLine($"Course received: {value.Name}");
             }
         }
 
+        // Commands
         [RelayCommand]
-        async Task SaveNote()
+        private async Task SaveNote()
         {
-            if (string.IsNullOrWhiteSpace(NewNoteContent))
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Please enter a note", "OK");
-                return;
-            }
+            if (!ValidateNote()) return;
 
-            if (Course == null)
+            try
             {
-                await Shell.Current.DisplayAlertAsync("Error", "Course not found", "OK");
-                return;
-            }
-
-            //Generate new note Id
-            NewNoteId = await _database.GetNextCourseNoteIdAsync();
-
-
-            // Save to database
-            NewNote = new CourseNote
-            {
-                Id = NewNoteId,
-                CreatedDate = DateTime.Now,
-                NoteContent = NewNoteContent,
-                CourseId = Course.Id
-            };
-
-            //Add new note to Course Notes list by Id
-            if(NewNote == null) 
-            {
-                await Shell.Current.DisplayAlertAsync("Error", "Note creation failed", "OK");
-                return;
-            } else
-            {
-                try
+                var newNote = new CourseNote
                 {
-                    await _database.SaveCourseNoteAsync(NewNote);
-                } catch (Exception ex)
-                {
-                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to save note: {ex.Message}", "OK");
-                    return;
-                }
+                    CreatedDate = DateTime.Now,
+                    NoteContent = NoteContent.Trim(),
+                    CourseId = Course.Id
+                };
 
-                await Shell.Current.DisplayAlertAsync("Success", "Note saved!", "OK");
+                await _database.SaveCourseNoteAsync(newNote);
+
+                await Shell.Current.DisplayAlertAsync("Success", "Note saved successfully!", "OK");
+                await GoBack();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to save note: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Save note error: {ex}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task Cancel()
+        {
+            bool hasContent = !string.IsNullOrWhiteSpace(NoteContent);
+
+            if (hasContent)
+            {
+                bool confirmed = await Shell.Current.DisplayAlertAsync(
+                    "Discard Changes",
+                    "Are you sure you want to discard this note?",
+                    "Discard",
+                    "Continue Editing");
+
+                if (!confirmed) return;
             }
 
             await GoBack();
@@ -96,16 +90,41 @@ namespace C_971.ViewModels
         {
             try
             {
-                // Use relative navigation (no leading slash)
-                await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
+                // Navigate back to previous page with course context
+                await Shell.Current.GoToAsync("..", new Dictionary<string, object>
                 {
                     ["course"] = Course
                 });
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Navigation error: {ex}");
             }
+        }
+
+        // Helper Methods
+        private bool ValidateNote()
+        {
+            if (string.IsNullOrWhiteSpace(NoteContent))
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "Please enter note content", "OK");
+                return false;
+            }
+
+            if (Course == null)
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "Course information not found", "OK");
+                return false;
+            }
+
+            if (NoteContent.Trim().Length < 3)
+            {
+                _ = Shell.Current.DisplayAlertAsync("Error", "Note must be at least 3 characters long", "OK");
+                return false;
+            }
+
+            return true;
         }
     }
 }

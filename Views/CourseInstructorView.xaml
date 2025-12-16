@@ -52,13 +52,13 @@
                     Command="{Binding AddCourseInstructorCommand}"
                     BackgroundColor="#2196F3"
                     TextColor="White"
-                    IsVisible="{Binding IsNotAddingCourseInstructor}"
+                    IsVisible="{Binding IsNotAddingInstructor}"
                     Padding="17"/>
 
             <!-- Remove Instructor Button -->
             <Button Grid.Column="1"
                     Text="Remove Instructor"
-                    Command="{Binding RemoveCourseInstructorCommand}"
+                    Command="{Binding RemoveInstructorCommand}"
                     BackgroundColor="#F44336"
                     TextColor="White"
                     IsVisible="{Binding IsNotAddingCourseInstructor}"/>

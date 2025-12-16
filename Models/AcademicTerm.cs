@@ -3,14 +3,13 @@ using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace C_971.Models
 {
-    [SQLite.Table("AcademicTerms")]
+    [Table("AcademicTerm")]
     public partial class AcademicTerm
     {
         // Primary Key

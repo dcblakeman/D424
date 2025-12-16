@@ -4,255 +4,260 @@ using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.LocalNotification;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
-        private DatabaseService _databaseService;
+        private readonly DatabaseService _database;
 
-        public ObservableCollection<string> StatusOptions { get; } = new ObservableCollection<string>
-        {
-            "NotEnrolled",
-            "InProgress",
-            "Completed",
-            "Dropped",
-            "Planned"
-        };
-
-        public ObservableCollection<string> AssessmentTypeOptions { get; } = new ObservableCollection<string>
-        {
-            "Objective",
-            "Performance"
-        };
-
-        public string Title => IsEditing ? "Edit Course Details" : "Course Details"; // Dynamic title based on mode
+        // Core Properties
+        [ObservableProperty]
+        private Course course;
 
         [ObservableProperty]
-        Course course;
+        private string name = "Course Details";
 
-        [ObservableProperty]
-        private CourseInstructor instructor = new CourseInstructor();
-
-        public ObservableCollection<CourseAssessment> Assessment { get; set; } = new ObservableCollection<CourseAssessment>();
-
+        // UI State
         [ObservableProperty]
         private bool isEditing;
 
         public bool IsNotEditing => !IsEditing;
 
-        [ObservableProperty]
-        int termId;
-
-        [ObservableProperty]
-        string id;
-
-        [ObservableProperty]
-        string name = "Course Details";
-
+        // Dynamic UI Properties
+        public string Title => IsEditing ? "Edit Course Details" : "Course Details";
         public string EditButtonText => IsEditing ? "Save Changes" : "Edit Course Details";
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
-        [RelayCommand]
-        async Task ToggleEdit()
+
+        // Static Collections
+        public ObservableCollection<CourseStatus> StatusOptions { get; } = new ObservableCollection<CourseStatus>
         {
-            if (IsEditing)
-            {
-                //// Validate before saving
-                //if (!await ValidateCourse())
-                //{
-                //    return; // Don't toggle edit mode if validation fails
-                //}
+            CourseStatus.NotEnrolled,
+            CourseStatus.InProgress,
+            CourseStatus.Completed,
+            CourseStatus.Dropped,
+            CourseStatus.Planned
+        };
 
-                // Save changes
-                await SaveCourseDetails();
-            }
+        public ObservableCollection<AssessmentType> AssessmentTypeOptions { get; } = new ObservableCollection<AssessmentType>
+        {
+            AssessmentType.Objective,
+            AssessmentType.Performance
+        };
 
-            // Only toggle if we're entering edit mode OR if validation passed
-            IsEditing = !IsEditing;
-            OnPropertyChanged(nameof(IsNotEditing));
-            OnPropertyChanged(nameof(EditButtonText));
-            OnPropertyChanged(nameof(EditButtonColor));
+        public CourseDetailsViewModel(DatabaseService databaseService)
+        {
+            _database = databaseService;
+            _ = RequestNotificationPermissions();
         }
+
+        // Property Change Handlers
+        partial void OnCourseChanged(Course value)
+        {
+            if (value != null)
+            {
+                Name = $"{value.Name} - Details";
+                IsEditing = false;
+                System.Diagnostics.Debug.WriteLine($"Course loaded: {value.Id} - {value.Name}");
+            }
+        }
+
         partial void OnIsEditingChanged(bool value)
         {
             OnPropertyChanged(nameof(IsNotEditing));
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(EditButtonText));
+            OnPropertyChanged(nameof(EditButtonColor));
         }
 
-        //Get Instructor Command
+        // Course Management
         [RelayCommand]
-        async Task GetInstructor()
+        private async Task ToggleEdit()
         {
-            //Go to CourseInstructorview
-            await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", true, new Dictionary<string, object>
-                {
-                    { "course", Course }
-                });
+            if (IsEditing)
+            {
+                // Save changes when exiting edit mode
+                await SaveCourse();
+            }
+
+            IsEditing = !IsEditing;
         }
 
-        //View Assessments Command
+        [RelayCommand]
+        private async Task SaveCourse()
+        {
+            if (Course == null) return;
+
+            try
+            {
+                //Display each field's value in alert
+                await Shell.Current.DisplayAlertAsync("Course Details",
+                    $"ID: {Course.Id}\n" +
+                    $"Name: {Course.Name}\n" +
+                    $"Start Date: {Course.StartDate}\n" +
+                    $"End Date: {Course.EndDate}\n" +
+                    $"Status: {Course.Status}\n" +
+                    $"Instructor: {Course.InstructorId}\n" +
+                    $"Start Date Notifications: {Course.StartDateNotifications}\n" +
+                    $"End Date Notifications: {Course.EndDateNotifications}",
+                    "OK");
+
+                //Refresh the page
+                OnPropertyChanged(nameof(Course));
+
+                var result = await _database.SaveCourseAsync(Course);
+
+                // Update notifications after saving
+                await ScheduleCourseNotifications();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to save course: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Save error: {ex}");
+            }
+        }
+
+        // Navigation Commands
+        [RelayCommand]
+        private async Task GetInstructor()
+        {
+            if (Course == null) return;
+
+            try
+            {
+                await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
+        }
+
         [RelayCommand]
         private async Task ViewAssessments()
         {
+            if (Course == null) return;
+
             try
-            { 
+            {
+                // Save any changes before navigating
                 if (IsEditing)
                 {
-                    await SaveCourseDetails();
-                }
-                else
-                {
+                    await SaveCourse();
                     IsEditing = false;
-                    OnPropertyChanged(nameof(IsNotEditing));
-                    OnPropertyChanged(nameof(EditButtonText));
-                    OnPropertyChanged(nameof(EditButtonColor));
-                    await Shell.Current.GoToAsync("AssessmentsView", new Dictionary<string, object>
-                    {
-                        ["course"] = Course       // Pass the actual Course object
-                    });
                 }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
-            }
-        }
 
-        private async Task<bool> ValidateCourse()
-        {
-            // Validate TermId
-            if (Course.TermId == 0)
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Please select a valid Term ID. Term ID cannot be 0.", "OK");
-                return false;
-            }
-
-            // Validate other required fields
-            if (string.IsNullOrWhiteSpace(Course.Name))
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Course name is required.", "OK");
-                return false;
-            }
-
-            if (Course.EndDate <= Course.StartDate)
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "End date must be after start date.", "OK");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(Instructor.Name))
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor name is required.", "OK");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(Instructor.Email))
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor email is required.", "OK");
-                return false;
-            }
-
-            // Validate email format
-            if (!IsValidEmail(Instructor.Email))
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid email address for the instructor.", "OK");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(Instructor.Phone))
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Instructor phone number is required.", "OK");
-                return false;
-            }
-
-            // Validate phone format (basic validation)
-            if (!IsValidPhone(Instructor.Phone))
-            {
-                await Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number for the instructor.", "OK");
-                return false;
-            }
-
-            return true; // All validation passed
-        }
-
-        private bool IsValidEmail(string email)
-        {
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool IsValidPhone(string phone)
-        {
-            // Remove any formatting characters
-            string cleanPhone = new(phone.Where(char.IsDigit).ToArray());
-
-            // Check if it's a valid length (10 digits for US format)
-            return cleanPhone.Length >= 10 && cleanPhone.Length <= 15;
-        }
-        private async Task SaveCourseDetails()
-        {
-            try
-            {
-                // Save changes to the course via the service
-                if (_databaseService != null && Course != null)
+                await Shell.Current.GoToAsync("AssessmentsView", new Dictionary<string, object>
                 {
-                    await _databaseService.UpdateCourse(Course);
-
-                    // Schedule or cancel course date notifications
-                    await ScheduleCourseNotifications();
-
-                    await Shell.Current.DisplayAlertAsync("Success", "Course updated successfully!", "OK");
-                }
+                    ["course"] = Course
+                });
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to save course details: {ex.Message}", "OK");
-
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
             }
         }
+
+        [RelayCommand]
+        private async Task AddNote()
+        {
+            if (Course == null) return;
+
+            try
+            {
+                await Shell.Current.GoToAsync($"{nameof(AddNoteView)}", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task ViewNotes()
+        {
+            if (Course == null) return;
+
+            try
+            {
+                await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task GoBack()
+        {
+            try
+            {
+                // Save changes before going back if in edit mode
+                if (IsEditing)
+                {
+                    await SaveCourse();
+                }
+
+                await Shell.Current.GoToAsync("CourseListView", true, new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
+        }
+
+        // Notification Management
         private async Task ScheduleCourseNotifications()
         {
-            // Cancel existing course notifications
-            CancelNotification($"course_start_{Course.Id}");
-            CancelNotification($"course_end_{Course.Id}");
+            if (Course == null) return;
 
-            // Schedule new course notifications if enabled
-            if (Course.StartDateNotifications && Course.StartDate > DateTime.Now)
+            try
             {
-                await ScheduleNotification(
-                    $"course_start_{Course.Id}",
-                    $"Course Starting: {Course.Name}",
-                    $"Your course '{Course.Name}' starts today!",
-                    Course.StartDate
-                );
+                // Cancel existing notifications
+                CancelNotification($"course_start_{Course.Id}");
+                CancelNotification($"course_end_{Course.Id}");
+
+                // Schedule start date notification
+                if (Course.StartDateNotifications && Course.StartDate > DateTime.Now)
+                {
+                    await ScheduleNotification(
+                        $"course_start_{Course.Id}",
+                        $"Course Starting: {Course.Name}",
+                        $"Your course '{Course.Name}' starts today!",
+                        Course.StartDate);
+                }
+
+                // Schedule end date notification
+                if (Course.EndDateNotifications && Course.EndDate > DateTime.Now)
+                {
+                    await ScheduleNotification(
+                        $"course_end_{Course.Id}",
+                        $"Course Ending: {Course.Name}",
+                        $"Your course '{Course.Name}' ends today!",
+                        Course.EndDate);
+                }
             }
-
-            if (Course.EndDateNotifications && Course.EndDate > DateTime.Now)
+            catch (Exception ex)
             {
-                await ScheduleNotification(
-                    $"course_end_{Course.Id}",
-                    $"Course Ending: {Course.Name}",
-                    $"Your course '{Course.Name}' ends today!",
-                    Course.EndDate
-                );
+                System.Diagnostics.Debug.WriteLine($"Failed to schedule course notifications: {ex.Message}");
             }
         }
 
-        // Schedule assignment notifications
         private async Task ScheduleNotification(string id, string title, string message, DateTime notifyTime)
         {
             try
@@ -262,12 +267,14 @@ namespace C_971.ViewModels
                     NotificationId = id.GetHashCode(),
                     Title = title,
                     Description = message,
-                    Schedule =
+                    Schedule = new NotificationRequestSchedule
                     {
                         NotifyTime = notifyTime
                     }
                 };
+
                 await LocalNotificationCenter.Current.Show(notification);
+                System.Diagnostics.Debug.WriteLine($"Scheduled notification: {title} at {notifyTime}");
             }
             catch (Exception ex)
             {
@@ -287,62 +294,16 @@ namespace C_971.ViewModels
             }
         }
 
-        public void Initialize()
-        {
-            // Initialize properties
-            Course = new Course(); // Ensure Course is not null
-            IsEditing = false; // Start in display mode
-
-            // Request notification permissions
-            _ = RequestNotificationPermissions();
-        }
-
-        public CourseDetailsViewModel(DatabaseService databaseService)
-        {
-            _databaseService = databaseService;
-        }
-
         private async Task RequestNotificationPermissions()
-        {
-            await LocalNotificationCenter.Current.RequestNotificationPermission();
-        }
-
-        [RelayCommand]
-        async Task AddNote()
-        {
-            await Shell.Current.GoToAsync($"{nameof(AddNoteView)}", true, new Dictionary<string, object>
-            {
-                { "course", Course }
-            });
-        }
-
-        [RelayCommand]
-        async Task ViewNotes()
-        {
-            await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", true, new Dictionary<string, object>
-            {
-                { "course", Course }
-            });
-        }
-
-        [RelayCommand]
-        public async Task GoBack()
         {
             try
             {
-                // Go back to courselistview with the term context
-                await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
-                {
-                    ["course"] = Course,
-                    ["refresh"] = true
-                });
+                await LocalNotificationCenter.Current.RequestNotificationPermission();
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Failed to request notification permissions: {ex.Message}");
             }
         }
-
-
     }
 }
