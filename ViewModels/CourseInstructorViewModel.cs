@@ -16,6 +16,9 @@ namespace C_971.ViewModels
         private Course course;
 
         [ObservableProperty]
+        private CourseInstructor instructor;
+
+        [ObservableProperty]
         private string name = "Course Instructor";
 
         // UI State
@@ -23,13 +26,24 @@ namespace C_971.ViewModels
         private bool isAddingInstructor;
 
         [ObservableProperty]
+        private bool isRemovingInstructor;
+
+        [ObservableProperty]
         private bool isRefreshing;
 
-        public bool IsNotAddingInstructor => !IsAddingInstructor;
+        public bool IsNotAddingInstructor => !IsAddingInstructor && !IsRemovingInstructor;
+
+        public bool IsNotRemovingInstructor => !IsRemovingInstructor;
 
         // Collections
         [ObservableProperty]
-        private ObservableCollection<CourseInstructor> instructors = new();
+        private ObservableCollection<CourseInstructor> instructors = [];
+
+        // Holds Instructor list for searching
+        private List<CourseInstructor> _allInstructors = [];
+
+        [ObservableProperty]
+        private string searchText = string.Empty;
 
         // New Instructor Form
         [ObservableProperty]
@@ -41,12 +55,9 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string instructorEmail = string.Empty;
 
-        [ObservableProperty]
-        private string searchText = string.Empty;
-
-        public CourseInstructorViewModel(DatabaseService databaseService)
+        public CourseInstructorViewModel(DatabaseService database)
         {
-            _database = databaseService;
+            _database = database;
         }
 
         // Property Change Handlers
@@ -64,22 +75,32 @@ namespace C_971.ViewModels
             OnPropertyChanged(nameof(IsNotAddingInstructor));
         }
 
+        partial void OnIsRemovingInstructorChanged(bool value)
+        {
+            OnPropertyChanged(nameof(IsNotAddingInstructor));
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            ApplySearchFilter();
+        }
+
+        // Search and Filter
+        [RelayCommand]
+        private void Search()
+        {
+            ApplySearchFilter();
+        }
+
         // Data Loading
         [RelayCommand]
         private async Task LoadInstructorsAsync()
         {
-            if (Course == null) return;
-
             IsRefreshing = true;
             try
             {
-                var instructorList = await _database.GetCourseInstructorsAsync();
-
-                Instructors.Clear();
-                foreach (var instructor in instructorList)
-                {
-                    Instructors.Add(instructor);
-                }
+                _allInstructors = await _database.GetCourseInstructorsAsync();
+                ApplySearchFilter();
             }
             catch (Exception ex)
             {
@@ -107,6 +128,19 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
+        private void RemoveInstructor()
+        {
+            IsRemovingInstructor = true;
+        }
+
+        [RelayCommand]
+        private void CancelRemoveInstructor()
+        {
+            IsRemovingInstructor = false;
+        }
+
+
+        [RelayCommand]
         private async Task AddCourseInstructor()
         {
             if (!ValidateInstructor()) return;
@@ -121,7 +155,10 @@ namespace C_971.ViewModels
                 };
 
                 await _database.SaveCourseInstructorAsync(newInstructor);
-                Instructors.Add(newInstructor);
+
+                // Add to cache and refresh display
+                _allInstructors.Add(newInstructor);
+                ApplySearchFilter();
 
                 ClearForm();
                 IsAddingInstructor = false;
@@ -132,26 +169,6 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Error", $"Failed to add instructor: {ex.Message}", "OK");
                 System.Diagnostics.Debug.WriteLine($"Add instructor error: {ex}");
-            }
-        }
-
-        [RelayCommand]
-        private async Task EditInstructor(CourseInstructor instructor)
-        {
-            if (instructor == null) return;
-
-            try
-            {
-                // For now, just show instructor details
-                // You could navigate to an edit page or show inline editing
-                await Shell.Current.DisplayAlertAsync(
-                    "Instructor Details",
-                    $"Name: {instructor.Name}\nEmail: {instructor.Email}\nPhone: {instructor.Phone}",
-                    "OK");
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to show instructor details: {ex.Message}", "OK");
             }
         }
 
@@ -171,7 +188,12 @@ namespace C_971.ViewModels
                 if (!confirmed) return;
 
                 await _database.DeleteCourseInstructorAsync(instructor);
+
+                // Remove from cache and refresh display
+                _allInstructors.Remove(instructor);
                 Instructors.Remove(instructor);
+
+                IsRemovingInstructor = false;
 
                 await Shell.Current.DisplayAlertAsync("Success", "Instructor deleted successfully.", "OK");
             }
@@ -188,7 +210,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await Shell.Current.GoToAsync("CourseDetailsview", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = Course
                 });
@@ -258,27 +280,22 @@ namespace C_971.ViewModels
             InstructorEmail = string.Empty;
         }
 
-        [RelayCommand]
-        private async Task Search()
+        private void ApplySearchFilter()
         {
-            //Search through instructor list
-            if (string.IsNullOrWhiteSpace(SearchText))
-            {
-                await LoadInstructorsAsync();
-            }
-            else
-            {
-                var filteredInstructors = Instructors.Where(i =>
+            Instructors.Clear();
+
+            var filteredInstructors = string.IsNullOrWhiteSpace(SearchText)
+                ? _allInstructors
+                : _allInstructors.Where(i =>
                     i.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                     i.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    i.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase)).ToList();
-                Instructors.Clear();
-                foreach (var instructor in filteredInstructors)
-                {
-                    Instructors.Add(instructor);
-                }
-            }
+                    i.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
+            foreach (var instructor in filteredInstructors)
+            {
+                Instructors.Add(instructor);
+            }
         }
+
     }
 }

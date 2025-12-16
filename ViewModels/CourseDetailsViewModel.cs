@@ -107,10 +107,11 @@ namespace C_971.ViewModels
                 //Refresh the page
                 OnPropertyChanged(nameof(Course));
 
-                var result = await _database.SaveCourseAsync(Course);
-
                 // Update notifications after saving
                 await ScheduleCourseNotifications();
+
+                // Save to the database
+                await _database.SaveCourseAsync(Course);
             }
             catch (Exception ex)
             {
@@ -127,7 +128,7 @@ namespace C_971.ViewModels
 
             try
             {
-                await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", true, new Dictionary<string, object>
                 {
                     ["course"] = Course
                 });
