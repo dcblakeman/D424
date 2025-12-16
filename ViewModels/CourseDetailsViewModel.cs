@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(Instructor), "instructor")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -16,6 +17,9 @@ namespace C_971.ViewModels
         // Core Properties
         [ObservableProperty]
         private Course course;
+
+        [ObservableProperty]
+        private CourseInstructor instructor;
 
         [ObservableProperty]
         private string name = "Course Details";

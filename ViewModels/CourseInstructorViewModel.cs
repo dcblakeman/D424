@@ -67,6 +67,8 @@ namespace C_971.ViewModels
             {
                 Name = $"{value.Name} - Instructors";
                 _ = LoadInstructorsAsync();
+
+                Course = value;
             }
         }
 
@@ -296,6 +298,5 @@ namespace C_971.ViewModels
                 Instructors.Add(instructor);
             }
         }
-
     }
 }

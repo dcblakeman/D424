@@ -11,7 +11,7 @@
     </Shell.BackButtonBehavior>
     
         <Shell.TitleView>
-        <Label Text="{Binding Name}" 
+        <Label Text="Course Details" 
                FontSize="24" 
                FontAttributes="Bold"
                TextColor="Black"
@@ -29,8 +29,7 @@
                     Command="{Binding ToggleEditCommand}"
                     BackgroundColor="{Binding EditButtonColor}"
                     TextColor="White"
-                    Margin="0,0,0,15"
-                    Padding="17"/>
+                    Margin="0,0,0,15"/>
 
                 <Button Grid.Column="1"
                     Text="Edit Instructor"
@@ -49,7 +48,6 @@
             </Grid>
             
             <!-- Course Details Section -->
-            <Label Text="Course Details" FontAttributes="Bold" FontSize="18" Margin="0,5,0,3" HorizontalOptions="Center"/>
             <Border Stroke="DarkBlue"
                 StrokeThickness="1"
                 Padding="10"
@@ -62,35 +60,30 @@
 
                 <VerticalStackLayout Spacing="8">
 
-                    <!-- Term ID -->
-                    <VerticalStackLayout Spacing="3">
-                        <Label Text="Term ID:" FontAttributes="Bold"/>
-                        <Label Text="{Binding Course.TermId}"/>
-                    </VerticalStackLayout>
-
-                    <!-- ID -->
-                    <VerticalStackLayout Spacing="3">
-                        <Label Text="ID:" FontAttributes="Bold"/>
-                        <Label Text="{Binding Course.Id}"/>
-                    </VerticalStackLayout>
-
                     <!-- Name -->
                     <VerticalStackLayout Spacing="3">
-                        <Label Text="Name:" FontAttributes="Bold"/>
+                        <Label Text="Name" FontAttributes="Bold" TextDecorations="Underline"/>
                         <Label Text="{Binding Course.Name}" IsVisible="{Binding IsNotEditing}"/>
                         <Entry Text="{Binding Course.Name, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+                    
+                    <!-- Description -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Description" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding Course.Description}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding Course.Description, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- Start Date -->
                     <VerticalStackLayout Spacing="3">
-                        <Label Text="Start Date:" FontAttributes="Bold"/>
+                        <Label Text="Start Date" FontAttributes="Bold" TextDecorations="Underline"/>
                         <Label Text="{Binding Course.StartDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
                         <DatePicker Date="{Binding Course.StartDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- End Date -->
                     <VerticalStackLayout Spacing="3">
-                        <Label Text="End Date:" FontAttributes="Bold"/>
+                        <Label Text="End Date:" FontAttributes="Bold" TextDecorations="Underline"/>
                         <Label Text="{Binding Course.EndDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
                         <DatePicker Date="{Binding Course.EndDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}" />
                     </VerticalStackLayout>
@@ -98,7 +91,7 @@
                     <!-- Status -->
                     <VerticalStackLayout Spacing="3">
                         <!-- Status -->
-                        <Label Grid.Row="4" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Row="4" Grid.Column="0" Text="Status" FontAttributes="Bold" VerticalOptions="Center" TextDecorations="Underline"/>
                         <Label Grid.Row="4" Grid.Column="1" 
                                Text="{Binding Course.Status, Mode=TwoWay}" 
                                VerticalOptions="Center"
@@ -113,7 +106,6 @@
             </Border>
 
             <!-- Notifications Section with Border -->
-            <Label Text="Course Notifications" FontAttributes="Bold" FontSize="18" Margin="0,20,0,3" HorizontalOptions="Center"/>
             <Border Stroke="DarkBlue"
                 StrokeThickness="1"
                 Padding="10"
@@ -123,21 +115,42 @@
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
 
-                <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10" Margin="0,5,0,0">
+
                     <!-- Start Date Notifications -->
-                    <VerticalStackLayout Spacing="3">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="3">
                         <Label Text="Start Date Notifications:" FontAttributes="Bold"/>
-                        <Label Text="{Binding Course.StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
-                        <Switch IsToggled="{Binding Course.StartDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                        <Label Text="{Binding Course.StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.StartDateNotifications, Mode=TwoWay}" 
+                                IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- End Date Notifications -->
-                    <VerticalStackLayout Spacing="3">
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="3">
                         <Label Text="End Date Notifications:" FontAttributes="Bold"/>
-                        <Label Text="{Binding Course.EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
-                        <Switch IsToggled="{Binding Course.EndDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                        <Label Text="{Binding Course.EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding Course.EndDateNotifications, Mode=TwoWay}" 
+                                IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
-                </VerticalStackLayout>
+                </Grid>
+            </Border>
+            <!--End Notifications Section-->
+
+            <!-- Course Instructor Section with Border -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10" Margin="0,5,0,0">
+                
+                </Grid>
             </Border>
             <!--End Notifications Section-->
 
