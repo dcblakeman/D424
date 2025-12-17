@@ -235,7 +235,11 @@ namespace C_971.Services
 
         internal async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
         {
-            throw new NotImplementedException();
+            //Retrieve course notes by course ID
+            await InitializeAsync();
+            return await _database.Table<CourseNote>()
+                .Where(n => n.CourseId == id)
+                .ToListAsync();
         }
 
         internal async Task<CourseInstructor> GetInstructorByIdAsync(int? instructorId)

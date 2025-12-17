@@ -19,7 +19,7 @@ namespace C_971.ViewModels
 
         // Form Properties
         [ObservableProperty]
-        private string noteContent = string.Empty;
+        private string newNoteContent = string.Empty;
 
         [ObservableProperty]
         private DateTime createdDate = DateTime.Now;
@@ -50,7 +50,7 @@ namespace C_971.ViewModels
                 var newNote = new CourseNote
                 {
                     CreatedDate = DateTime.Now,
-                    NoteContent = NoteContent.Trim(),
+                    NoteContent = NewNoteContent.Trim(),
                     CourseId = Course.Id
                 };
 
@@ -69,7 +69,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task Cancel()
         {
-            bool hasContent = !string.IsNullOrWhiteSpace(NoteContent);
+            bool hasContent = !string.IsNullOrWhiteSpace(NewNoteContent);
 
             if (hasContent)
             {
@@ -91,7 +91,7 @@ namespace C_971.ViewModels
             try
             {
                 // Navigate back to previous page with course context
-                await Shell.Current.GoToAsync("..", new Dictionary<string, object>
+                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = Course
                 });
@@ -106,7 +106,7 @@ namespace C_971.ViewModels
         // Helper Methods
         private bool ValidateNote()
         {
-            if (string.IsNullOrWhiteSpace(NoteContent))
+            if (string.IsNullOrWhiteSpace(NewNoteContent))
             {
                 _ = Shell.Current.DisplayAlertAsync("Error", "Please enter note content", "OK");
                 return false;
@@ -118,7 +118,7 @@ namespace C_971.ViewModels
                 return false;
             }
 
-            if (NoteContent.Trim().Length < 3)
+            if (NewNoteContent.Trim().Length < 3)
             {
                 _ = Shell.Current.DisplayAlertAsync("Error", "Note must be at least 3 characters long", "OK");
                 return false;

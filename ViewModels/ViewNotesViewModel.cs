@@ -27,7 +27,7 @@ namespace C_971.ViewModels
 		private List<CourseNote> notes = [];
 
 		[ObservableProperty]
-        private string name = "Course Notes";
+        private string name = "View Notes";
 
         [ObservableProperty]
         private CourseNote note;
