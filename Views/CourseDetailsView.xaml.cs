@@ -9,4 +9,14 @@ public partial class CourseDetailsView : ContentPage
 		InitializeComponent();
 		BindingContext = courseDetailsViewModel;
     }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is CourseDetailsViewModel viewModel)
+        {
+            await viewModel.OnAppearingAsync();
+        }
+    }
 }

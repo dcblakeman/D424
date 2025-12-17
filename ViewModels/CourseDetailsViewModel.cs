@@ -65,6 +65,8 @@ namespace C_971.ViewModels
                 Name = $"{value.Name} - Details";
                 IsEditing = false;
                 System.Diagnostics.Debug.WriteLine($"Course loaded: {value.Id} - {value.Name}");
+
+                _= LoadInstructorAsync();
             }
         }
 
@@ -309,6 +311,48 @@ namespace C_971.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to request notification permissions: {ex.Message}");
             }
+        }
+
+        private async Task LoadInstructorAsync()
+        {
+            if (Course == null) return;
+            try
+            {
+                var instructor = await _database.GetInstructorByIdAsync(Course.InstructorId);
+                Instructor = instructor;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load instructor: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task RefreshData()
+        {
+            if (Course?.Id > 0)
+            {
+                try
+                {
+                    // Reload course from database to get latest InstructorId
+                    Course = await _database.GetCourseByIdAsync(Course.Id);
+
+                    // Load the instructor data
+                    await LoadInstructorAsync();
+
+                    System.Diagnostics.Debug.WriteLine($"Refreshed course and instructor data");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Failed to refresh data: {ex.Message}");
+                }
+            }
+        }
+
+        public async Task OnAppearingAsync()
+        {
+            // Refresh data when returning to this page
+            await RefreshData();
         }
     }
 }

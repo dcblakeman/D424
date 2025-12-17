@@ -237,6 +237,14 @@ namespace C_971.Services
         {
             throw new NotImplementedException();
         }
+
+        internal async Task<CourseInstructor> GetInstructorByIdAsync(int? instructorId)
+        {
+            //Retrieve instructor by ID
+            await InitializeAsync();
+            return await _database.Table<CourseInstructor>()
+                .FirstOrDefaultAsync(i => i.Id == instructorId);
+        }
         #endregion
     }
 }

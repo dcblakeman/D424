@@ -26,9 +26,6 @@ public partial class CourseInstructorView : ContentPage
         var instructor = (CourseInstructor)border.BindingContext;
         var viewModel = (CourseInstructorViewModel)BindingContext;
 
-        // Visual feedback animation
-        await AnimateTapFeedback(border);
-
         // Check if we're in remove mode
         if (viewModel.IsRemovingInstructor)
         {
@@ -37,32 +34,17 @@ public partial class CourseInstructorView : ContentPage
         }
         else
         {
+            //Assign the selected instructor to the course
+            viewModel.Course.InstructorId = instructor.Id;
+
+            //Update the course in the databaes with the instructorid
+            viewModel.Course = await viewModel.UpdateCourseAsync(viewModel.Course);
+
             // Navigate to detail view - only pass course since that's what CourseDetailsView expects
             await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>
             {
                 ["course"] = viewModel.Course
             });
-        }
-    }
-
-    private async Task AnimateTapFeedback(Border border)
-    {
-        try
-        {
-            // Non-blocking animation
-            var originalColor = border.BackgroundColor;
-
-            await border.ScaleToAsync(0.95, 50);
-            border.BackgroundColor = Color.FromArgb("#E3F2FD");
-
-            await Task.Delay(100);
-
-            await border.ScaleToAsync(1, 50);
-            border.BackgroundColor = originalColor;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Animation error: {ex.Message}");
         }
     }
 }

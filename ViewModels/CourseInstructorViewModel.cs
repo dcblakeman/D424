@@ -298,5 +298,20 @@ namespace C_971.ViewModels
                 Instructors.Add(instructor);
             }
         }
+
+        internal async Task<Course> UpdateCourseAsync(Course course)
+        {
+            try
+            {
+                await _database.SaveCourseAsync(course);
+                return course;
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to update course: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Update course error: {ex}");
+                throw;
+            }
+        }
     }
 }
