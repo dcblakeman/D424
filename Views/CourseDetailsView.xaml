@@ -148,8 +148,23 @@
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
 
-                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10" Margin="0,5,0,0">
-                
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" Margin="0,0,0,0">
+                    <!-- ID -->
+                        <Label Grid.Row="0" Grid.Column="0" Text="Instructor ID:" FontAttributes="Bold"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Instructor.Id, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    <!-- Name -->
+                        <Label Grid.Row="1" Grid.Column="0" Text="Instructor Name:" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Instructor.Name, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    <!-- Phone -->
+                        <Label Grid.Row="2" Grid.Column="0" Text="Instructor Phone:" FontAttributes="Bold"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Phone}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Grid.Row="2" Grid.Column="1" Text="{Binding Instructor.Phone, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    <!-- Email -->
+                        <Label Grid.Row="3" Grid.Column="0" Text="Instructor Email:" FontAttributes="Bold"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Email}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Instructor.Email, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                 </Grid>
             </Border>
             <!--End Notifications Section-->
