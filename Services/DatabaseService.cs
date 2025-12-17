@@ -250,5 +250,25 @@ namespace C_971.Services
                 .FirstOrDefaultAsync(i => i.Id == instructorId);
         }
         #endregion
+
+        public async Task<bool> CanAddAssessment(int courseId, AssessmentType assessmentType)
+        {
+            var existingAssessment = await _database.Table<CourseAssessment>()
+                .FirstOrDefaultAsync(a => a.CourseId == courseId && a.Type == assessmentType);
+
+            return existingAssessment == null;
+        }
+
+        public async Task<bool> ValidateCourseAssessments(int courseId)
+        {
+            var assessments = await _database.Table<CourseAssessment>()
+                .Where(a => a.CourseId == courseId)
+                .ToListAsync();
+
+            var hasPerformance = assessments.Any(a => a.Type == AssessmentType.Performance);
+            var hasObjective = assessments.Any(a => a.Type == AssessmentType.Objective);
+
+            return hasPerformance && hasObjective && assessments.Count == 2;
+        }
     }
 }
