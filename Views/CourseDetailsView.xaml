@@ -28,11 +28,13 @@
                 <Button Text="{Binding EditButtonText}"
                     Command="{Binding ToggleEditCommand}"
                     BackgroundColor="{Binding EditButtonColor}"
+                    FontAttributes="Bold"  
                     TextColor="White"
                     Margin="0,0,0,15"/>
 
                 <Button Grid.Column="1"
                     Text="Edit Instructor"
+                    FontAttributes="Bold"
                     Command="{Binding GetInstructorCommand}"
                     BackgroundColor="#F44336"
                     TextColor="White"
@@ -41,6 +43,7 @@
                 <!--Back Button-->
                 <Button Grid.Column="2"
                     Text="Back"
+                    FontAttributes="Bold"
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Grey"
                     TextColor="White"
@@ -137,6 +140,8 @@
                 </Grid>
             </Border>
             <!--End Notifications Section-->
+            
+            <Label Text="Course Instructor" FontAttributes="Bold" FontSize="18" Margin="0,25,0,3" HorizontalOptions="Center"/>
 
             <!-- Course Instructor Section with Border -->
             <Border Stroke="DarkBlue"
@@ -170,6 +175,8 @@
 
             <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" Margin="0,5,0,15">
                 <Button Text="Add Note"
+                        FontAttributes="Bold"
+                        
                         Command="{Binding AddNoteCommand}"
                         BackgroundColor="#2196F3"
                         TextColor="White"
@@ -177,6 +184,7 @@
                         Grid.ColumnSpan="2"/>
 
                 <Button Text="View Notes"
+                        FontAttributes="Bold"
                         Command="{Binding ViewNotesCommand}"
                         BackgroundColor="#F44336"
                         TextColor="White"
@@ -185,6 +193,7 @@
 
             </Grid>
             <Button Text="Assessments"
+                        FontAttributes="Bold"
                         Command="{Binding ViewAssessmentsCommand}"
                         BackgroundColor="#4CAF50"
                         TextColor="White"
