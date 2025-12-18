@@ -47,8 +47,12 @@ namespace C_971
             builder.Services.AddSingleton<CourseInstructorView>();
             builder.Services.AddSingleton<CourseInstructorViewModel>();
 
-            builder.Services.AddSingleton<AssessmentsView>();
-            builder.Services.AddSingleton<AssessmentsViewModel>();
+            builder.Services.AddSingleton<AssessmentSelectionView>();
+            builder.Services.AddSingleton<AssessmentSelectionViewModel>();
+
+
+            //builder.Services.AddSingleton<AssessmentsView>();
+            //builder.Services.AddSingleton<AssessmentsViewModel>();
 
             var app = builder.Build();
 

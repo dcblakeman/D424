@@ -65,7 +65,7 @@ namespace C_971.ViewModels
 
         public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
 
-        public string EditButtonText => IsEditing ? "Save" : "Edit Assessments";
+        public string EditButtonText => IsEditing ? "Add Assessment" : "Edit Assessments";
 
         [RelayCommand]
         private async Task GoBack()

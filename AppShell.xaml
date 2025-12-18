@@ -32,6 +32,6 @@
         ContentTemplate="{DataTemplate views:CourseInstructorView}"
         Route="CourseInstructorView"/>
     <ShellContent
-        ContentTemplate="{DataTemplate views:AssessmentsView}"
-        Route="AssessmentsView"/>
+        ContentTemplate="{DataTemplate views:AssessmentSelectionView}"
+        Route="AssessmentSelectionView"/>
 </Shell>

@@ -159,7 +159,7 @@ namespace C_971.ViewModels
                     IsEditing = false;
                 }
 
-                await Shell.Current.GoToAsync("AssessmentsView", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(AssessmentSelectionView)}", new Dictionary<string, object>
                 {
                     ["course"] = Course
                 });

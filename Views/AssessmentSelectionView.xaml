@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.AssessmentSelectionView"
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:AssessmentSelectionViewModel"
+             Title="{Binding Name}">
+
+    <Shell.TitleView>
+        <Label Text="{Binding Name}" 
+            FontSize="24" 
+            FontAttributes="Bold"
+            TextColor="Black"
+            VerticalOptions="Center"
+            HorizontalOptions="Center" />
+    </Shell.TitleView>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Top buttons -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Start" 
+                             HorizontalOptions="Fill"
+                             Spacing="20"
+                             Margin="0,20,0,0">
+            <Button Text="Performance"
+                    BackgroundColor="#4A90E2" 
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    CornerRadius="20"
+                    Padding="17"
+                    Margin="5"
+                    HorizontalOptions="Fill" />
+            <Button Text="Objective"
+                    BackgroundColor="#5CB85C" 
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    CornerRadius="20"
+                    Padding="17"
+                    Margin="5"
+                    HorizontalOptions="Fill" />
+        </VerticalStackLayout>
+
+        <!-- Bottom back button -->
+        <Button Grid.Row="1"
+                Text="Back"
+                BackgroundColor="#6C757D" 
+                FontAttributes="Bold"
+                TextColor="White"
+                CornerRadius="20"
+                Padding="17"
+                Margin="5,0,5,20"
+                HorizontalOptions="Fill"
+                Command="{Binding GoBackCommand}" />
+    </Grid>
+</ContentPage>

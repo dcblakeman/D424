@@ -19,7 +19,7 @@
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto">
 
         <!-- Buttons Row -->
         <Grid Grid.Row="0" ColumnDefinitions="*,*" Margin="10,0,10,5">
@@ -31,7 +31,7 @@
                     FontAttributes="Bold"
                     CornerRadius="5"
                     Margin="5,0,5,0"/>
-            
+
             <Button Grid.Column="1" 
                     Text="Back" 
                     Command="{Binding GoBackCommand}"
