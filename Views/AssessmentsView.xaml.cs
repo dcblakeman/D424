@@ -9,4 +9,14 @@ public partial class AssessmentsView : ContentPage
 		InitializeComponent();
 		BindingContext = viewModel;
 	}
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is CourseDetailsViewModel viewModel)
+        {
+            await viewModel.OnAppearingAsync();
+        }
+    }
 }

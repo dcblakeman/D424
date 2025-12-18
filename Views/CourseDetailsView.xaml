@@ -109,7 +109,7 @@
             </Border>
             
             <Label Text="Course Notifications" FontAttributes="Bold" FontSize="18" Margin="0,10,0,0" HorizontalOptions="Center"/>
-            <!-- Notifications Section with Border -->
+            <!-- Notifications Section with Border --> 
             <Border Stroke="DarkBlue"
                 StrokeThickness="1"
                 Padding="10"

@@ -19,6 +19,12 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string name = "Assessments";
 
+        [ObservableProperty]
+        private string searchText = string.Empty;
+
+        [ObservableProperty]
+        private CourseAssessment assessment;
+
         // UI State
         [ObservableProperty]
         private bool isEditing;
@@ -26,17 +32,86 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isRefreshing;
 
-        public bool IsNotEditing => !IsEditing;
+        [ObservableProperty]
+        private bool isAddingAssessment;
+
+        [ObservableProperty]
+        private bool isRemovingAssessment;
+
+        [ObservableProperty]
+        private bool isSavingAssessment;
+
+        [ObservableProperty]
+        private bool isDeletingAssessment;
+
+        [ObservableProperty]
+        private bool isLoadingAssessments;
+
+        public bool IsNotRefreshing => !IsRefreshing;
+
+        public bool IsNotAddingAssessment => !IsAddingAssessment;
+
+        public bool IsNotRemovingAssessment => !IsRemovingAssessment;
+
+        public bool IsNotSavingAssessment => !IsSavingAssessment;
+
+        public bool IsNotDeletingAssessment => !IsDeletingAssessment;
+
+
+        public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
+
+        public string EditButtonText => IsEditing ? "Save" : "Edit Assessments";
+
+        [RelayCommand]
+        private async Task GoBack()
+        {
+            try
+            {
+                // Use relative navigation (no leading slash)
+                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task Edit()
+        {
+            if (IsEditing)
+            {
+                // Save logic here
+                await SaveAssessment(Assessment);
+            }
+
+            IsEditing = !IsEditing;
+            OnPropertyChanged(nameof(EditButtonText));
+        }
 
         // Collections
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
+
+        private List<CourseAssessment> _allAssessments = new();
 
         public AssessmentsViewModel(DatabaseService database)
         {
             _database = database;
             _ = RequestNotificationPermissions();
         }
+
+        public async Task OnAppearingAsync()
+        {
+            if (Assessments.Count == 0)
+            {
+                await LoadAssessmentsAsync();
+            }
+        }
+
 
         // Property Change Handlers
         partial void OnCourseChanged(Course value)
@@ -162,24 +237,6 @@ namespace C_971.ViewModels
             }
         }
 
-        // Navigation
-        [RelayCommand]
-        private async Task GoBack()
-        {
-            try
-            {
-                await Shell.Current.GoToAsync("..", new Dictionary<string, object>
-                {
-                    ["course"] = Course
-                });
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
-                System.Diagnostics.Debug.WriteLine($"Navigation error: {ex}");
-            }
-        }
-
         // Notification Management
         private async Task UpdateAssessmentNotifications(CourseAssessment assessment)
         {
@@ -257,6 +314,35 @@ namespace C_971.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to request notification permissions: {ex.Message}");
+            }
+        }
+
+        private void CancelNotification(int id)
+        {
+            try
+            {
+                LocalNotificationCenter.Current.Cancel(id);
+                System.Diagnostics.Debug.WriteLine($"Cancelled notification: {id}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to cancel notification: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private void Search()
+        {
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                Assessments = new ObservableCollection<CourseAssessment>(_allAssessments);
+            }
+            else
+            {
+                var filtered = _allAssessments
+                    .Where(a => a.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                Assessments = new ObservableCollection<CourseAssessment>(filtered);
             }
         }
     }
