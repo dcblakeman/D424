@@ -25,6 +25,11 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private CourseAssessment assessment;
 
+        [ObservableProperty]
+        private ObservableCollection<CourseAssessment> assessments = new();
+
+        private List<CourseAssessment> _allAssessments = new();
+
         // UI State
         [ObservableProperty]
         private bool isEditing;
@@ -91,12 +96,6 @@ namespace C_971.ViewModels
             IsEditing = !IsEditing;
             OnPropertyChanged(nameof(EditButtonText));
         }
-
-        // Collections
-        [ObservableProperty]
-        private ObservableCollection<CourseAssessment> assessments = new();
-
-        private List<CourseAssessment> _allAssessments = new();
 
         public AssessmentsViewModel(DatabaseService database)
         {

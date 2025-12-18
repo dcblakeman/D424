@@ -24,23 +24,23 @@
         <!-- Buttons Row -->
         <Grid Grid.Row="0" ColumnDefinitions="*,*" Margin="10,0,10,5">
             <Button Grid.Column="0" 
-                    Text="Back" 
-                    Command="{Binding GoBackCommand}"
-                    BackgroundColor="#6c757d"
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    CornerRadius="5"
-                    Margin="0,0,5,0"
-                    Padding="17"/>
-
-            <Button Grid.Column="1" 
                     Text="{Binding EditButtonText}" 
                     Command="{Binding EditCommand}"
                     BackgroundColor="#007bff"
                     TextColor="White"
                     FontAttributes="Bold"
                     CornerRadius="5"
-                    Margin="5,0,0,0"/>
+                    Margin="5,0,5,0"/>
+            
+            <Button Grid.Column="1" 
+                    Text="Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="#6c757d"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="5"
+                    Margin="5,0,5,0"
+                    Padding="17"/>
         </Grid>
 
         <ScrollView Grid.Row="1">
@@ -198,6 +198,96 @@
                     </Grid>
                 </Border>
                 <!--End Notifications Section-->
+
+                <!-- Course Assesesment List Section -->
+                <RefreshView Grid.Row="3"
+                             Command="{Binding LoadCourseAssessmentsCommand}"  
+                             IsRefreshing="{Binding IsRefreshing}">
+
+                    <!-- Calls Course Assessments List -->
+                    <CollectionView ItemsSource="{Binding Assessments}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:CourseAssessment">
+
+                                <Grid Padding="10">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border StrokeThickness="1"   
+                                    Stroke="LightGray"   
+                                    Padding="10">
+
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8"/>
+                                        </Border.StrokeShape>
+
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnCourseTapped"/>
+                                        </Border.GestureRecognizers>
+
+                                        <!-- Course Entries -->
+                                        <VerticalStackLayout Spacing="5">
+
+                                            <!-- ID -->
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label Text="ID:" FontAttributes="Bold"/>
+                                                <Label Text="{Binding Id}"/>
+                                            </HorizontalStackLayout>
+
+                                            <!-- Name -->
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label Text="Name:" FontAttributes="Bold"/>
+                                                <Label Text="{Binding Name}" LineBreakMode="TailTruncation"/>
+                                            </HorizontalStackLayout>
+
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Dates Column -->
+                                                <HorizontalStackLayout Grid.Column="0" Spacing="10">
+                                                    <Label Text="Dates:" FontAttributes="Bold"/>
+                                                    <Label>
+                                                        <Label.FormattedText>
+                                                            <FormattedString>
+                                                                <Span Text="{Binding StartDate, StringFormat='{0:MM/dd/yyyy}'}"/>
+                                                                <Span Text=" - "/>
+                                                                <Span Text="{Binding EndDate, StringFormat='{0:MM/dd/yyyy}'}"/>
+                                                            </FormattedString>
+                                                        </Label.FormattedText>
+                                                    </Label>
+                                                </HorizontalStackLayout>
+
+                                                <!-- Status Column -->
+                                                <Label Grid.Column="1"
+                                               Text="{Binding Status}" 
+                                               FontAttributes="Bold" 
+                                               TextColor="DarkBlue"/>
+                                            </Grid>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                        <!-- Empty Course Section -->
+                        <CollectionView.EmptyView>
+                            <StackLayout Padding="20" VerticalOptions="Center">
+                                <Label Text="No courses available"   
+                               HorizontalOptions="Center"  
+                               FontSize="18"  
+                               TextColor="Gray"/>
+                            </StackLayout>
+                        </CollectionView.EmptyView>
+                        <!-- End Empty Course Section -->
+
+                    </CollectionView>
+                </RefreshView>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
