@@ -96,6 +96,12 @@
 	  <MauiXaml Update="Views\CourseListView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\ObjectiveAssessmentView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\PerformanceAssessmentView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\ViewNotesView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

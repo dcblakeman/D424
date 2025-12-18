@@ -50,9 +50,11 @@ namespace C_971
             builder.Services.AddSingleton<AssessmentSelectionView>();
             builder.Services.AddSingleton<AssessmentSelectionViewModel>();
 
+            builder.Services.AddSingleton<PerformanceAssessmentView>();
+            builder.Services.AddSingleton<PerformanceAssessmentViewModel>();
 
-            //builder.Services.AddSingleton<AssessmentsView>();
-            //builder.Services.AddSingleton<AssessmentsViewModel>();
+            builder.Services.AddSingleton<ObjectiveAssessmentView>();
+            builder.Services.AddSingleton<ObjectiveAssessmentViewModel>();
 
             var app = builder.Build();
 

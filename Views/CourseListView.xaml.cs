@@ -6,7 +6,7 @@ namespace C_971.Views
 {
     public partial class CourseListView : ContentPage
     {
-        public CourseListView (CourseListViewModel courseListViewModel)
+        public CourseListView(CourseListViewModel courseListViewModel)
         {
             InitializeComponent();
             BindingContext = courseListViewModel;

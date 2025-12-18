@@ -33,6 +33,7 @@
                              Spacing="20"
                              Margin="0,20,0,0">
             <Button Text="Performance"
+                    Command="{Binding NavigateToPerformanceAssessmentViewCommand}"
                     BackgroundColor="#4A90E2" 
                     FontAttributes="Bold"
                     TextColor="White"
@@ -41,6 +42,7 @@
                     Margin="5"
                     HorizontalOptions="Fill" />
             <Button Text="Objective"
+                    Command="{Binding NavigateToObjectiveAssessmentViewCommand}"
                     BackgroundColor="#5CB85C" 
                     FontAttributes="Bold"
                     TextColor="White"

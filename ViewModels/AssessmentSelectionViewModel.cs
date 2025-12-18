@@ -40,9 +40,39 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private async Task GoToPerformanceAssessmentView()
+        private async Task NavigateToPerformanceAssessmentView()
         {
+            if (Course == null) return;
 
+            try
+            {
+                await Shell.Current.GoToAsync($"{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToObjectiveAssessmentView()
+        {
+            if (Course == null) return;
+
+            try
+            {
+                await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
+                {
+                    ["course"] = Course
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
         }
     }
 }
