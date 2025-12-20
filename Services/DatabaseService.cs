@@ -283,5 +283,22 @@ namespace C_971.Services
         {
             throw new NotImplementedException();
         }
+
+        internal async Task<IEnumerable<CourseAssessment>> GetAssessmentsByTypeAsync(AssessmentType performance)
+        {
+            var assessments = await _database.Table<CourseAssessment>()
+                .Where(a => a.Type == performance)
+                .ToListAsync();
+
+            return assessments;
+        }
+
+        //Get course assessment by course ID and type
+        internal async Task<CourseAssessment?> GetCourseAssessmentByCourseIdAndTypeAsync(int courseId, AssessmentType type)
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseAssessment>()
+                .FirstOrDefaultAsync(a => a.CourseId == courseId && a.Type == type);
+        }
     }
 }

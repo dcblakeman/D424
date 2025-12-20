@@ -210,7 +210,7 @@ namespace C_971.ViewModels
                 Assessment.CourseId = CourseId;
                 Assessment.Name = AssessmentName;
                 Assessment.Type = AssessmentType.Performance;
-                Assessment.Status = AssessmentStatus; // FIX: assign a single AssessmentStatus, not the list
+                Assessment.Status = AssessmentStatus;
                 Assessment.StartDate = AssessmentStartDate;
                 Assessment.EndDate = AssessmentEndDate;
                 Assessment.Description = AssessmentDescription;
@@ -338,21 +338,38 @@ namespace C_971.ViewModels
             OnPropertyChanged(nameof(BackButtonText));
 
             SearchText = "";
+            await Search();
         }
 
         [RelayCommand]
         public async Task Search()
         {
-            IsSearching = true;
-            OnPropertyChanged(nameof(IsNotSearching));
-            if (string.IsNullOrWhiteSpace(SearchText))
+            try
             {
-                Assessments = new ObservableCollection<CourseAssessment>(_allAssessments);
+                IsSearching = true;
+                OnPropertyChanged(nameof(IsNotSearching));
+
+                // Get all Performance assessments from all courses
+                var allPerformanceAssessments = await _database.GetAssessmentsByTypeAsync(AssessmentType.Performance);
+
+                if (string.IsNullOrWhiteSpace(SearchText))
+                {
+                    // Show all performance assessments
+                    Assessments = new ObservableCollection<CourseAssessment>(allPerformanceAssessments);
+                }
+                else
+                {
+                    // Filter performance assessments by search text
+                    var filtered = allPerformanceAssessments.Where(a =>
+                        a.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                        .ToList();
+                    Assessments = new ObservableCollection<CourseAssessment>(filtered);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var filtered = _allAssessments.FindAll(a => a.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
-                Assessments = new ObservableCollection<CourseAssessment>(filtered);
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to search assessments: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Search assessments error: {ex}");
             }
         }
 
@@ -365,14 +382,19 @@ namespace C_971.ViewModels
 
                 // Load existing assessments for this course
                 _ = LoadCourseAssessments();
+
+                //Check Performance Assessments for CourseId
+
+
             }
         }
 
         partial void OnAssessmentChanged(CourseAssessment? oldValue, CourseAssessment newValue)
         {
-            // Update UI for Assessment ID
-            AssessmentId = Assessment.Id;
-
+            //If an assessment has the seame courseId assigned to it
+            if(oldValue != newValue)
+            {
+            }
         }
 
         [RelayCommand]
