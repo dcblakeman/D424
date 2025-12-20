@@ -270,5 +270,10 @@ namespace C_971.Services
 
             return hasPerformance && hasObjective && assessments.Count == 2;
         }
+
+        internal async Task DeleteAssessmentAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

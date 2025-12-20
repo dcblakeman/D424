@@ -27,6 +27,21 @@ namespace C_971.ViewModels
         private CourseAssessment assessment;
 
         [ObservableProperty]
+        private string assessmentName;
+
+        [ObservableProperty]
+        private string assessmentDescription;
+
+        [ObservableProperty]
+        private DateTime assessmentStartDate;
+
+        [ObservableProperty]
+        private DateTime assessmentEndDate;
+
+        [ObservableProperty]
+        private AssessmentStatus assessmentStatus;
+
+        [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
 
         private List<CourseAssessment> _allAssessments = new();

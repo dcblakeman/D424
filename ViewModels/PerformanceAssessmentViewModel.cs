@@ -66,11 +66,15 @@ namespace C_971.ViewModels
 
         public bool IsNotDeletingAssessment => !IsDeletingAssessment;
 
+        public bool IsNotEditing => !IsEditing;
 
-        public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
 
-        public string EditButtonText => IsEditing ? "Add Assessment" : "Edit Assessment";
- 
+        //public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
+
+        public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
+
+        public string BackButtonText => IsEditing ? "Cancel" : "Back";
+
 
         public PerformanceAssessmentViewModel(DatabaseService database)
         {
@@ -81,18 +85,29 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task GoBack()
         {
-            try
+            if (IsEditing)
             {
-                // Use relative navigation (no leading slash)
-                await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
+                IsEditing = false;
+                OnPropertyChanged(nameof(IsNotEditing));
+                OnPropertyChanged(nameof(EditButtonText));
+                OnPropertyChanged(nameof(BackButtonText));
+            }
+            else
+            {
+                try
                 {
-                    ["course"] = Course
-                });
+                    // Use relative navigation (no leading slash)
+                    await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
+                    {
+                        ["course"] = Course
+                    });
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+                }
             }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
-            }
+
         }
 
         private async Task RequestNotificationPermissions()
@@ -107,21 +122,28 @@ namespace C_971.ViewModels
             }
         }
 
+        partial void OnIsEditingChanged(bool value)
+        {
+            OnPropertyChanged(nameof(IsNotEditing));
+            OnPropertyChanged(nameof(EditButtonText));
+            OnPropertyChanged(nameof(BackButtonText));
+        }
+
         [RelayCommand]
-        private async Task Edit()
+        private async Task EditAssessment()
         {
             if (IsEditing)
             {
-                // Save logic here
+                // Currently editing, so save changes
                 await SaveAssessment(Assessment);
+                IsEditing = false;  // Exit edit mode after saving
+            }
+            else
+            {
+                // Not editing, so enter edit mode
+                IsEditing = true;
             }
 
-            IsEditing = !IsEditing;
-            OnPropertyChanged(nameof(EditButtonText));
-        }
-
-        partial void OnIsEditingChanged(bool value)
-        {
             OnPropertyChanged(nameof(IsNotEditing));
         }
 
@@ -210,6 +232,50 @@ namespace C_971.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to cancel notification: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        internal async Task DeleteAssessment()
+        {
+            if (Assessment == null) return;
+
+            bool answer = await Shell.Current.DisplayAlertAsync(
+                "Delete Assessment",
+                $"Are you sure you want to delete '{Assessment.Name}'?",
+                "Yes",
+                "No");
+
+            if (answer)
+            {
+                try
+                {
+                    await _database.DeleteAssessmentAsync(Assessment.Id);
+                    await Shell.Current.DisplayAlertAsync("Success", "Assessment deleted successfully.", "OK");
+
+                    // Navigate back since the assessment no longer exists
+                    await Shell.Current.GoToAsync("..");
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to delete assessment: {ex.Message}", "OK");
+                }
+            }
+
+            [RelayCommand]
+            async Task FindAssessment()
+            {
+                // Show the search bar and switch to search mode
+                IsEditing = true; // This will show the search bar
+                OnPropertyChanged(nameof(IsNotEditing));
+                OnPropertyChanged(nameof(EditButtonText));
+                OnPropertyChanged(nameof(BackButtonText));
+
+                // Optionally clear previous search and focus on search bar
+                SearchText = "";
+
+                // You might want to add some visual indication that we're in "search mode" vs "edit mode"
+                // Or create a separate IsSearching property if you want to distinguish between the two
             }
         }
 

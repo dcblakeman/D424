@@ -23,10 +23,10 @@
     <Grid RowDefinitions="Auto,Auto">
 
         <!-- Buttons Row -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,*" Margin="10,0,10,5">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*" Margin="5,0,5,0">
             <Button Grid.Column="0" 
                     Text="{Binding EditButtonText}" 
-                    Command="{Binding EditCommand}"
+                    Command="{Binding EditAssessmentCommand}"
                     BackgroundColor="#007bff"
                     TextColor="White"
                     FontAttributes="Bold"
@@ -34,7 +34,7 @@
                     Margin="5,0,5,0"/>
 
             <Button Grid.Column="1" 
-                    Text="Back" 
+                    Text="{Binding BackButtonText}" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="#6c757d"
                     TextColor="White"
@@ -72,7 +72,7 @@
                 <!-- End Search Bar Border -->
 
                 <!-- Assessment -->
-                <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="5,10,5,0" IsVisible="{Binding IsNotEditing}">
+                <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="5,5,5,0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="5"/>
                     </Border.StrokeShape>
@@ -131,6 +131,27 @@
                     </Grid>
                 </Border>
                 <!--End Notifications Section-->
+
+                <Grid ColumnDefinitions="*,*" Margin="0,5,0,0" IsVisible="{Binding IsNotEditing}">
+                    <Button Grid.Column="0" 
+                            Text="Find Assessment" 
+                            Command="{Binding FindAssessmentCommand}"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="5"
+                            Margin="5,0,5,0"/>
+
+                                    <Button Grid.Column="1" 
+                            Text="Delete Assessment" 
+                            Command="{Binding DeleteAssessmentCommand}"
+                            BackgroundColor="#dc3545"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            CornerRadius="5"
+                            Margin="5,0,5,0"
+                            Padding="17"/>
+                </Grid>
 
                 <!-- Course Assesesment List Section -->
                 <RefreshView Grid.Row="3"
