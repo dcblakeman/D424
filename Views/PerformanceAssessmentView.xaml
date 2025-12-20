@@ -77,29 +77,36 @@
                         <RoundRectangle CornerRadius="5"/>
                     </Border.StrokeShape>
 
-                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
                         <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Assessment.Id}" VerticalOptions="Center"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding AssessmentId}" VerticalOptions="Center"/>
 
                         <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Assessment.Name}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                        <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Assessment.Name}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding AssessmentName}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Grid.Row="1" Grid.Column="1" Text="{Binding AssessmentName}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Assessment.Type}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                        <Picker Grid.Row="2" Grid.Column="1" SelectedItem="{Binding Assessment.Type}" ItemsSource="{Binding AssessmentTypeOptions}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                        <Picker Grid.Row="2" Grid.Column="1" ItemsSource="{Binding AssessmentTypeOptions}" SelectedItem="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
                         <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
-                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Assessment.Description}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                        <Entry Grid.Row="3" Grid.Column="1" Text="{Binding Assessment.Description}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding AssessmentDescription}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Grid.Row="3" Grid.Column="1" Text="{Binding AssessmentDescription}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
                         <Label Grid.Row="4" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
-                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding Assessment.StartDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                        <DatePicker Grid.Row="4" Grid.Column="1" Date="{Binding Assessment.StartDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding AssessmentStartDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Grid.Row="4" Grid.Column="1" Date="{Binding AssessmentStartDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
                         <Label Grid.Row="5" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
-                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding Assessment.EndDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                        <DatePicker Grid.Row="5" Grid.Column="1" Date="{Binding Assessment.EndDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding AssessmentEndDate, StringFormat='{0:MM/dd/yyyy}'}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Grid.Row="5" Grid.Column="1" Date="{Binding AssessmentEndDate}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                        <Label Grid.Row="6" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Row="6" Grid.Column="1" Text="{Binding AssessmentStatus}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                        <Picker Grid.Row="6" Grid.Column="1" ItemsSource="{Binding AssessmentStatusOptions}" SelectedItem="{Binding AssessmentStatus}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+
+                        <Label Grid.Row="7" Grid.Column="0" Text="Course ID:" FontAttributes="Bold" VerticalOptions="Center"/>
+                        <Label Grid.Row="7" Grid.Column="1" Text="{Binding CourseId}" VerticalOptions="Center"/>
                     </Grid>
                 </Border>
 

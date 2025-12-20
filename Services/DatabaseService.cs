@@ -184,6 +184,14 @@ namespace C_971.Services
                 .ToListAsync();
             return assessments.Count > 0 ? assessments[0].Id + 1 : 1;
         }
+
+        // In your DatabaseService
+        public async Task<List<CourseAssessment>> GetCourseAssessmentsByCourseIdAsync(int courseId)
+        {
+            return await _database.Table<CourseAssessment>()
+                .Where(a => a.CourseId == courseId)
+                .ToListAsync();
+        }
         #endregion
 
         #region Course Instructors

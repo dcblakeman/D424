@@ -20,32 +20,37 @@ namespace C_971.ViewModels
         private Course course;
 
         [ObservableProperty]
-        private string assessmentName;
+        private string assessmentName = String.Empty;
 
         [ObservableProperty]
         private AssessmentType assessmentType = AssessmentType.Performance;
 
         [ObservableProperty]
-        private AssessmentStatus assessmentStatus;
+        private AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
 
         [ObservableProperty]
-        private DateTime assessmentStartDate;
+        private DateTime assessmentStartDate = DateTime.Today;
 
         [ObservableProperty]
-        private DateTime assessmentEndDate;
+        private DateTime assessmentEndDate = DateTime.Today.AddMonths(6);
 
         [ObservableProperty]
-        private string assessmentDescription;
+        private string assessmentDescription = String.Empty;
 
         [ObservableProperty]
         private string name = "Performance Assessment";
-
 
         [ObservableProperty]
         private string searchText = string.Empty;
 
         [ObservableProperty]
-        private CourseAssessment assessment;
+        private CourseAssessment assessment = new();
+
+        [ObservableProperty]
+        private int assessmentId;
+
+        [ObservableProperty]
+        private int courseId;
 
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
@@ -100,6 +105,23 @@ namespace C_971.ViewModels
 
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
+
+        //Assessment StatusOptions
+        [ObservableProperty]
+        private List<AssessmentStatus> assessmentStatusOptions = new()
+        {
+            AssessmentStatus.Pending,
+            AssessmentStatus.InProgress,
+            AssessmentStatus.Completed,
+            AssessmentStatus.Overdue
+        };
+
+        [ObservableProperty]
+        private List<AssessmentType> assessmentTypeOptions = new()
+        {
+            AssessmentType.Objective,
+            AssessmentType.Performance
+        };
 
         public PerformanceAssessmentViewModel(DatabaseService database)
         {
@@ -166,7 +188,7 @@ namespace C_971.ViewModels
             if (IsEditing)
             {
                 // Currently editing, so save changes
-                await SaveAssessment(Assessment);
+                await SaveAssessment();
                 IsEditing = false;  // Exit edit mode after saving
             }
             else
@@ -179,26 +201,29 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private async Task SaveAssessment(CourseAssessment assessment)
+        private async Task SaveAssessment()
         {
-            if (Assessment.Id == 0)
+            if (AssessmentId == 0)
             {
+                await Shell.Current.DisplayAlertAsync("Info", $"Course ID: {CourseId}", "OK");
                 //Save the new assessment
-                assessment.CourseId = Course.Id;
-                assessment.Name = AssessmentName;
-                assessment.Type = AssessmentType.Performance;
-                assessment.Status = AssessmentStatus;
-                assessment.StartDate = AssessmentStartDate;
-                assessment.EndDate = AssessmentEndDate;
-                assessment.Description = AssessmentDescription;
+                Assessment.CourseId = CourseId;
+                Assessment.Name = AssessmentName;
+                Assessment.Type = AssessmentType.Performance;
+                Assessment.Status = AssessmentStatus; // FIX: assign a single AssessmentStatus, not the list
+                Assessment.StartDate = AssessmentStartDate;
+                Assessment.EndDate = AssessmentEndDate;
+                Assessment.Description = AssessmentDescription;
             }
 
             try
             {
-                await _database.SaveCourseAssessmentAsync(assessment);
+                await _database.SaveCourseAssessmentAsync(Assessment);
+
+                AssessmentId = Assessment.Id;
 
                 // Update notifications if needed
-                await UpdateAssessmentNotifications(assessment);
+                await UpdateAssessmentNotifications(Assessment);
 
                 await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
             }
@@ -328,6 +353,56 @@ namespace C_971.ViewModels
             {
                 var filtered = _allAssessments.FindAll(a => a.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
                 Assessments = new ObservableCollection<CourseAssessment>(filtered);
+            }
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            if (value != null)
+            {
+                CourseId = value.Id;
+                AssessmentType = AssessmentType.Performance;
+
+                // Load existing assessments for this course
+                _ = LoadCourseAssessments();
+            }
+        }
+
+        partial void OnAssessmentChanged(CourseAssessment? oldValue, CourseAssessment newValue)
+        {
+            // Update UI for Assessment ID
+            AssessmentId = Assessment.Id;
+
+        }
+
+        [RelayCommand]
+        private async Task LoadCourseAssessments()
+        {
+            try
+            {
+                IsLoadingAssessments = true;
+
+                // Get all assessments for this course
+                var courseAssessments = await _database.GetCourseAssessmentsByCourseIdAsync(Course.Id);
+
+                _allAssessments = courseAssessments?.ToList() ?? new List<CourseAssessment>();
+                Assessments.Clear();
+
+                foreach (var assessment in _allAssessments)
+                {
+                    Assessments.Add(assessment);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load assessments: {ex.Message}", "OK");
+                System.Diagnostics.Debug.WriteLine($"Load assessments error: {ex}");
+            }
+            finally
+            {
+                IsLoadingAssessments = false;
+                OnPropertyChanged(nameof(IsNotEditing)); // Update UI state
             }
         }
     }
