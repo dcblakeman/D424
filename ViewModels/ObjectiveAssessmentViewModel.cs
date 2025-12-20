@@ -68,6 +68,11 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isLoadingAssessments;
 
+        [ObservableProperty]
+        private bool isFindingAssessments;
+
+        public bool IsNotFindingAssessments => !IsNotFindingAssessments;
+
         public bool IsNotRefreshing => !IsRefreshing;
 
         public bool IsNotAddingAssessment => !IsAddingAssessment;

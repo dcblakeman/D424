@@ -52,7 +52,7 @@
                 StrokeThickness="1"
                 BackgroundColor="White"
                 Margin="5,0,5,10"
-                IsVisible="{Binding IsEditing}">
+                IsVisible="{Binding IsSearching}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8"/>
                     </Border.StrokeShape>
@@ -67,12 +67,12 @@
                        PlaceholderColor="Gray"
                        FontSize="16"
                        Margin="5"
-                       IsVisible="{Binding IsEditing}"/>
+                       IsVisible="{Binding IsSearching}"/>
                 </Border>
                 <!-- End Search Bar Border -->
 
                 <!-- Assessment -->
-                <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="5,5,5,0">
+                <Border Stroke="DarkBlue" StrokeThickness="1" Padding="10" BackgroundColor="AliceBlue" Margin="5,5,5,0" IsVisible="{Binding IsNotSearching}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="5"/>
                     </Border.StrokeShape>
@@ -104,7 +104,7 @@
                 </Border>
 
                 <!-- Assessment 1 Notifications Section -->
-                <Border Stroke="DarkBlue" StrokeThickness="1" Padding="20,5,5,5" BackgroundColor="AliceBlue" Margin="5,5,5,0" IsVisible="{Binding IsNotEditing}">
+                <Border Stroke="DarkBlue" StrokeThickness="1" Padding="20,5,5,5" BackgroundColor="AliceBlue" Margin="5,5,5,0" IsVisible="{Binding IsNotSearching}">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="5"/>
                     </Border.StrokeShape>
@@ -132,25 +132,25 @@
                 </Border>
                 <!--End Notifications Section-->
 
-                <Grid ColumnDefinitions="*,*" Margin="0,5,0,0" IsVisible="{Binding IsNotEditing}">
+                <Grid ColumnDefinitions="*,*" Margin="0,5,0,0" IsVisible="{Binding IsNotSearching}">
                     <Button Grid.Column="0" 
-                            Text="Find Assessment" 
-                            Command="{Binding FindAssessmentCommand}"
-                            BackgroundColor="#28a745"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            CornerRadius="5"
-                            Margin="5,0,5,0"/>
+                        Text="Find Assessment" 
+                        Command="{Binding FindAssessmentCommand}"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="5"
+                        Margin="5,0,5,0"
+                        Padding="17"/>
 
-                                    <Button Grid.Column="1" 
-                            Text="Delete Assessment" 
-                            Command="{Binding DeleteAssessmentCommand}"
-                            BackgroundColor="#dc3545"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            CornerRadius="5"
-                            Margin="5,0,5,0"
-                            Padding="17"/>
+                    <Button Grid.Column="1" 
+                        Text="Delete Assessment" 
+                        Command="{Binding DeleteAssessmentCommand}"
+                        BackgroundColor="#dc3545"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="5"
+                        Margin="5,0,5,0"/>
                 </Grid>
 
                 <!-- Course Assesesment List Section -->

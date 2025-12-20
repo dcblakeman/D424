@@ -20,6 +20,24 @@ namespace C_971.ViewModels
         private Course course;
 
         [ObservableProperty]
+        private string assessmentName;
+
+        [ObservableProperty]
+        private AssessmentType assessmentType = AssessmentType.Performance;
+
+        [ObservableProperty]
+        private AssessmentStatus assessmentStatus;
+
+        [ObservableProperty]
+        private DateTime assessmentStartDate;
+
+        [ObservableProperty]
+        private DateTime assessmentEndDate;
+
+        [ObservableProperty]
+        private string assessmentDescription;
+
+        [ObservableProperty]
         private string name = "Performance Assessment";
 
 
@@ -56,6 +74,11 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isLoadingAssessments;
 
+        [ObservableProperty]
+        private bool isSearching;
+
+        public bool IsNotSearching => !IsSearching;
+
         public bool IsNotRefreshing => !IsRefreshing;
 
         public bool IsNotAddingAssessment => !IsAddingAssessment;
@@ -71,10 +94,12 @@ namespace C_971.ViewModels
 
         //public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
 
+        //public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
+
+        //public string BackButtonText => IsEditing ? "Cancel" : "Back";
+
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
-
-        public string BackButtonText => IsEditing ? "Cancel" : "Back";
-
+        public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
 
         public PerformanceAssessmentViewModel(DatabaseService database)
         {
@@ -90,6 +115,12 @@ namespace C_971.ViewModels
                 IsEditing = false;
                 OnPropertyChanged(nameof(IsNotEditing));
                 OnPropertyChanged(nameof(EditButtonText));
+                OnPropertyChanged(nameof(BackButtonText));
+            }
+            else if (IsSearching)
+            {
+                IsSearching = false;
+                OnPropertyChanged(nameof(IsNotSearching));
                 OnPropertyChanged(nameof(BackButtonText));
             }
             else
@@ -150,7 +181,17 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveAssessment(CourseAssessment assessment)
         {
-            if (assessment == null) return;
+            if (Assessment.Id == 0)
+            {
+                //Save the new assessment
+                assessment.CourseId = Course.Id;
+                assessment.Name = AssessmentName;
+                assessment.Type = AssessmentType.Performance;
+                assessment.Status = AssessmentStatus;
+                assessment.StartDate = AssessmentStartDate;
+                assessment.EndDate = AssessmentEndDate;
+                assessment.Description = AssessmentDescription;
+            }
 
             try
             {
@@ -261,23 +302,33 @@ namespace C_971.ViewModels
                     await Shell.Current.DisplayAlertAsync("Error", $"Failed to delete assessment: {ex.Message}", "OK");
                 }
             }
-
-            [RelayCommand]
-            async Task FindAssessment()
-            {
-                // Show the search bar and switch to search mode
-                IsEditing = true; // This will show the search bar
-                OnPropertyChanged(nameof(IsNotEditing));
-                OnPropertyChanged(nameof(EditButtonText));
-                OnPropertyChanged(nameof(BackButtonText));
-
-                // Optionally clear previous search and focus on search bar
-                SearchText = "";
-
-                // You might want to add some visual indication that we're in "search mode" vs "edit mode"
-                // Or create a separate IsSearching property if you want to distinguish between the two
-            }
         }
 
+        [RelayCommand]
+        public async Task FindAssessment()
+        {
+            // Show the search bar and switch to search mode
+            IsSearching = true; // This will show the search bar
+            OnPropertyChanged(nameof(IsNotSearching));
+            OnPropertyChanged(nameof(BackButtonText));
+
+            SearchText = "";
+        }
+
+        [RelayCommand]
+        public async Task Search()
+        {
+            IsSearching = true;
+            OnPropertyChanged(nameof(IsNotSearching));
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                Assessments = new ObservableCollection<CourseAssessment>(_allAssessments);
+            }
+            else
+            {
+                var filtered = _allAssessments.FindAll(a => a.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
+                Assessments = new ObservableCollection<CourseAssessment>(filtered);
+            }
+        }
     }
 }
