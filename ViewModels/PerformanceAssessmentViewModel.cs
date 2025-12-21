@@ -51,6 +51,9 @@ namespace C_971.ViewModels
         public bool assessmentEndDateNotifications = true;
 
         [ObservableProperty]
+        public bool assessmentIsActive = false;
+
+        [ObservableProperty]
         public string name = "Performance Assessment";
 
         [ObservableProperty]
@@ -221,7 +224,8 @@ namespace C_971.ViewModels
                     EndDate = AssessmentEndDate,
                     Description = AssessmentDescription,
                     StartDateNotifications = AssessmentStartDateNotifications,
-                    EndDateNotifications = AssessmentEndDateNotifications
+                    EndDateNotifications = AssessmentEndDateNotifications,
+                    IsActive = AssessmentIsActive
                 };
             }
 
@@ -354,6 +358,20 @@ namespace C_971.ViewModels
             SearchText = string.Empty; // Clear any existing search textq
         }
 
+        async partial void OnAssessmentChanging(CourseAssessment assessment)
+        {
+            if (assessmentId == 0) return;
+            AssessmentIsActive = false;
+            await SaveAssessment();
+        }
+
+        async partial void OnAssessmentChanged(CourseAssessment assessemnt)
+        {
+            if (AssessmentId == 0) return;
+            AssessmentIsActive = true;
+            await SaveAssessment();
+        }
+
         partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
@@ -397,7 +415,7 @@ namespace C_971.ViewModels
 
         private async Task PopulateAssessmentProperties()
         {
-            Assessment = await _database.GetAssessmentbyCourseIdAndType(CourseId, AssessmentType.Performance);
+            Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(CourseId, AssessmentType.Performance, Assessment.IsActive = true);
 
             if (Assessment != null && AssessmentType == AssessmentType.Performance)
             {
@@ -412,6 +430,7 @@ namespace C_971.ViewModels
                     AssessmentEndDate = Assessment.EndDate;
                     AssessmentStartDateNotifications = Assessment.StartDateNotifications;
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
+                    AssessmentIsActive = Assessment.IsActive;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
 

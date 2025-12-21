@@ -30,6 +30,8 @@ namespace C_971.Models
         public bool StartDateNotifications { get; set; } = true;
         public bool EndDateNotifications { get; set; } = true;
 
+        public bool IsActive { get; set; } = false;
+
         [Indexed, NotNull]
         public int CourseId { get; set; } = 0;
     }

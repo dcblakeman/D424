@@ -89,7 +89,7 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="5"/>
                     </Border.StrokeShape>
-                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
                         <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
                         <Label Grid.Row="0" Grid.Column="1" Text="{Binding AssessmentId}" VerticalOptions="Center"/>
 
@@ -119,11 +119,14 @@
 
                         <Label Grid.Row="7" Grid.Column="0" Text="Course ID:" FontAttributes="Bold" VerticalOptions="Center"/>
                         <Label Grid.Row="7" Grid.Column="1" Text="{Binding CourseId}" VerticalOptions="Center"/>
+
+                        <Label Grid.Row="8" Grid.Column="1" Text="IsActive:" VerticalOptions="Center" TextColor="Gray" FontAttributes="Italic"/>
+                        <Label Grid.Row="8" Grid.Column="2" Text="{Binding AssessmentIsActive, Converter={StaticResource BoolToYesNoConverter}}" VerticalOptions="Center" TextColor="Gray" FontAttributes="Italic"/>
                     </Grid>
                 </Border>
 
                 <!-- Notifications Section -->
-                <Border Stroke="DarkBlue" 
+                <Border Stroke="DarkBlue"
                         StrokeThickness="1" 
                         Padding="20,5,5,5" 
                         BackgroundColor="AliceBlue" 

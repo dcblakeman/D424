@@ -7,7 +7,7 @@ public partial class PerformanceAssessmentView : ContentPage
 {
 	public PerformanceAssessmentView(PerformanceAssessmentViewModel viewModel)
 	{
-		InitializeComponent();
+        InitializeComponent();
 		BindingContext = viewModel;
 	}
 
@@ -71,9 +71,10 @@ public partial class PerformanceAssessmentView : ContentPage
             viewModel.CourseId = assessment.CourseId;
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
+            viewModel.AssessmentIsActive = assessment.IsActive;
 
-            // Navigate to detail view
-            await Shell.Current.GoToAsync(nameof(PerformanceAssessmentView));
+            //End Searching
+            await viewModel.GoBackCommand.ExecuteAsync(null);
 
         }
     }

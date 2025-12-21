@@ -242,5 +242,11 @@ namespace C_971.ViewModels
             NewCourseEndDate = DateTime.Now.AddMonths(3);
             NewCourseStatus = CourseStatus.Planned;
         }
+
+        [RelayCommand]
+        private void RemoveCourse()
+        {
+            IsRemovingCourse = true;
+        }
     }
 }

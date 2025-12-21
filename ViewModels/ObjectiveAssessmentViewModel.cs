@@ -22,7 +22,6 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string name = "Objective Assessment";
 
-
         [ObservableProperty]
         private string searchText = string.Empty;
 
@@ -57,9 +56,10 @@ namespace C_971.ViewModels
         public bool assessmentEndDateNotifications = true;
 
         [ObservableProperty]
-        private ObservableCollection<CourseAssessment> assessments = new();
+        public bool assessmentIsActive = false;
 
-        private List<CourseAssessment> _allAssessments = new();
+        [ObservableProperty]
+        private ObservableCollection<CourseAssessment> assessments = new();
 
         // UI State
         [ObservableProperty]
@@ -85,6 +85,7 @@ namespace C_971.ViewModels
         
         [ObservableProperty]
         private bool isSearching;
+
         private IEnumerable<CourseAssessment> _allObjectiveAssessments;
 
         public bool IsNotSearching => !IsSearching;
@@ -100,8 +101,6 @@ namespace C_971.ViewModels
         public bool IsNotDeletingAssessment => !IsDeletingAssessment;
 
         public bool IsNotEditing => !IsEditing;
-
-        //public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
 
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
 
@@ -350,6 +349,19 @@ namespace C_971.ViewModels
             _ = LoadAllObjectiveAssessments();
 
             SearchText = string.Empty; // Clear any existing search textq
+        }
+
+        async partial void OnAssessmentChanging(CourseAssessment assessment)
+        {
+            if (assessmentId == 0) return;
+            assessment.IsActive = false;
+            await SaveAssessment();
+        }
+
+        async partial void OnAssessmentChanged(CourseAssessment assessemnt)
+        {
+            if (AssessmentId == 0) return;
+            Assessment.IsActive = true;
         }
 
         partial void OnNewCourseChanged(Course value)

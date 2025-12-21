@@ -59,9 +59,10 @@ public partial class ObjectiveAssessmentView : ContentPage
             viewModel.CourseId = assessment.CourseId;
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
+            viewModel.AssessmentIsActive = assessment.IsActive;
 
-            // Navigate to detail view
-            await Shell.Current.GoToAsync(nameof(ObjectiveAssessmentView));
+            //End Searching
+            await viewModel.GoBackCommand.ExecuteAsync(null);
         }
     }
 }

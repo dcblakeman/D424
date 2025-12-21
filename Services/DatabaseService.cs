@@ -336,5 +336,13 @@ namespace C_971.Services
             return await assessment.FirstOrDefaultAsync();
 
         }
+
+        internal async Task<CourseAssessment> GetAssessmentbyCourseIdAndTypeAndIsActive(int courseId, AssessmentType performance, bool assessmentIsActive)
+        {
+            await InitializeAsync();
+            var assessment = _database.Table<CourseAssessment>()
+                .Where(a => a.CourseId == courseId && a.Type == performance && a.IsActive == assessmentIsActive);
+            return await assessment.FirstOrDefaultAsync();
+        }
     }
 }

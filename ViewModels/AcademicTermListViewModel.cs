@@ -180,14 +180,6 @@ namespace C_971.ViewModels
 
             try
             {
-                bool confirmed = await Shell.Current.DisplayAlertAsync(
-                    "Delete Term",
-                    $"Are you sure you want to delete '{term.Name}'? This action cannot be undone.",
-                    "Delete",
-                    "Cancel");
-
-                if (!confirmed) return;
-
                 await _database.DeleteTermAsync(term);
 
                 // Remove from cache and UI
