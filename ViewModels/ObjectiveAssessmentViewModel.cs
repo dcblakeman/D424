@@ -17,6 +17,9 @@ namespace C_971.ViewModels
         private Course course;
 
         [ObservableProperty]
+        private int courseId;
+
+        [ObservableProperty]
         private string name = "Objective Assessment";
 
 
@@ -27,19 +30,25 @@ namespace C_971.ViewModels
         private CourseAssessment assessment;
 
         [ObservableProperty]
-        private string assessmentName;
+        public int assessmentId = 0;
 
         [ObservableProperty]
-        private string assessmentDescription;
+        private string assessmentName = String.Empty;
 
         [ObservableProperty]
-        private DateTime assessmentStartDate;
+        private string assessmentDescription = String.Empty;
 
         [ObservableProperty]
-        private DateTime assessmentEndDate;
+        private DateTime assessmentStartDate = DateTime.Now;
 
         [ObservableProperty]
-        private AssessmentStatus assessmentStatus;
+        private DateTime assessmentEndDate = DateTime.Now.AddMonths(6);
+
+        [ObservableProperty]
+        private AssessmentType assessmentType = AssessmentType.Objective;
+
+        [ObservableProperty]
+        private AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
 
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
@@ -67,11 +76,12 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private bool isLoadingAssessments;
-
+        
         [ObservableProperty]
-        private bool isFindingAssessments;
+        private bool isSearching;
+        private IEnumerable<CourseAssessment> _allObjectiveAssessments;
 
-        public bool IsNotFindingAssessments => !IsNotFindingAssessments;
+        public bool IsNotSearching => !IsSearching;
 
         public bool IsNotRefreshing => !IsRefreshing;
 
@@ -83,10 +93,31 @@ namespace C_971.ViewModels
 
         public bool IsNotDeletingAssessment => !IsDeletingAssessment;
 
+        public bool IsNotEditing => !IsEditing;
 
-        public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
+        //public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
 
-        public string EditButtonText => IsEditing ? "Add Assessment" : "Edit Assessment";
+        public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
+
+        public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
+
+
+        //Assessment StatusOptions
+        [ObservableProperty]
+        private List<AssessmentStatus> assessmentStatusOptions = new()
+        {
+            AssessmentStatus.Pending,
+            AssessmentStatus.InProgress,
+            AssessmentStatus.Completed,
+            AssessmentStatus.Overdue
+        };
+
+        [ObservableProperty]
+        private List<AssessmentType> assessmentTypeOptions = new()
+        {
+            AssessmentType.Objective,
+            AssessmentType.Performance
+        };
 
 
         public ObjectiveAssessmentViewModel(DatabaseService database)
@@ -98,18 +129,35 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task GoBack()
         {
-            try
+            if (IsEditing)
             {
-                // Use relative navigation (no leading slash)
-                await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
+                IsEditing = false;
+                OnPropertyChanged(nameof(IsNotEditing));
+                OnPropertyChanged(nameof(EditButtonText));
+                OnPropertyChanged(nameof(BackButtonText));
+            }
+            else if (IsSearching)
+            {
+                IsSearching = false;
+                OnPropertyChanged(nameof(IsNotSearching));
+                OnPropertyChanged(nameof(BackButtonText));
+            }
+            else
+            {
+                try
                 {
-                    ["course"] = Course
-                });
+                    // Use relative navigation (no leading slash)
+                    await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
+                    {
+                        ["course"] = Course
+                    });
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
+                }
             }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
-            }
+
         }
 
         private async Task RequestNotificationPermissions()
@@ -124,36 +172,59 @@ namespace C_971.ViewModels
             }
         }
 
+        partial void OnIsEditingChanged(bool value)
+        {
+            OnPropertyChanged(nameof(IsNotEditing));
+            OnPropertyChanged(nameof(EditButtonText));
+            OnPropertyChanged(nameof(BackButtonText));
+        }
+
         [RelayCommand]
-        private async Task Edit()
+        private async Task EditAssessment()
         {
             if (IsEditing)
             {
-                // Save logic here
-                await SaveAssessment(Assessment);
+                // Currently editing, so save changes
+                await SaveAssessment();
+                IsEditing = false;  // Exit edit mode after saving
+            }
+            else
+            {
+                // Not editing, so enter edit mode
+                IsEditing = true;
             }
 
-            IsEditing = !IsEditing;
-            OnPropertyChanged(nameof(EditButtonText));
-        }
-
-        partial void OnIsEditingChanged(bool value)
-        {
             OnPropertyChanged(nameof(IsNotEditing));
         }
 
         [RelayCommand]
-        private async Task SaveAssessment(CourseAssessment assessment)
+        private async Task SaveAssessment()
         {
-            if (assessment == null) return;
+            if (AssessmentId == 0)
+            {
+                await Shell.Current.DisplayAlertAsync("Info", $"Course ID: {CourseId}", "OK");
+                //Save the new assessment
+                Assessment = new CourseAssessment
+                {
+                    CourseId = CourseId,
+                    Name = AssessmentName,
+                    Type = AssessmentType.Objective,
+                    Status = AssessmentStatus,
+                    StartDate = AssessmentStartDate,
+                    EndDate = AssessmentEndDate,
+                    Description = AssessmentDescription
+                };
+            }
 
             try
             {
-                await _database.SaveCourseAssessmentAsync(assessment);
+                await _database.SaveCourseAssessmentAsync(Assessment);
+
+                AssessmentId = Assessment.Id;
 
                 // Update notifications if needed
-                await UpdateAssessmentNotifications(assessment);
 
+                await UpdateAssessmentNotifications(Assessment);
                 await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
             }
             catch (Exception ex)
@@ -227,6 +298,134 @@ namespace C_971.ViewModels
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to cancel notification: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        internal async Task DeleteAssessment()
+        {
+            if (Assessment == null) return;
+
+            bool answer = await Shell.Current.DisplayAlertAsync(
+                "Delete Assessment",
+                $"Are you sure you want to delete '{Assessment.Name}'?",
+                "Yes",
+                "No");
+
+            if (answer)
+            {
+                try
+                {
+                    await _database.DeleteAssessmentAsync(Assessment.Id);
+                    await Shell.Current.DisplayAlertAsync("Success", "Assessment deleted successfully.", "OK");
+
+                    // Navigate back since the assessment no longer exists
+                    await Shell.Current.GoToAsync("..");
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to delete assessment: {ex.Message}", "OK");
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task FindAssessment()
+        {
+            // Show the search bar and switch to search mode
+            IsSearching = true; // This will show the search bar
+            OnPropertyChanged(nameof(IsNotSearching));
+
+            _ = LoadAllObjectiveAssessments();
+
+            SearchText = string.Empty; // Clear any existing search textq
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            if (value != null)
+            {
+                CourseId = value.Id;
+                AssessmentType = AssessmentType.Performance;
+
+                // Load existing assessments for this course
+                _ = LoadAllObjectiveAssessments();
+
+                // Populate assessment properties
+                _ = PopulateAssessmentProperties();
+            }
+        }
+
+        partial void OnSearchTextChanged(string value)
+        {
+            ApplySearchFilter();
+        }
+
+        // Search and Filter
+        [RelayCommand]
+        private void Search()
+        {
+            ApplySearchFilter();
+        }
+
+        private void ApplySearchFilter()
+        {
+            Assessments.Clear();
+
+            var filteredAssessments = string.IsNullOrWhiteSpace(SearchText)
+                ? _allObjectiveAssessments
+                : _allObjectiveAssessments.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var assessment in filteredAssessments)
+            {
+                Assessments.Add(assessment);
+            }
+        }
+        private async Task PopulateAssessmentProperties()
+        {
+            Assessment = await _database.GetAssessmentbyCourseId(CourseId);
+
+            if (Assessment != null)
+            {
+                try
+                {
+                    AssessmentId = Assessment.Id;
+                    AssessmentName = Assessment.Name;
+                    AssessmentDescription = Assessment.Description;
+                    AssessmentType = Assessment.Type;
+                    AssessmentStatus = Assessment.Status;
+                    AssessmentStartDate = Assessment.StartDate;
+                    AssessmentEndDate = Assessment.EndDate;
+
+                    await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
+
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to populate assessment properties: {ex.Message}", "OK");
+                    System.Diagnostics.Debug.WriteLine($"PopulateAssessmentProperties error: {ex}");
+                }
+
+            }
+        }
+
+        [RelayCommand]
+        private async Task LoadAllObjectiveAssessments()
+        {
+            IsRefreshing = true;
+            try
+            {
+                // Load ALL Performance assessments for search functionality
+                _allObjectiveAssessments = await _database.GetAssessmentsByTypeAsync(AssessmentType.Objective);
+                ApplySearchFilter();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Debug Error", ex.Message, "OK");
+            }
+            finally
+            {
+                IsRefreshing = false;
             }
         }
     }
