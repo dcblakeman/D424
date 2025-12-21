@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class ViewNotesViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -18,7 +18,7 @@ namespace C_971.ViewModels
         private bool isRefreshing;
 
 		[ObservableProperty]
-        public Course course;
+        public Course newCourse;
 
         public ObservableCollection<CourseNote> CourseNotesList { get; private set; } = [];
 
@@ -37,7 +37,7 @@ namespace C_971.ViewModels
             _database = databaseService;
         }
 
-        partial void OnCourseChanged(Course value)
+        partial void OnNewCourseChanged(Course value)
         {
             // Called automatically when Course property changes
             if (value?.Id > 0)
@@ -49,11 +49,11 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task LoadCourseNotes()
         {
-            if (Course?.Id <= 0) return;
+            if (NewCourse?.Id <= 0) return;
 
             IsRefreshing = true;
             {
-                Notes = (List<CourseNote>)await _database.GetCourseNotesByCourseIdAsync(Course.Id);
+                Notes = (List<CourseNote>)await _database.GetCourseNotesByCourseIdAsync(NewCourse.Id);
 
 				// Add all notes at once
 				CourseNotesList = new ObservableCollection<CourseNote>(Notes);
@@ -68,7 +68,7 @@ namespace C_971.ViewModels
                 // Use relative navigation (no leading slash)
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)

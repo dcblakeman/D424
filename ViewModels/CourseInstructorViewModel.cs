@@ -6,14 +6,14 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class CourseInstructorViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        private Course course;
+        private Course newCourse;
 
         [ObservableProperty]
         private CourseInstructor instructor;
@@ -61,14 +61,14 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnCourseChanged(Course value)
+        partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
             {
                 Name = $"{value.Name} - Instructors";
                 _ = LoadInstructorsAsync();
 
-                Course = value;
+                NewCourse = value;
             }
         }
 
@@ -214,7 +214,7 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)

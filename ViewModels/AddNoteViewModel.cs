@@ -5,14 +5,14 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class AddNoteViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        private Course course;
+        private Course newCourse;
 
         [ObservableProperty]
         private string name = "Add Note";
@@ -30,7 +30,7 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnCourseChanged(Course value)
+        partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
             {
@@ -51,7 +51,7 @@ namespace C_971.ViewModels
                 {
                     CreatedDate = DateTime.Now,
                     NoteContent = NewNoteContent.Trim(),
-                    CourseId = Course.Id
+                    CourseId = NewCourse.Id
                 };
 
                 await _database.SaveCourseNoteAsync(newNote);
@@ -93,7 +93,7 @@ namespace C_971.ViewModels
                 // Navigate back to previous page with course context
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -112,7 +112,7 @@ namespace C_971.ViewModels
                 return false;
             }
 
-            if (Course == null)
+            if (NewCourse == null)
             {
                 _ = Shell.Current.DisplayAlertAsync("Error", "Course information not found", "OK");
                 return false;

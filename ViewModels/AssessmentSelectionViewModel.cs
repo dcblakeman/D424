@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -18,7 +18,7 @@ namespace C_971.ViewModels
         }
 
         [ObservableProperty]
-        private Course course;
+        private Course newCourse;
 
         [ObservableProperty]
         private string name = "Assessment Selection";
@@ -30,7 +30,7 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -42,13 +42,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task NavigateToPerformanceAssessmentView()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -60,13 +60,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task NavigateToObjectiveAssessmentView()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)

@@ -35,15 +35,15 @@ public partial class CourseInstructorView : ContentPage
         else
         {
             //Assign the selected instructor to the course
-            viewModel.Course.InstructorId = instructor.Id;
+            viewModel.NewCourse.InstructorId = instructor.Id;
 
             //Update the course in the databaes with the instructorid
-            viewModel.Course = await viewModel.UpdateCourseAsync(viewModel.Course);
+            viewModel.NewCourse = await viewModel.UpdateCourseAsync(viewModel.NewCourse);
 
             // Navigate to detail view - only pass course since that's what CourseDetailsView expects
             await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>
             {
-                ["course"] = viewModel.Course
+                ["course"] = viewModel.NewCourse
             });
         }
     }

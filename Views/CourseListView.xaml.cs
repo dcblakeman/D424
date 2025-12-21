@@ -26,7 +26,7 @@ namespace C_971.Views
         private async void OnCourseTapped(object sender, EventArgs e)
         {
             var border = (Border)sender;
-            var course = (Course)border.BindingContext;
+            var newCourse = (Course)border.BindingContext;
             var viewModel = (CourseListViewModel)BindingContext;
 
             // Visual feedback animation
@@ -42,14 +42,14 @@ namespace C_971.Views
                 // Show confirmation dialog
                 bool confirm = await Shell.Current.DisplayAlertAsync(
                     "Confirm Removal",
-                    $"Are you sure you want to remove '{course.Name}'?",
+                    $"Are you sure you want to remove '{newCourse.Name}'?",
                     "Yes",
                     "No");
 
                 if (confirm)
                 {
                     // Remove from collection
-                    viewModel.Courses.Remove(course);
+                    viewModel.Courses.Remove(newCourse);
 
                     // Exit remove mode
                     viewModel.IsRemovingCourse = false;
@@ -62,8 +62,8 @@ namespace C_971.Views
                 // Normal navigation behavior
                 await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
                 {
-                    { "course", course },
-                    {"termid", course.TermId  }
+                    { "course", newCourse },
+                    {"termid", newCourse.TermId  }
                 });
             }
         }

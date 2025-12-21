@@ -8,18 +8,18 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
-    [QueryProperty(nameof(Instructor), "instructor")]
+    [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewInstructor), "instructor")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        private Course course;
+        private Course newCourse;
 
         [ObservableProperty]
-        private CourseInstructor instructor;
+        private CourseInstructor newInstructor;
 
         [ObservableProperty]
         private string name = "Course Details";
@@ -58,14 +58,12 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnCourseChanged(Course value)
+        partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
             {
                 Name = $"{value.Name} - Details";
                 IsEditing = false;
-                System.Diagnostics.Debug.WriteLine($"Course loaded: {value.Id} - {value.Name}");
-
                 _= LoadInstructorAsync();
             }
         }
@@ -94,30 +92,30 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveCourse()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 //Display each field's value in alert
                 await Shell.Current.DisplayAlertAsync("Course Details",
-                    $"ID: {Course.Id}\n" +
-                    $"Name: {Course.Name}\n" +
-                    $"Start Date: {Course.StartDate}\n" +
-                    $"End Date: {Course.EndDate}\n" +
-                    $"Status: {Course.Status}\n" +
-                    $"Instructor: {Course.InstructorId}\n" +
-                    $"Start Date Notifications: {Course.StartDateNotifications}\n" +
-                    $"End Date Notifications: {Course.EndDateNotifications}",
+                    $"ID: {NewCourse.Id}\n" +
+                    $"Name: {NewCourse.Name}\n" +
+                    $"Start Date: {NewCourse.StartDate}\n" +
+                    $"End Date: {NewCourse.EndDate}\n" +
+                    $"Status: {NewCourse.Status}\n" +
+                    $"Instructor: {NewCourse.InstructorId}\n" +
+                    $"Start Date Notifications: {NewCourse.StartDateNotifications}\n" +
+                    $"End Date Notifications: {NewCourse.EndDateNotifications}",
                     "OK");
 
                 //Refresh the page
-                OnPropertyChanged(nameof(Course));
+                OnPropertyChanged(nameof(NewCourse));
 
                 // Update notifications after saving
                 await ScheduleCourseNotifications();
 
                 // Save to the database
-                await _database.SaveCourseAsync(Course);
+                await _database.SaveCourseAsync(NewCourse);
             }
             catch (Exception ex)
             {
@@ -130,13 +128,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task GetInstructor()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -148,7 +146,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task ViewAssessments()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
@@ -161,7 +159,7 @@ namespace C_971.ViewModels
 
                 await Shell.Current.GoToAsync($"{nameof(AssessmentSelectionView)}", new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -173,13 +171,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task AddNote()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(AddNoteView)}", new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -191,13 +189,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task ViewNotes()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -219,7 +217,7 @@ namespace C_971.ViewModels
 
                 await Shell.Current.GoToAsync("CourseListView", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)
@@ -231,32 +229,32 @@ namespace C_971.ViewModels
         // Notification Management
         private async Task ScheduleCourseNotifications()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
 
             try
             {
                 // Cancel existing notifications
-                CancelNotification($"course_start_{Course.Id}");
-                CancelNotification($"course_end_{Course.Id}");
+                CancelNotification($"course_start_{NewCourse.Id}");
+                CancelNotification($"course_end_{NewCourse.Id}");
 
                 // Schedule start date notification
-                if (Course.StartDateNotifications && Course.StartDate > DateTime.Now)
+                if (NewCourse.StartDateNotifications && NewCourse.StartDate > DateTime.Now)
                 {
                     await ScheduleNotification(
-                        $"course_start_{Course.Id}",
-                        $"Course Starting: {Course.Name}",
-                        $"Your course '{Course.Name}' starts today!",
-                        Course.StartDate);
+                        $"course_start_{NewCourse.Id}",
+                        $"Course Starting: {NewCourse.Name}",
+                        $"Your course '{NewCourse.Name}' starts today!",
+                        NewCourse.StartDate);
                 }
 
                 // Schedule end date notification
-                if (Course.EndDateNotifications && Course.EndDate > DateTime.Now)
+                if (NewCourse.EndDateNotifications && NewCourse.EndDate > DateTime.Now)
                 {
                     await ScheduleNotification(
-                        $"course_end_{Course.Id}",
-                        $"Course Ending: {Course.Name}",
-                        $"Your course '{Course.Name}' ends today!",
-                        Course.EndDate);
+                        $"course_end_{NewCourse.Id}",
+                        $"Course Ending: {NewCourse.Name}",
+                        $"Your course '{NewCourse.Name}' ends today!",
+                        NewCourse.EndDate);
                 }
             }
             catch (Exception ex)
@@ -315,11 +313,11 @@ namespace C_971.ViewModels
 
         private async Task LoadInstructorAsync()
         {
-            if (Course == null) return;
+            if (NewCourse == null) return;
             try
             {
-                var instructor = await _database.GetInstructorByIdAsync(Course.InstructorId);
-                Instructor = instructor;
+                var instructor = await _database.GetInstructorByIdAsync(NewCourse.InstructorId);
+                NewInstructor = instructor;
             }
             catch (Exception ex)
             {
@@ -330,12 +328,12 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task RefreshData()
         {
-            if (Course?.Id > 0)
+            if (NewCourse?.Id > 0)
             {
                 try
                 {
                     // Reload course from database to get latest InstructorId
-                    Course = await _database.GetCourseByIdAsync(Course.Id);
+                    NewCourse = await _database.GetCourseByIdAsync(NewCourse.Id);
 
                     // Load the instructor data
                     await LoadInstructorAsync();
