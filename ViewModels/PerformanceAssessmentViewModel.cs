@@ -103,13 +103,6 @@ namespace C_971.ViewModels
 
         public bool IsNotEditing => !IsEditing;
 
-
-        //public bool IsNotEditing => !IsEditing && !IsSavingAssessment && !IsDeletingAssessment && !IsAddingAssessment && !IsRemovingAssessment && !IsLoadingAssessments && !IsRefreshing;
-
-        //public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
-
-        //public string BackButtonText => IsEditing ? "Cancel" : "Back";
-
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
         public string AddButtonText => IsAddingAssessment ? "Save Assessment" : "Add Assessment";
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
@@ -136,9 +129,6 @@ namespace C_971.ViewModels
             IsSearching = false;
             _database = database;
             _ = RequestNotificationPermissions();
-
-            // Load existing assessments for this course
-            //_ = LoadAllPerformanceAssessments();
 
             // Populate assessment properties
             _ = PopulateAssessmentProperties();
@@ -220,7 +210,6 @@ namespace C_971.ViewModels
         {
             if (AssessmentId == 0)
             {
-                await Shell.Current.DisplayAlertAsync("Info", $"Course ID: {CourseId}", "OK");
                 //Save the new assessment
                 Assessment = new CourseAssessment
                 {
@@ -239,15 +228,9 @@ namespace C_971.ViewModels
             try
             {
                 await _database.SaveCourseAssessmentAsync(Assessment);
-
                 AssessmentId = Assessment.Id;
-
-                // Update notifications if needed
-
                 await UpdateAssessmentNotifications(Assessment);
                 await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
-
-                //Navigate to Course Details View
 
             }
             catch (Exception ex)
@@ -342,8 +325,15 @@ namespace C_971.ViewModels
                     await _database.DeleteAssessmentAsync(Assessment.Id);
                     await Shell.Current.DisplayAlertAsync("Success", "Assessment deleted successfully.", "OK");
 
-                    // Navigate back since the assessment no longer exists
-                    await Shell.Current.GoToAsync("..");
+                    //Clear the Assessment Fields
+                    AssessmentId = 0;
+                    AssessmentName = String.Empty;
+                    AssessmentType = AssessmentType.Performance;
+                    AssessmentDescription = String.Empty;
+                    AssessmentStartDate = DateTime.Now;
+                    AssessmentEndDate = DateTime.Now.AddMonths(6);
+                    AssessmentStatus = AssessmentStatus.Pending;
+
                 }
                 catch (Exception ex)
                 {
@@ -409,7 +399,7 @@ namespace C_971.ViewModels
         {
             Assessment = await _database.GetAssessmentbyCourseIdAndType(CourseId, AssessmentType.Performance);
 
-            if (Assessment != null && AssessmentType == AssessmentType.Objective)
+            if (Assessment != null && AssessmentType == AssessmentType.Performance)
             {
                 try
                 {
