@@ -11,14 +11,14 @@ using System.Text;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class PerformanceAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        public Course course;
+        public Course newCourse;
 
         [ObservableProperty]
         public CourseAssessment assessment = new();
@@ -36,13 +36,19 @@ namespace C_971.ViewModels
         public AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
 
         [ObservableProperty]
+        public string assessmentDescription = String.Empty;
+
+        [ObservableProperty]
         public DateTime assessmentStartDate = DateTime.Today;
 
         [ObservableProperty]
         public DateTime assessmentEndDate = DateTime.Today.AddMonths(6);
 
         [ObservableProperty]
-        public string assessmentDescription = String.Empty;
+        public bool assessmentStartDateNotifications = true;
+
+        [ObservableProperty]
+        public bool assessmentEndDateNotifications = true;
 
         [ObservableProperty]
         public string name = "Performance Assessment";
@@ -105,6 +111,7 @@ namespace C_971.ViewModels
         //public string BackButtonText => IsEditing ? "Cancel" : "Back";
 
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
+        public string AddButtonText => IsAddingAssessment ? "Save Assessment" : "Add Assessment";
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
 
         //Assessment StatusOptions
@@ -160,7 +167,7 @@ namespace C_971.ViewModels
                     // Use relative navigation (no leading slash)
                     await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
                     {
-                        ["course"] = Course
+                        ["course"] = NewCourse
                     });
                 }
                 catch (Exception ex)
@@ -223,7 +230,9 @@ namespace C_971.ViewModels
                     Status = AssessmentStatus,
                     StartDate = AssessmentStartDate,
                     EndDate = AssessmentEndDate,
-                    Description = AssessmentDescription
+                    Description = AssessmentDescription,
+                    StartDateNotifications = AssessmentStartDateNotifications,
+                    EndDateNotifications = AssessmentEndDateNotifications
                 };
             }
 
@@ -237,6 +246,9 @@ namespace C_971.ViewModels
 
                 await UpdateAssessmentNotifications(Assessment);
                 await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
+
+                //Navigate to Course Details View
+
             }
             catch (Exception ex)
             {
@@ -264,7 +276,7 @@ namespace C_971.ViewModels
                         await ScheduleNotification(
                             $"assessment_{assessment.Id}",
                             "Assessment Due Tomorrow",
-                            $"{assessment.Name} for {Course?.Name ?? "course"} is due tomorrow",
+                            $"{assessment.Name} for {NewCourse?.Name ?? "course"} is due tomorrow",
                             notifyTime);
                     }
                 }
@@ -352,7 +364,7 @@ namespace C_971.ViewModels
             SearchText = string.Empty; // Clear any existing search textq
         }
 
-        partial void OnCourseChanged(Course value)
+        partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
             {
@@ -371,40 +383,6 @@ namespace C_971.ViewModels
         {
             ApplySearchFilter();
         }
-
-        //[RelayCommand]
-        //private async Task LoadCourseAssessments()
-        //{
-        //    try
-        //    {
-        //        // Load the specific Performance Assessment for THIS course
-        //        var courseAssessments = await _database.GetCourseAssessmentsByCourseIdAsync(CourseId);
-        //        var performanceAssessment = courseAssessments?.FirstOrDefault(a => a.Type == AssessmentType.Performance);
-
-        //        if (performanceAssessment != null)
-        //        {
-        //            System.Diagnostics.Debug.WriteLine($"Found Performance Assessment: {performanceAssessment.Name}");
-        //            Assessment = performanceAssessment;
-                   
-        //        }
-        //        else
-        //        {
-        //            await Shell.Current.DisplayAlertAsync("Alert", "No Performance Assessment found for this course","OK");
-        //            // Create new empty assessment
-        //            Assessment = new CourseAssessment
-        //            {
-        //                CourseId = CourseId,
-        //                Type = AssessmentType.Performance
-        //            };
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        System.Diagnostics.Debug.WriteLine($"LoadCourseAssessments error: {ex}");
-        //        await Shell.Current.DisplayAlertAsync("Error", $"Failed to load assessment: {ex.Message}", "OK");
-        //    }
-        //}
-
 
         // Search and Filter
         [RelayCommand]
@@ -426,11 +404,12 @@ namespace C_971.ViewModels
                 Assessments.Add(assessment);
             }
         }
+
         private async Task PopulateAssessmentProperties()
         {
-            Assessment = await _database.GetAssessmentbyCourseId(CourseId);
+            Assessment = await _database.GetAssessmentbyCourseIdAndType(CourseId, AssessmentType.Performance);
 
-            if (Assessment != null)
+            if (Assessment != null && AssessmentType == AssessmentType.Objective)
             {
                 try
                 {
@@ -441,6 +420,8 @@ namespace C_971.ViewModels
                     AssessmentStatus = Assessment.Status;
                     AssessmentStartDate = Assessment.StartDate;
                     AssessmentEndDate = Assessment.EndDate;
+                    AssessmentStartDateNotifications = Assessment.StartDateNotifications;
+                    AssessmentEndDateNotifications = Assessment.EndDateNotifications;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
 
@@ -451,12 +432,7 @@ namespace C_971.ViewModels
                     System.Diagnostics.Debug.WriteLine($"PopulateAssessmentProperties error: {ex}");
                 }
 
-            } else
-            {
-                await Shell.Current.DisplayAlertAsync("Alert", "No Performance Assessment found for this course", "OK");
             }
-
-
         }
 
         [RelayCommand]
@@ -476,6 +452,29 @@ namespace C_971.ViewModels
             finally
             {
                 IsRefreshing = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task AddAssessment()
+        {
+            // Navigate to a new PerformanceAssessmentViewModel with empty assessment
+            var newAssessment = new CourseAssessment
+            {
+                CourseId = CourseId,
+                Type = AssessmentType.Performance
+            };
+            try
+            {
+                await Shell.Current.GoToAsync("PerformanceAssessmentView", true, new Dictionary<string, object>
+                {
+                    ["course"] = NewCourse,
+                    ["assessment"] = newAssessment
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Failed to navigate to add assessment: {ex.Message}", "OK");
             }
         }
     }

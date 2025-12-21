@@ -34,7 +34,17 @@
                     Margin="5,0,5,0"
                     IsVisible="{Binding IsNotSearching}"/>
 
-                <Button Grid.Column="1" 
+            <Button Grid.Column="0" 
+                    Text="{Binding AddButtonText}" 
+                    Command="{Binding AddAssessmentCommand}"
+                    BackgroundColor="#007bff"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="5"
+                    Margin="5,0,5,0"
+                    IsVisible="{Binding IsSearching}"/>
+                
+            <Button Grid.Column="1" 
                     Text="{Binding BackButtonText}" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="#6c757d"
@@ -125,13 +135,13 @@
                         <Grid ColumnDefinitions="*,Auto,Auto,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="10">
                             <VerticalStackLayout Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
                                 <Label Text="Start Date Notifications:" FontAttributes="Bold"/>
-                                <Label Text="{Binding Course.StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
-                                <Switch IsToggled="{Binding Course.StartDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                                <Label Text="{Binding AssessmentStartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                                <Switch IsToggled="{Binding AssessmentStartDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                             </VerticalStackLayout>
                             <VerticalStackLayout Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
                                 <Label Text="End Date Notifications:" FontAttributes="Bold"/>
-                                <Label Text="{Binding Course.EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
-                                <Switch IsToggled="{Binding Course.EndDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                                <Label Text="{Binding AssessmentEndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" IsVisible="{Binding IsNotEditing}"/>
+                                <Switch IsToggled="{Binding AssessmentEndDateNotifications, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                             </VerticalStackLayout>
                         </Grid>
                     </Border>

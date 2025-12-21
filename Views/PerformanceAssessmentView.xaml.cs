@@ -59,11 +59,22 @@ public partial class PerformanceAssessmentView : ContentPage
         }
         else
         {
-            // Normal navigation behavior
-            //await Shell.Current.GoToAsync("PerformanceAssessmentView", new Dictionary<string, object>
-            //{
-            //    ["course"] = Course]
-            //});
+            //Assign Assessment to ViewModel property
+            viewModel.Assessment = assessment;
+            viewModel.AssessmentId = assessment.Id;
+            viewModel.AssessmentName = assessment.Name;
+            viewModel.AssessmentType = assessment.Type;
+            viewModel.AssessmentStatus = assessment.Status;
+            viewModel.AssessmentStartDate = assessment.StartDate;
+            viewModel.AssessmentEndDate = assessment.EndDate;
+            viewModel.AssessmentDescription = assessment.Description;
+            viewModel.CourseId = assessment.CourseId;
+            viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
+            viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
+
+            // Navigate to detail view
+            await Shell.Current.GoToAsync(nameof(PerformanceAssessmentView));
+
         }
     }
 

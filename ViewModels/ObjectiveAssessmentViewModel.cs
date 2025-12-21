@@ -7,14 +7,14 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class ObjectiveAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        private Course course;
+        private Course newCourse;
 
         [ObservableProperty]
         private int courseId;
@@ -36,6 +36,12 @@ namespace C_971.ViewModels
         private string assessmentName = String.Empty;
 
         [ObservableProperty]
+        private AssessmentType assessmentType = AssessmentType.Objective;
+
+        [ObservableProperty]
+        private AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
+
+        [ObservableProperty]
         private string assessmentDescription = String.Empty;
 
         [ObservableProperty]
@@ -45,10 +51,10 @@ namespace C_971.ViewModels
         private DateTime assessmentEndDate = DateTime.Now.AddMonths(6);
 
         [ObservableProperty]
-        private AssessmentType assessmentType = AssessmentType.Objective;
+        public bool assessmentStartDateNotifications = true;
 
         [ObservableProperty]
-        private AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
+        public bool assessmentEndDateNotifications = true;
 
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
@@ -99,6 +105,8 @@ namespace C_971.ViewModels
 
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
 
+        public string AddButtonText => IsAddingAssessment ? "Save Assessment" : "Add Assessment";
+
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
 
 
@@ -124,6 +132,7 @@ namespace C_971.ViewModels
         {
             _database = database;
             _ = RequestNotificationPermissions();
+            IsSearching = false;
         }
 
         [RelayCommand]
@@ -149,7 +158,7 @@ namespace C_971.ViewModels
                     // Use relative navigation (no leading slash)
                     await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
                     {
-                        ["course"] = Course
+                        ["course"] = NewCourse
                     });
                 }
                 catch (Exception ex)
@@ -212,7 +221,9 @@ namespace C_971.ViewModels
                     Status = AssessmentStatus,
                     StartDate = AssessmentStartDate,
                     EndDate = AssessmentEndDate,
-                    Description = AssessmentDescription
+                    Description = AssessmentDescription,
+                    StartDateNotifications = AssessmentStartDateNotifications,
+                    EndDateNotifications = AssessmentEndDateNotifications
                 };
             }
 
@@ -253,7 +264,7 @@ namespace C_971.ViewModels
                         await ScheduleNotification(
                             $"assessment_{assessment.Id}",
                             "Assessment Due Tomorrow",
-                            $"{assessment.Name} for {Course?.Name ?? "course"} is due tomorrow",
+                            $"{assessment.Name} for {NewCourse?.Name ?? "course"} is due tomorrow",
                             notifyTime);
                     }
                 }
@@ -341,7 +352,7 @@ namespace C_971.ViewModels
             SearchText = string.Empty; // Clear any existing search textq
         }
 
-        partial void OnCourseChanged(Course value)
+        partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
             {
@@ -383,9 +394,9 @@ namespace C_971.ViewModels
         }
         private async Task PopulateAssessmentProperties()
         {
-            Assessment = await _database.GetAssessmentbyCourseId(CourseId);
+            Assessment = await _database.GetAssessmentbyCourseIdAndType(CourseId, AssessmentType.Objective);
 
-            if (Assessment != null)
+            if (Assessment != null && AssessmentType == AssessmentType.Objective)
             {
                 try
                 {
@@ -396,6 +407,8 @@ namespace C_971.ViewModels
                     AssessmentStatus = Assessment.Status;
                     AssessmentStartDate = Assessment.StartDate;
                     AssessmentEndDate = Assessment.EndDate;
+                    AssessmentStartDateNotifications = Assessment.StartDateNotifications;
+                    AssessmentEndDateNotifications = Assessment.EndDateNotifications;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
 
@@ -426,6 +439,29 @@ namespace C_971.ViewModels
             finally
             {
                 IsRefreshing = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task AddAssessment()
+        {
+            // Navigate to a new PerformanceAssessmentViewModel with empty assessment
+            var newAssessment = new CourseAssessment
+            {
+                CourseId = CourseId,
+                Type = AssessmentType.Performance
+            };
+            try
+            {
+                await Shell.Current.GoToAsync("PerformanceAssessmentView", true, new Dictionary<string, object>
+                {
+                    ["course"] = NewCourse,
+                    ["assessment"] = newAssessment
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Failed to navigate to add assessment: {ex.Message}", "OK");
             }
         }
     }
