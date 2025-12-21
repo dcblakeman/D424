@@ -7,7 +7,7 @@ namespace C_971.Models
     public partial class CourseAssessment
     {
         [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        public int Id { get; set; } = 0;
 
         [MaxLength(100), NotNull]
         public string Name { get; set; } = string.Empty;
@@ -16,13 +16,13 @@ namespace C_971.Models
         public string Description { get; set; } = string.Empty;  
 
         [NotNull]
-        public DateTime StartDate { get; set; }  
+        public DateTime StartDate { get; set; } = DateTime.Now;
         [NotNull]
-        public DateTime EndDate { get; set; }  
+        public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(6);
         public DateTime? CompletedDate { get; set; } = null;
 
         [NotNull]
-        public AssessmentType Type { get; set; } 
+        public AssessmentType Type { get; set; } = AssessmentType.Performance;
 
         [NotNull]
         public AssessmentStatus Status { get; set; } = AssessmentStatus.Pending;
@@ -31,6 +31,6 @@ namespace C_971.Models
         public bool EndDateNotifications { get; set; } = true;
 
         [Indexed, NotNull]
-        public int CourseId { get; set; }
+        public int CourseId { get; set; } = 0;
     }
 }

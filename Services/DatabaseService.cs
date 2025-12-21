@@ -3,6 +3,7 @@ using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace C_971.Services
 {
@@ -16,9 +17,7 @@ namespace C_971.Services
 
             try
             {
-                var databasePath = Path.Combine(FileSystem.AppDataDirectory, "CollegeCourseTracker.db");
-                _database = new SQLiteAsyncConnection(databasePath);
-
+                _database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
                 await _database.CreateTableAsync<AcademicTerm>();
                 await _database.CreateTableAsync<Course>();
                 await _database.CreateTableAsync<CourseNote>();
@@ -154,7 +153,7 @@ namespace C_971.Services
         #endregion
 
         #region Course Assessments
-        public async Task<List<CourseAssessment>> GetCourseAssessmentsAsync(int courseId)
+        public async Task<IEnumerable<CourseAssessment>> GetCourseAssessmentsAsync(int courseId)
         {
             await InitializeAsync();
             return await _database.Table<CourseAssessment>()
@@ -186,8 +185,9 @@ namespace C_971.Services
         }
 
         // In your DatabaseService
-        public async Task<List<CourseAssessment>> GetCourseAssessmentsByCourseIdAsync(int courseId)
+        public async Task<IEnumerable<CourseAssessment>> GetCourseAssessmentsByCourseIdAsync(int courseId)
         {
+            await InitializeAsync();
             return await _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId)
                 .ToListAsync();
@@ -279,18 +279,22 @@ namespace C_971.Services
             return hasPerformance && hasObjective && assessments.Count == 2;
         }
 
-        internal async Task DeleteAssessmentAsync(int id)
+        public async Task DeleteAssessmentAsync(int id)
         {
-            throw new NotImplementedException();
+            await InitializeAsync();
+            var assessment = await _database.FindAsync<CourseAssessment>(id);
+            if (assessment != null)
+            {
+                await _database.DeleteAsync(assessment);
+            }
         }
 
-        internal async Task<IEnumerable<CourseAssessment>> GetAssessmentsByTypeAsync(AssessmentType performance)
+        public async Task<List<CourseAssessment>> GetAssessmentsByTypeAsync(AssessmentType performance)
         {
-            var assessments = await _database.Table<CourseAssessment>()
+            await InitializeAsync();
+            return await _database.Table<CourseAssessment>()
                 .Where(a => a.Type == performance)
                 .ToListAsync();
-
-            return assessments;
         }
 
         //Get course assessment by course ID and type
@@ -299,6 +303,29 @@ namespace C_971.Services
             await InitializeAsync();
             return await _database.Table<CourseAssessment>()
                 .FirstOrDefaultAsync(a => a.CourseId == courseId && a.Type == type);
+        }
+
+        internal async Task<IEnumerable<CourseAssessment>> GetCourseAssessmentsByType(AssessmentType performance)
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseAssessment>()
+                .Where(a => a.Type == performance)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<CourseAssessment>> GetAllAssessmentsAsync()
+        {
+            await InitializeAsync();
+            return await _database.Table<CourseAssessment>().ToListAsync();
+        }
+
+        public async Task<CourseAssessment> GetAssessmentbyCourseId(int courseId)
+        {
+            await InitializeAsync();
+            var assessment = _database.Table<CourseAssessment>()
+                .Where(a => a.CourseId == courseId);
+
+            return await assessment.FirstOrDefaultAsync();
         }
     }
 }

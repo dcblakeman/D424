@@ -6,6 +6,7 @@ using Plugin.LocalNotification;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace C_971.ViewModels
@@ -17,45 +18,45 @@ namespace C_971.ViewModels
 
         // Core Properties
         [ObservableProperty]
-        private Course course;
+        public Course course;
 
         [ObservableProperty]
-        private string assessmentName = String.Empty;
+        public CourseAssessment assessment = new();
 
         [ObservableProperty]
-        private AssessmentType assessmentType = AssessmentType.Performance;
+        public int assessmentId = 0;
 
         [ObservableProperty]
-        private AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
+        public string assessmentName = String.Empty;
 
         [ObservableProperty]
-        private DateTime assessmentStartDate = DateTime.Today;
+        public AssessmentType assessmentType = AssessmentType.Performance;
 
         [ObservableProperty]
-        private DateTime assessmentEndDate = DateTime.Today.AddMonths(6);
+        public AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
 
         [ObservableProperty]
-        private string assessmentDescription = String.Empty;
+        public DateTime assessmentStartDate = DateTime.Today;
 
         [ObservableProperty]
-        private string name = "Performance Assessment";
+        public DateTime assessmentEndDate = DateTime.Today.AddMonths(6);
 
         [ObservableProperty]
-        private string searchText = string.Empty;
+        public string assessmentDescription = String.Empty;
 
         [ObservableProperty]
-        private CourseAssessment assessment = new();
+        public string name = "Performance Assessment";
 
         [ObservableProperty]
-        private int assessmentId;
+        public string searchText = string.Empty;
 
         [ObservableProperty]
-        private int courseId;
+        public int courseId;
 
         [ObservableProperty]
-        private ObservableCollection<CourseAssessment> assessments = new();
+        public ObservableCollection<CourseAssessment> assessments = new();
 
-        private List<CourseAssessment> _allAssessments = new();
+        public List<CourseAssessment> _allPerformanceAssessments = new();
 
         // UI State
         [ObservableProperty]
@@ -125,8 +126,15 @@ namespace C_971.ViewModels
 
         public PerformanceAssessmentViewModel(DatabaseService database)
         {
+            IsSearching = false;
             _database = database;
             _ = RequestNotificationPermissions();
+
+            // Load existing assessments for this course
+            //_ = LoadAllPerformanceAssessments();
+
+            // Populate assessment properties
+            _ = PopulateAssessmentProperties();
         }
 
         [RelayCommand]
@@ -207,13 +215,16 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Info", $"Course ID: {CourseId}", "OK");
                 //Save the new assessment
-                Assessment.CourseId = CourseId;
-                Assessment.Name = AssessmentName;
-                Assessment.Type = AssessmentType.Performance;
-                Assessment.Status = AssessmentStatus;
-                Assessment.StartDate = AssessmentStartDate;
-                Assessment.EndDate = AssessmentEndDate;
-                Assessment.Description = AssessmentDescription;
+                Assessment = new CourseAssessment
+                {
+                    CourseId = CourseId,
+                    Name = AssessmentName,
+                    Type = AssessmentType.Performance,
+                    Status = AssessmentStatus,
+                    StartDate = AssessmentStartDate,
+                    EndDate = AssessmentEndDate,
+                    Description = AssessmentDescription
+                };
             }
 
             try
@@ -223,8 +234,8 @@ namespace C_971.ViewModels
                 AssessmentId = Assessment.Id;
 
                 // Update notifications if needed
-                await UpdateAssessmentNotifications(Assessment);
 
+                await UpdateAssessmentNotifications(Assessment);
                 await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
             }
             catch (Exception ex)
@@ -335,42 +346,10 @@ namespace C_971.ViewModels
             // Show the search bar and switch to search mode
             IsSearching = true; // This will show the search bar
             OnPropertyChanged(nameof(IsNotSearching));
-            OnPropertyChanged(nameof(BackButtonText));
 
-            SearchText = "";
-            await Search();
-        }
+            _ = LoadAllPerformanceAssessments();
 
-        [RelayCommand]
-        public async Task Search()
-        {
-            try
-            {
-                IsSearching = true;
-                OnPropertyChanged(nameof(IsNotSearching));
-
-                // Get all Performance assessments from all courses
-                var allPerformanceAssessments = await _database.GetAssessmentsByTypeAsync(AssessmentType.Performance);
-
-                if (string.IsNullOrWhiteSpace(SearchText))
-                {
-                    // Show all performance assessments
-                    Assessments = new ObservableCollection<CourseAssessment>(allPerformanceAssessments);
-                }
-                else
-                {
-                    // Filter performance assessments by search text
-                    var filtered = allPerformanceAssessments.Where(a =>
-                        a.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0)
-                        .ToList();
-                    Assessments = new ObservableCollection<CourseAssessment>(filtered);
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to search assessments: {ex.Message}", "OK");
-                System.Diagnostics.Debug.WriteLine($"Search assessments error: {ex}");
-            }
+            SearchText = string.Empty; // Clear any existing search textq
         }
 
         partial void OnCourseChanged(Course value)
@@ -381,50 +360,122 @@ namespace C_971.ViewModels
                 AssessmentType = AssessmentType.Performance;
 
                 // Load existing assessments for this course
-                _ = LoadCourseAssessments();
+                _ = LoadAllPerformanceAssessments();
 
-                //Check Performance Assessments for CourseId
-
-
+                // Populate assessment properties
+                _ = PopulateAssessmentProperties();
             }
         }
 
-        partial void OnAssessmentChanged(CourseAssessment? oldValue, CourseAssessment newValue)
+        partial void OnSearchTextChanged(string value)
         {
-            //If an assessment has the seame courseId assigned to it
-            if(oldValue != newValue)
+            ApplySearchFilter();
+        }
+
+        //[RelayCommand]
+        //private async Task LoadCourseAssessments()
+        //{
+        //    try
+        //    {
+        //        // Load the specific Performance Assessment for THIS course
+        //        var courseAssessments = await _database.GetCourseAssessmentsByCourseIdAsync(CourseId);
+        //        var performanceAssessment = courseAssessments?.FirstOrDefault(a => a.Type == AssessmentType.Performance);
+
+        //        if (performanceAssessment != null)
+        //        {
+        //            System.Diagnostics.Debug.WriteLine($"Found Performance Assessment: {performanceAssessment.Name}");
+        //            Assessment = performanceAssessment;
+                   
+        //        }
+        //        else
+        //        {
+        //            await Shell.Current.DisplayAlertAsync("Alert", "No Performance Assessment found for this course","OK");
+        //            // Create new empty assessment
+        //            Assessment = new CourseAssessment
+        //            {
+        //                CourseId = CourseId,
+        //                Type = AssessmentType.Performance
+        //            };
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine($"LoadCourseAssessments error: {ex}");
+        //        await Shell.Current.DisplayAlertAsync("Error", $"Failed to load assessment: {ex.Message}", "OK");
+        //    }
+        //}
+
+
+        // Search and Filter
+        [RelayCommand]
+        private void Search()
+        {
+            ApplySearchFilter();
+        }
+
+        private void ApplySearchFilter()
+        {
+            Assessments.Clear();
+
+            var filteredAssessments = string.IsNullOrWhiteSpace(SearchText)
+                ? _allPerformanceAssessments
+                : _allPerformanceAssessments.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+            foreach (var assessment in filteredAssessments)
             {
+                Assessments.Add(assessment);
             }
+        }
+        private async Task PopulateAssessmentProperties()
+        {
+            Assessment = await _database.GetAssessmentbyCourseId(CourseId);
+
+            if (Assessment != null)
+            {
+                try
+                {
+                    AssessmentId = Assessment.Id;
+                    AssessmentName = Assessment.Name;
+                    AssessmentDescription = Assessment.Description;
+                    AssessmentType = Assessment.Type;
+                    AssessmentStatus = Assessment.Status;
+                    AssessmentStartDate = Assessment.StartDate;
+                    AssessmentEndDate = Assessment.EndDate;
+
+                    await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
+
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to populate assessment properties: {ex.Message}", "OK");
+                    System.Diagnostics.Debug.WriteLine($"PopulateAssessmentProperties error: {ex}");
+                }
+
+            } else
+            {
+                await Shell.Current.DisplayAlertAsync("Alert", "No Performance Assessment found for this course", "OK");
+            }
+
+
         }
 
         [RelayCommand]
-        private async Task LoadCourseAssessments()
+        private async Task LoadAllPerformanceAssessments()
         {
+            IsRefreshing = true;
             try
             {
-                IsLoadingAssessments = true;
-
-                // Get all assessments for this course
-                var courseAssessments = await _database.GetCourseAssessmentsByCourseIdAsync(Course.Id);
-
-                _allAssessments = courseAssessments?.ToList() ?? new List<CourseAssessment>();
-                Assessments.Clear();
-
-                foreach (var assessment in _allAssessments)
-                {
-                    Assessments.Add(assessment);
-                }
-
+                // Load ALL Performance assessments for search functionality
+                _allPerformanceAssessments = await _database.GetAssessmentsByTypeAsync(AssessmentType.Performance);
+                ApplySearchFilter();
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load assessments: {ex.Message}", "OK");
-                System.Diagnostics.Debug.WriteLine($"Load assessments error: {ex}");
+                await Shell.Current.DisplayAlertAsync("Debug Error", ex.Message, "OK");
             }
             finally
             {
-                IsLoadingAssessments = false;
-                OnPropertyChanged(nameof(IsNotEditing)); // Update UI state
+                IsRefreshing = false;
             }
         }
     }
