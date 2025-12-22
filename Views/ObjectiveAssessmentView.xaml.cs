@@ -47,6 +47,13 @@ public partial class ObjectiveAssessmentView : ContentPage
         }
         else
         {
+            if (viewModel.Assessment != null)
+            {
+                //Deactivate Current Assessment
+                viewModel.Assessment.IsActive = false;
+                viewModel.SaveAssessmentCommand.Execute(null);
+            }
+
             //Assign Assessment to ViewModel property
             viewModel.Assessment = assessment;
             viewModel.AssessmentId = assessment.Id;

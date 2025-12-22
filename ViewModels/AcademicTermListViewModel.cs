@@ -48,6 +48,7 @@ namespace C_971.ViewModels
         public AcademicTermListViewModel(DatabaseService database)
         {
             _database = database;
+            Console.WriteLine($"Database Path: {C_971.Constants.DatabasePath}");
         }
 
         // Initialization

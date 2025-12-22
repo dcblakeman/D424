@@ -11,7 +11,6 @@ public partial class PerformanceAssessmentView : ContentPage
 		BindingContext = viewModel;
 	}
 
-
     protected override async void OnAppearing()
     {
         base.OnAppearing();

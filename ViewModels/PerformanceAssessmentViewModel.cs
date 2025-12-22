@@ -21,6 +21,15 @@ namespace C_971.ViewModels
         public Course newCourse;
 
         [ObservableProperty]
+        public int courseId;
+
+        [ObservableProperty]
+        public string name = "Performance Assessment";
+
+        [ObservableProperty]
+        public string searchText = string.Empty;
+
+        [ObservableProperty]
         public CourseAssessment assessment = new();
 
         [ObservableProperty]
@@ -54,15 +63,6 @@ namespace C_971.ViewModels
         public bool assessmentIsActive = false;
 
         [ObservableProperty]
-        public string name = "Performance Assessment";
-
-        [ObservableProperty]
-        public string searchText = string.Empty;
-
-        [ObservableProperty]
-        public int courseId;
-
-        [ObservableProperty]
         public ObservableCollection<CourseAssessment> assessments = new();
 
         public List<CourseAssessment> _allPerformanceAssessments = new();
@@ -94,16 +94,6 @@ namespace C_971.ViewModels
 
         public bool IsNotSearching => !IsSearching;
 
-        public bool IsNotRefreshing => !IsRefreshing;
-
-        public bool IsNotAddingAssessment => !IsAddingAssessment;
-
-        public bool IsNotRemovingAssessment => !IsRemovingAssessment;
-
-        public bool IsNotSavingAssessment => !IsSavingAssessment;
-
-        public bool IsNotDeletingAssessment => !IsDeletingAssessment;
-
         public bool IsNotEditing => !IsEditing;
 
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
@@ -131,9 +121,8 @@ namespace C_971.ViewModels
         {
             IsSearching = false;
             _database = database;
-            _ = RequestNotificationPermissions();
 
-            // Populate assessment properties
+            _ = RequestNotificationPermissions();
             _ = PopulateAssessmentProperties();
         }
 
@@ -204,34 +193,38 @@ namespace C_971.ViewModels
                 // Not editing, so enter edit mode
                 IsEditing = true;
             }
-
             OnPropertyChanged(nameof(IsNotEditing));
         }
 
         [RelayCommand]
         private async Task SaveAssessment()
         {
-            Assessment.IsActive = false;
-            await _database.SaveCourseAssessmentAsync(Assessment);
-
-            Assessment.Id = AssessmentId;
-            Assessment.CourseId = CourseId;
-            Assessment.Name = AssessmentName;
-            Assessment.Type = AssessmentType.Performance;
-            Assessment.Status = AssessmentStatus;
-            Assessment.StartDate = AssessmentStartDate;
-            Assessment.EndDate = AssessmentEndDate;
-            Assessment.Description = AssessmentDescription;
-            Assessment.StartDateNotifications = AssessmentStartDateNotifications;
-            Assessment.EndDateNotifications = AssessmentEndDateNotifications;
-            Assessment.IsActive = AssessmentIsActive;
-
             try
             {
-                await _database.SaveCourseAssessmentAsync(Assessment);
-                AssessmentId = Assessment.Id;
-                await UpdateAssessmentNotifications(Assessment);
-                await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
+                if (Assessment != null)
+                {
+                    Assessment.IsActive = false;
+                    await _database.SaveCourseAssessmentAsync(Assessment);
+
+                    Assessment.Id = AssessmentId;
+                    Assessment.CourseId = CourseId;
+                    Assessment.Name = AssessmentName;
+                    Assessment.Type = AssessmentType.Performance;
+                    Assessment.Status = AssessmentStatus;
+                    Assessment.StartDate = AssessmentStartDate;
+                    Assessment.EndDate = AssessmentEndDate;
+                    Assessment.Description = AssessmentDescription;
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
+                    Assessment.IsActive = AssessmentIsActive;
+
+                    await _database.SaveCourseAssessmentAsync(Assessment);
+
+                    AssessmentId = Assessment.Id;
+                    await UpdateAssessmentNotifications(Assessment);
+                    await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
+                }
+
             }
             catch (Exception ex)
             {

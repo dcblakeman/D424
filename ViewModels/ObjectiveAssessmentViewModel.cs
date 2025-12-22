@@ -26,7 +26,7 @@ namespace C_971.ViewModels
         private string searchText = string.Empty;
 
         [ObservableProperty]
-        private CourseAssessment assessment;
+        private CourseAssessment assessment = new();
 
         [ObservableProperty]
         public int assessmentId = 0;
@@ -61,6 +61,8 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
 
+        private List<CourseAssessment> _allObjectiveAssessments = new();
+
         // UI State
         [ObservableProperty]
         private bool isEditing;
@@ -86,26 +88,12 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isSearching;
 
-        private IEnumerable<CourseAssessment> _allObjectiveAssessments;
-
         public bool IsNotSearching => !IsSearching;
-
-        public bool IsNotRefreshing => !IsRefreshing;
-
-        public bool IsNotAddingAssessment => !IsAddingAssessment;
-
-        public bool IsNotRemovingAssessment => !IsRemovingAssessment;
-
-        public bool IsNotSavingAssessment => !IsSavingAssessment;
-
-        public bool IsNotDeletingAssessment => !IsDeletingAssessment;
 
         public bool IsNotEditing => !IsEditing;
 
         public string EditButtonText => IsEditing ? "Save Assessment" : "Edit Assessment";
-
         public string AddButtonText => IsAddingAssessment ? "Save Assessment" : "Add Assessment";
-
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
 
 
@@ -126,12 +114,13 @@ namespace C_971.ViewModels
             AssessmentType.Performance
         };
 
-
         public ObjectiveAssessmentViewModel(DatabaseService database)
         {
             _database = database;
+            IsSearching = false; IsSearching = false;
+
             _ = RequestNotificationPermissions();
-            IsSearching = false;
+            _ = PopulateAssessmentProperties();
         }
 
         [RelayCommand]
@@ -201,41 +190,38 @@ namespace C_971.ViewModels
                 // Not editing, so enter edit mode
                 IsEditing = true;
             }
-
             OnPropertyChanged(nameof(IsNotEditing));
         }
 
         [RelayCommand]
         private async Task SaveAssessment()
         {
-            if (AssessmentId == 0)
-            {
-                await Shell.Current.DisplayAlertAsync("Info", $"Course ID: {CourseId}", "OK");
-                //Save the new assessment
-                Assessment = new CourseAssessment
-                {
-                    CourseId = CourseId,
-                    Name = AssessmentName,
-                    Type = AssessmentType.Objective,
-                    Status = AssessmentStatus,
-                    StartDate = AssessmentStartDate,
-                    EndDate = AssessmentEndDate,
-                    Description = AssessmentDescription,
-                    StartDateNotifications = AssessmentStartDateNotifications,
-                    EndDateNotifications = AssessmentEndDateNotifications
-                };
-            }
-
             try
             {
-                await _database.SaveCourseAssessmentAsync(Assessment);
+                if (Assessment != null)
+                {
+                    Assessment.IsActive = false;
+                    await _database.SaveCourseAssessmentAsync(Assessment);
 
-                AssessmentId = Assessment.Id;
+                    Assessment.Id = AssessmentId;
+                    Assessment.CourseId = CourseId;
+                    Assessment.Name = AssessmentName;
+                    Assessment.Type = AssessmentType.Performance;
+                    Assessment.Status = AssessmentStatus;
+                    Assessment.StartDate = AssessmentStartDate;
+                    Assessment.EndDate = AssessmentEndDate;
+                    Assessment.Description = AssessmentDescription;
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
+                    Assessment.IsActive = AssessmentIsActive;
 
-                // Update notifications if needed
+                    await _database.SaveCourseAssessmentAsync(Assessment);
 
-                await UpdateAssessmentNotifications(Assessment);
-                await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
+                    AssessmentId = Assessment.Id;
+                    await UpdateAssessmentNotifications(Assessment);
+                    await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
+                }
+  
             }
             catch (Exception ex)
             {
@@ -329,8 +315,15 @@ namespace C_971.ViewModels
                     await _database.DeleteAssessmentAsync(Assessment.Id);
                     await Shell.Current.DisplayAlertAsync("Success", "Assessment deleted successfully.", "OK");
 
-                    // Navigate back since the assessment no longer exists
-                    await Shell.Current.GoToAsync("..");
+                    //Clear the Assessment Fields
+                    AssessmentId = 0;
+                    AssessmentName = String.Empty;
+                    AssessmentType = AssessmentType.Performance;
+                    AssessmentDescription = String.Empty;
+                    AssessmentStartDate = DateTime.Now;
+                    AssessmentEndDate = DateTime.Now.AddMonths(6);
+                    AssessmentStatus = AssessmentStatus.Pending;
+
                 }
                 catch (Exception ex)
                 {
@@ -351,25 +344,12 @@ namespace C_971.ViewModels
             SearchText = string.Empty; // Clear any existing search textq
         }
 
-        async partial void OnAssessmentChanging(CourseAssessment assessment)
-        {
-            if (assessmentId == 0) return;
-            assessment.IsActive = false;
-            await SaveAssessment();
-        }
-
-        async partial void OnAssessmentChanged(CourseAssessment assessemnt)
-        {
-            if (AssessmentId == 0) return;
-            Assessment.IsActive = true;
-        }
-
         partial void OnNewCourseChanged(Course value)
         {
             if (value != null)
             {
                 CourseId = value.Id;
-                AssessmentType = AssessmentType.Performance;
+                AssessmentType = AssessmentType.Objective;
 
                 // Load existing assessments for this course
                 _ = LoadAllObjectiveAssessments();
@@ -406,7 +386,7 @@ namespace C_971.ViewModels
         }
         private async Task PopulateAssessmentProperties()
         {
-            Assessment = await _database.GetAssessmentbyCourseIdAndType(CourseId, AssessmentType.Objective);
+            Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(CourseId, AssessmentType.Objective, Assessment.IsActive = true);
 
             if (Assessment != null && AssessmentType == AssessmentType.Objective)
             {
@@ -421,6 +401,7 @@ namespace C_971.ViewModels
                     AssessmentEndDate = Assessment.EndDate;
                     AssessmentStartDateNotifications = Assessment.StartDateNotifications;
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
+                    AssessmentIsActive = Assessment.IsActive;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
 
@@ -457,24 +438,21 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task AddAssessment()
         {
-            // Navigate to a new PerformanceAssessmentViewModel with empty assessment
-            var newAssessment = new CourseAssessment
-            {
-                CourseId = CourseId,
-                Type = AssessmentType.Performance
-            };
-            try
-            {
-                await Shell.Current.GoToAsync("PerformanceAssessmentView", true, new Dictionary<string, object>
-                {
-                    ["course"] = NewCourse,
-                    ["assessment"] = newAssessment
-                });
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Failed to navigate to add assessment: {ex.Message}", "OK");
-            }
+            IsSearching = false;
+            IsEditing = true;
+
+            OnPropertyChanged(nameof(AddButtonText));
+            OnPropertyChanged(nameof(IsNotSearching));
+            OnPropertyChanged(nameof(IsNotEditing));
+
+            // Clear existing assessment properties for new entry
+            AssessmentId = 0;
+            AssessmentName = String.Empty;
+            AssessmentType = AssessmentType.Performance;
+            AssessmentDescription = String.Empty;
+            AssessmentStartDate = DateTime.Now;
+            AssessmentEndDate = DateTime.Now.AddMonths(6);
+            AssessmentStatus = AssessmentStatus.Pending;
         }
     }
 }
