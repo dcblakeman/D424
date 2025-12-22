@@ -68,6 +68,9 @@ public partial class ObjectiveAssessmentView : ContentPage
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
             viewModel.AssessmentIsActive = assessment.IsActive;
 
+            //Save Assessment to database
+            await viewModel.SaveAssessmentCommand.ExecuteAsync(null);
+
             //End Searching
             await viewModel.GoBackCommand.ExecuteAsync(null);
         }

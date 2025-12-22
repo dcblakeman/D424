@@ -202,24 +202,35 @@ namespace C_971.ViewModels
                 {
                     Assessment.IsActive = false;
                     await _database.SaveCourseAssessmentAsync(Assessment);
+
+                    Assessment.Id = AssessmentId;
+                    Assessment.CourseId = CourseId;
+                    Assessment.Name = AssessmentName;
+                    Assessment.Type = AssessmentType.Objective;
+                    Assessment.Status = AssessmentStatus;
+                    Assessment.StartDate = AssessmentStartDate;
+                    Assessment.EndDate = AssessmentEndDate;
+                    Assessment.Description = AssessmentDescription;
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
+                    Assessment.IsActive = true;
                 } 
                 else
                 {
                     Assessment = new CourseAssessment();
+                    Assessment.CourseId = CourseId;
+                    Assessment.Name = AssessmentName;
+                    Assessment.Type = AssessmentType.Objective;
+                    Assessment.Status = AssessmentStatus;
+                    Assessment.StartDate = AssessmentStartDate;
+                    Assessment.EndDate = AssessmentEndDate;
+                    Assessment.Description = AssessmentDescription;
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
+                    Assessment.IsActive = true;
                 }
 
-                Assessment.Id = AssessmentId;
-                Assessment.CourseId = CourseId;
-                Assessment.Name = AssessmentName;
-                Assessment.Type = AssessmentType.Objective;
-                Assessment.Status = AssessmentStatus;
-                Assessment.StartDate = AssessmentStartDate;
-                Assessment.EndDate = AssessmentEndDate;
-                Assessment.Description = AssessmentDescription;
-                Assessment.StartDateNotifications = AssessmentStartDateNotifications;
-                Assessment.EndDateNotifications = AssessmentEndDateNotifications;
-                Assessment.IsActive = AssessmentIsActive;
-
+                
                 await _database.SaveCourseAssessmentAsync(Assessment);
 
                 AssessmentId = Assessment.Id;
