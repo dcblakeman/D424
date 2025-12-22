@@ -205,8 +205,8 @@ namespace C_971.ViewModels
                 {
                     Assessment.IsActive = false;
                     await _database.SaveCourseAssessmentAsync(Assessment);
-
                     Assessment.Id = AssessmentId;
+                }
                     Assessment.CourseId = CourseId;
                     Assessment.Name = AssessmentName;
                     Assessment.Type = AssessmentType.Performance;
@@ -223,7 +223,6 @@ namespace C_971.ViewModels
                     AssessmentId = Assessment.Id;
                     await UpdateAssessmentNotifications(Assessment);
                     await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
-                }
 
             }
             catch (Exception ex)
