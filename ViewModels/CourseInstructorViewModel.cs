@@ -214,7 +214,8 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["instructor"] = NewInstructor
                 });
             }
             catch (Exception ex)
