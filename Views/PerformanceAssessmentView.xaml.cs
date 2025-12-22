@@ -59,6 +59,13 @@ public partial class PerformanceAssessmentView : ContentPage
         }
         else
         {
+            if (viewModel.Assessment != null)
+            {
+                //Deactivate Current Assessment
+                viewModel.Assessment.IsActive = false;
+                viewModel.SaveAssessmentCommand.Execute(null);
+            }
+
             //Assign Assessment to ViewModel property
             viewModel.Assessment = assessment;
             viewModel.AssessmentId = assessment.Id;
@@ -71,7 +78,10 @@ public partial class PerformanceAssessmentView : ContentPage
             viewModel.CourseId = assessment.CourseId;
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
-            viewModel.AssessmentIsActive = assessment.IsActive;
+            viewModel.AssessmentIsActive = true;
+
+            //Save Assessment to database
+            await viewModel.SaveAssessmentCommand.ExecuteAsync(null);
 
             //End Searching
             await viewModel.GoBackCommand.ExecuteAsync(null);

@@ -358,19 +358,27 @@ namespace C_971.ViewModels
             SearchText = string.Empty; // Clear any existing search textq
         }
 
-        async partial void OnAssessmentChanging(CourseAssessment assessment)
+/*        async partial void OnAssessmentChanging(CourseAssessment assessment)
         {
-            if (assessmentId == 0) return;
+            // Populate assessment properties
+            //_ = PopulateAssessmentProperties();
+
+            //await Shell.Current.DisplayAlertAsync("Alert", $"assessmentID: {assessment.Id}", "OK");
+            //if (assessment.Id == 0) return;
             AssessmentIsActive = false;
             await SaveAssessment();
         }
 
         async partial void OnAssessmentChanged(CourseAssessment assessemnt)
         {
+            // Populate assessment properties
+            //_ = PopulateAssessmentProperties();
+
+            //await Shell.Current.DisplayAlertAsync("Alert", $"AssessmentID: {Assessment.Id}", "OK");
             if (AssessmentId == 0) return;
             AssessmentIsActive = true;
             await SaveAssessment();
-        }
+        }*/
 
         partial void OnNewCourseChanged(Course value)
         {
