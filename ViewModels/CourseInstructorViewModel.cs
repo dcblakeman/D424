@@ -16,10 +16,10 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
-        private CourseInstructor instructor;
+        private CourseInstructor newInstructor;
 
         [ObservableProperty]
-        private string name = "Course Instructor";
+        private string viewName = "Course Instructor";
 
         // UI State
         [ObservableProperty]
@@ -47,13 +47,16 @@ namespace C_971.ViewModels
 
         // New Instructor Form
         [ObservableProperty]
-        private string instructorName = string.Empty;
+        private int newInstructorId = 0;
 
         [ObservableProperty]
-        private string instructorPhone = string.Empty;
+        private string newInstructorName = string.Empty;
 
         [ObservableProperty]
-        private string instructorEmail = string.Empty;
+        private string newInstructorPhone = string.Empty;
+
+        [ObservableProperty]
+        private string newInstructorEmail = string.Empty;
 
         public CourseInstructorViewModel(DatabaseService database)
         {
@@ -65,7 +68,7 @@ namespace C_971.ViewModels
         {
             if (value != null)
             {
-                Name = $"{value.Name} - Instructors";
+                ViewName = $"{value.Name} - Instructors";
                 _ = LoadInstructorsAsync();
 
                 NewCourse = value;
@@ -149,17 +152,14 @@ namespace C_971.ViewModels
 
             try
             {
-                var newInstructor = new CourseInstructor
-                {
-                    Name = InstructorName.Trim(),
-                    Phone = InstructorPhone.Trim(),
-                    Email = InstructorEmail.Trim().ToLowerInvariant()
-                };
+                NewInstructor.Name = NewInstructorName.Trim();
+                NewInstructor.Phone = NewInstructorPhone.Trim();
+                NewInstructor.Email = NewInstructorEmail.Trim().ToLowerInvariant();
 
-                await _database.SaveCourseInstructorAsync(newInstructor);
+                await _database.SaveCourseInstructorAsync(NewInstructor);
 
                 // Add to cache and refresh display
-                _allInstructors.Add(newInstructor);
+                _allInstructors.Add(NewInstructor);
                 ApplySearchFilter();
 
                 ClearForm();
@@ -227,36 +227,50 @@ namespace C_971.ViewModels
         // Helper Methods
         private bool ValidateInstructor()
         {
-            if (string.IsNullOrWhiteSpace(InstructorName))
+            if (string.IsNullOrWhiteSpace(NewInstructorName))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "Instructor name is required", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(InstructorEmail))
+            if (string.IsNullOrWhiteSpace(NewInstructorEmail))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "Email address is required", "OK");
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(InstructorPhone))
+            if (string.IsNullOrWhiteSpace(NewInstructorPhone))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "Phone number is required", "OK");
                 return false;
             }
 
             // Basic email validation
-            if (!IsValidEmail(InstructorEmail))
+            if (!IsValidEmail(NewInstructorEmail))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid email address", "OK");
                 return false;
             }
 
             // Check for duplicate email
-            if (Instructors.Any(i => i.Email.Equals(InstructorEmail.Trim(), StringComparison.OrdinalIgnoreCase)))
+            if (Instructors.Any(i => i.Email.Equals(NewInstructorEmail.Trim(), StringComparison.OrdinalIgnoreCase)))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "An instructor with this email already exists", "OK");
                 return false;
+            }
+
+            // Check for duplicate phone number
+            if (Instructors.Any(i => i.Phone.Equals(NewInstructorPhone.Trim(), StringComparison.OrdinalIgnoreCase)))
+            {
+                _ = Shell.Current.DisplayAlertAsync("Validation Error", "An instructor with this phone number already exists", "OK");
+                return false;
+            }
+
+            // Check for correct phone number format
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewInstructorPhone.Trim(), @"^\+?[1-9]\d{1,14}$"))
+            {
+            _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number", "OK");
+            return false;
             }
 
             return true;
@@ -277,9 +291,9 @@ namespace C_971.ViewModels
 
         private void ClearForm()
         {
-            InstructorName = string.Empty;
-            InstructorPhone = string.Empty;
-            InstructorEmail = string.Empty;
+            NewInstructorName = string.Empty;
+            NewInstructorPhone = string.Empty;
+            NewInstructorEmail = string.Empty;
         }
 
         private void ApplySearchFilter()

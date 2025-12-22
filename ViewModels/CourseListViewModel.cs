@@ -53,7 +53,7 @@ namespace C_971.ViewModels
         private DateTime newCourseStartDate = DateTime.Now;
 
         [ObservableProperty]
-        private DateTime newCourseEndDate = DateTime.Now.AddMonths(3);
+        private DateTime newCourseEndDate = DateTime.Now.AddMonths(6);
 
         [ObservableProperty]
         private CourseStatus newCourseStatus = CourseStatus.Planned;
@@ -239,14 +239,15 @@ namespace C_971.ViewModels
         {
             NewCourseName = string.Empty;
             NewCourseStartDate = DateTime.Now;
-            NewCourseEndDate = DateTime.Now.AddMonths(3);
+            NewCourseEndDate = DateTime.Now.AddMonths(6);
             NewCourseStatus = CourseStatus.Planned;
         }
 
         [RelayCommand]
-        private void RemoveCourse()
+        private void RemoveCourse(Course newCourse)
         {
             IsRemovingCourse = true;
+            _database.DeleteCourseAsync(newCourse);
         }
     }
 }

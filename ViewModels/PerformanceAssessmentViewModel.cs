@@ -205,8 +205,8 @@ namespace C_971.ViewModels
                 {
                     Assessment.IsActive = false;
                     await _database.SaveCourseAssessmentAsync(Assessment);
+
                     Assessment.Id = AssessmentId;
-                }
                     Assessment.CourseId = CourseId;
                     Assessment.Name = AssessmentName;
                     Assessment.Type = AssessmentType.Performance;
@@ -216,14 +216,30 @@ namespace C_971.ViewModels
                     Assessment.Description = AssessmentDescription;
                     Assessment.StartDateNotifications = AssessmentStartDateNotifications;
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
-                    Assessment.IsActive = AssessmentIsActive;
+                    Assessment.IsActive = true;
+                }
+                else
+                {
+                    Assessment = new CourseAssessment();
+                    Assessment.Id = 0;
+                    Assessment.CourseId = CourseId;
+                    Assessment.Name = AssessmentName;
+                    Assessment.Type = AssessmentType.Performance;
+                    Assessment.Status = AssessmentStatus;
+                    Assessment.StartDate = AssessmentStartDate;
+                    Assessment.EndDate = AssessmentEndDate;
+                    Assessment.Description = AssessmentDescription;
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
+                    Assessment.IsActive = true;
+                    await Shell.Current.DisplayAlertAsync("Test", $"Assessment ID: {Assessment.Id}", "OK");
+                }
 
-                    await _database.SaveCourseAssessmentAsync(Assessment);
+                await _database.SaveCourseAssessmentAsync(Assessment);
 
-                    AssessmentId = Assessment.Id;
-                    await UpdateAssessmentNotifications(Assessment);
-                    await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
-
+                AssessmentId = Assessment.Id;
+                await UpdateAssessmentNotifications(Assessment);
+                await Shell.Current.DisplayAlertAsync("Success", "Assessment saved successfully!", "OK");
             }
             catch (Exception ex)
             {
@@ -391,7 +407,7 @@ namespace C_971.ViewModels
         {
             Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(CourseId, AssessmentType.Performance, Assessment.IsActive = true);
 
-            if (Assessment != null && AssessmentType == AssessmentType.Performance)
+            if (Assessment != null)
             {
                 try
                 {
@@ -456,6 +472,7 @@ namespace C_971.ViewModels
             AssessmentStartDate = DateTime.Now;
             AssessmentEndDate = DateTime.Now.AddMonths(6);
             AssessmentStatus = AssessmentStatus.Pending;
+            AssessmentIsActive = true;
         }
     }
 }

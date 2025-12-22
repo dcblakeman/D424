@@ -163,7 +163,6 @@ namespace C_971.Services
 
         public async Task<int> SaveCourseAssessmentAsync(CourseAssessment assessment)
         {
-            await Shell.Current.DisplayAlertAsync("Test", $"{assessment.Name}", "OK");
             await InitializeAsync();
             return assessment.Id != 0
                 ? await _database.UpdateAsync(assessment)

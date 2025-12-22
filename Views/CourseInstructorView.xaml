@@ -7,7 +7,7 @@
              x:DataType="vm:CourseInstructorViewModel">
 
     <Shell.TitleView>
-        <Label Text="{Binding Name}" 
+        <Label Text="{Binding ViewName}" 
                FontSize="24" 
                FontAttributes="Bold"
                TextColor="Black"
@@ -120,14 +120,14 @@
                 <!-- Name Entry -->
                 <VerticalStackLayout Spacing="3">
                     <Label Text="Name:" FontAttributes="Bold"/>
-                    <Entry Text="{Binding InstructorName, Mode=TwoWay}" 
+                    <Entry Text="{Binding NewInstructorName, Mode=TwoWay}" 
                    Placeholder="Enter instructor name"/>
                 </VerticalStackLayout>
 
                 <!-- Email Entry -->
                 <VerticalStackLayout Spacing="3">
                     <Label Text="Email:" FontAttributes="Bold"/>
-                    <Entry Text="{Binding InstructorEmail, Mode=TwoWay}" 
+                    <Entry Text="{Binding NewInstructorEmail, Mode=TwoWay}" 
                    Placeholder="Enter email address"
                    Keyboard="Email"/>
                 </VerticalStackLayout>
@@ -135,7 +135,7 @@
                 <!-- Phone Entry -->
                 <VerticalStackLayout Spacing="3">
                     <Label Text="Phone:" FontAttributes="Bold"/>
-                    <Entry Text="{Binding InstructorPhone, Mode=TwoWay}" 
+                    <Entry Text="{Binding NewInstructorPhone, Mode=TwoWay}" 
                    Placeholder="Enter phone number"
                    Keyboard="Telephone"/>
                 </VerticalStackLayout>

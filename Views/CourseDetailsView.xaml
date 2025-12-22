@@ -66,29 +66,29 @@
                     <!-- Course Name -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Name" FontAttributes="Bold" TextDecorations="Underline"/>
-                        <Label Text="{Binding NewCourse.Name}" IsVisible="{Binding IsNotEditing}"/>
-                        <Entry Text="{Binding NewCourse.Name, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                        <Label Text="{Binding NewCourseName}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding NewCourseName, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
                     
                     <!-- Course Description -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Description" FontAttributes="Bold" TextDecorations="Underline"/>
-                        <Label Text="{Binding NewCourse.Description}" IsVisible="{Binding IsNotEditing}"/>
-                        <Entry Text="{Binding NewCourse.Description, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                        <Label Text="{Binding NewCourseDescription}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding NewCourseDescription, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- Course Start Date -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Start Date" FontAttributes="Bold" TextDecorations="Underline"/>
-                        <Label Text="{Binding NewCourse.StartDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
-                        <DatePicker Date="{Binding NewCourse.StartDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                        <Label Text="{Binding NewCourseStartDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Date="{Binding NewCourseStartDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- Course End Date -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="End Date:" FontAttributes="Bold" TextDecorations="Underline"/>
-                        <Label Text="{Binding NewCourse.EndDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
-                        <DatePicker Date="{Binding NewCourse.EndDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}" />
+                        <Label Text="{Binding NewCourseEndDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Date="{Binding NewCourseEndDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}" />
                     </VerticalStackLayout>
 
                     <!-- Course Status -->
@@ -96,11 +96,11 @@
                         <!-- Status -->
                         <Label Grid.Row="4" Grid.Column="0" Text="Status" FontAttributes="Bold" VerticalOptions="Center" TextDecorations="Underline"/>
                         <Label Grid.Row="4" Grid.Column="1" 
-                               Text="{Binding NewCourse.Status, Mode=TwoWay}" 
+                               Text="{Binding NewCourseStatus, Mode=TwoWay}" 
                                VerticalOptions="Center"
                                IsVisible="{Binding IsNotEditing}"/>
                         <Picker Grid.Row="4" Grid.Column="1" 
-                        SelectedItem="{Binding NewCourse.Status, Mode=TwoWay}"
+                        SelectedItem="{Binding NewCourseStatus, Mode=TwoWay}"
                         ItemsSource="{Binding StatusOptions}"
                         IsVisible="{Binding IsEditing}"        
                         VerticalOptions="Center"/>
@@ -124,16 +124,16 @@
                     <!-- Start Date Notifications -->
                     <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="3">
                         <Label Text="Start Date Notifications:" FontAttributes="Bold"/>
-                        <Label Text="{Binding NewCourse.StartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
+                        <Label Text="{Binding NewCourseStartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
                                IsVisible="{Binding IsNotEditing}"/>
-                        <Switch IsToggled="{Binding NewCourse.StartDateNotifications, Mode=TwoWay}" 
+                        <Switch IsToggled="{Binding NewCourseStartDateNotifications, Mode=TwoWay}" 
                                 IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
                     <!-- End Date Notifications -->
                     <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="3">
                         <Label Text="End Date Notifications:" FontAttributes="Bold"/>
-                        <Label Text="{Binding NewCourse.EndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
+                        <Label Text="{Binding NewCourseEndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
                                IsVisible="{Binding IsNotEditing}"/>
                         <Switch IsToggled="{Binding NewCourse.EndDateNotifications, Mode=TwoWay}" 
                                 IsVisible="{Binding IsEditing}"/>

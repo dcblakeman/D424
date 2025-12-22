@@ -74,7 +74,6 @@ public partial class PerformanceAssessmentView : ContentPage
             viewModel.AssessmentStartDate = assessment.StartDate;
             viewModel.AssessmentEndDate = assessment.EndDate;
             viewModel.AssessmentDescription = assessment.Description;
-            viewModel.CourseId = assessment.CourseId;
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
             viewModel.AssessmentIsActive = true;

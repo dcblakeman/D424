@@ -19,6 +19,36 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
+        private int newCourseId = 0;
+
+        [ObservableProperty]
+        private string newCourseName = String.Empty;
+
+        [ObservableProperty]
+        public string newCourseDescription = String.Empty;
+
+        [ObservableProperty]
+        public DateTime newCourseStartDate = DateTime.Today;
+
+        [ObservableProperty]
+        public DateTime newCourseEndDate = DateTime.Today.AddMonths(6);
+
+        [ObservableProperty]
+        public CourseStatus newCourseStatus = CourseStatus.Planned;
+
+        [ObservableProperty]
+        public bool newCourseStartDateNotifications = true;
+
+        [ObservableProperty]
+        public bool newCourseEndDateNotifications = true;
+
+        [ObservableProperty]
+        public int newCourseTermId = 0;
+
+        [ObservableProperty]
+        public int newCourseInstructorId = 0;
+
+        [ObservableProperty]
         private CourseInstructor newInstructor;
 
         [ObservableProperty]
@@ -96,20 +126,19 @@ namespace C_971.ViewModels
 
             try
             {
-                //Display each field's value in alert
-                await Shell.Current.DisplayAlertAsync("Course Details",
-                    $"ID: {NewCourse.Id}\n" +
-                    $"Name: {NewCourse.Name}\n" +
-                    $"Start Date: {NewCourse.StartDate}\n" +
-                    $"End Date: {NewCourse.EndDate}\n" +
-                    $"Status: {NewCourse.Status}\n" +
-                    $"Instructor: {NewCourse.InstructorId}\n" +
-                    $"Start Date Notifications: {NewCourse.StartDateNotifications}\n" +
-                    $"End Date Notifications: {NewCourse.EndDateNotifications}",
-                    "OK");
-
                 //Refresh the page
                 OnPropertyChanged(nameof(NewCourse));
+
+                // Update course properties
+                NewCourse.Id = NewCourseId;
+                NewCourse.Name = NewCourseName;
+                NewCourse.Description = NewCourseDescription;
+                NewCourse.StartDate = NewCourseStartDate;
+                NewCourse.EndDate = NewCourseEndDate;
+                NewCourse.Status = NewCourseStatus;
+                NewCourse.StartDateNotifications = NewCourseStartDateNotifications;
+                NewCourse.EndDateNotifications = NewCourseEndDateNotifications;
+                NewCourse.InstructorId = NewCourseInstructorId;
 
                 // Update notifications after saving
                 await ScheduleCourseNotifications();

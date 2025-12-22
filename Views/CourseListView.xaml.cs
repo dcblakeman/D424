@@ -50,6 +50,7 @@ namespace C_971.Views
                 {
                     // Remove from collection
                     viewModel.Courses.Remove(newCourse);
+                    viewModel.RemoveCourseCommand.Execute(newCourse);
 
                     // Exit remove mode
                     viewModel.IsRemovingCourse = false;
@@ -62,8 +63,7 @@ namespace C_971.Views
                 // Normal navigation behavior
                 await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
                 {
-                    { "course", newCourse },
-                    {"termid", newCourse.TermId  }
+                    { "course", newCourse }
                 });
             }
         }
