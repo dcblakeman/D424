@@ -7,7 +7,7 @@
              x:DataType="viewmodel:AcademicTermListViewModel">
 
     <Shell.TitleView>
-        <Label Text="{Binding Name}" 
+        <Label Text="{Binding ViewName}" 
             FontSize="24" 
             FontAttributes="Bold"
             TextColor="Black"
@@ -140,7 +140,6 @@
 
         <!-- Content Section -->
         <RefreshView Grid.Row="3"
-                     Command="{Binding LoadAcademicTermsCommand}"
                      IsRefreshing="{Binding IsRefreshing}">
             
             <CollectionView ItemsSource="{Binding AcademicTerms}">

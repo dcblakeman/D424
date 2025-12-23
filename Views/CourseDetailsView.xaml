@@ -135,7 +135,7 @@
                         <Label Text="End Date Notifications:" FontAttributes="Bold"/>
                         <Label Text="{Binding NewCourseEndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
                                IsVisible="{Binding IsNotEditing}"/>
-                        <Switch IsToggled="{Binding NewCourse.EndDateNotifications, Mode=TwoWay}" 
+                        <Switch IsToggled="{Binding NewCourseEndDateNotifications, Mode=TwoWay}" 
                                 IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
                 </Grid>
@@ -157,16 +157,16 @@
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" Margin="0,0,0,0">
                     <!-- ID -->
                         <Label Grid.Row="0" Grid.Column="0" Text="Instructor ID:" FontAttributes="Bold"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding NewInstructor.Id}" IsVisible="{Binding IsNotEditing}"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding NewInstructor.Id}"/>
                     <!-- Name -->
                         <Label Grid.Row="1" Grid.Column="0" Text="Instructor Name:" FontAttributes="Bold"/>
-                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding NewInstructor.Name}" IsVisible="{Binding IsNotEditing}"/>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding NewInstructor.Name}"/>
                     <!-- Phone -->
                         <Label Grid.Row="2" Grid.Column="0" Text="Instructor Phone:" FontAttributes="Bold"/>
-                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding NewInstructor.Phone}" IsVisible="{Binding IsNotEditing}"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding NewInstructor.Phone}"/>
                     <!-- Email -->
                         <Label Grid.Row="3" Grid.Column="0" Text="Instructor Email:" FontAttributes="Bold"/>
-                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding NewInstructor.Email}" IsVisible="{Binding IsNotEditing}"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding NewInstructor.Email}"/>
                 </Grid>
             </Border>
             <!--End Notifications Section-->

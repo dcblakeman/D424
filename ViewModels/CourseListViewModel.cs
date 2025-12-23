@@ -7,22 +7,34 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(Term), "term")]
-    [QueryProperty(nameof(TermId), "termId")]
-    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(NewTerm), "term")]
+    [QueryProperty(nameof(NewCourse), "course")]
     public partial class CourseListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
+        [ObservableProperty]
+        private string viewName = "Course List";
+
         // Core Properties
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm newTerm = new AcademicTerm();
 
         [ObservableProperty]
-        private int termId;
+        private Course newCourse = new Course(); 
+
+        // New Course Form
+        [ObservableProperty]
+        private string newCourseName = string.Empty;
 
         [ObservableProperty]
-        private Course course;
+        private DateTime newCourseStartDate = DateTime.Now;
+
+        [ObservableProperty]
+        private DateTime newCourseEndDate = DateTime.Now.AddMonths(6);
+
+        [ObservableProperty]
+        private CourseStatus newCourseStatus = CourseStatus.Planned;
 
         // UI State
         [ObservableProperty]
@@ -43,23 +55,7 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private ObservableCollection<Course> courses = new();
 
-        private List<Course> _allCourses = new();
-
-        // New Course Form
-        [ObservableProperty]
-        private string newCourseName = string.Empty;
-
-        [ObservableProperty]
-        private DateTime newCourseStartDate = DateTime.Now;
-
-        [ObservableProperty]
-        private DateTime newCourseEndDate = DateTime.Now.AddMonths(6);
-
-        [ObservableProperty]
-        private CourseStatus newCourseStatus = CourseStatus.Planned;
-
-        [ObservableProperty]
-        private string name = "Course List";
+        private List<Course> _allCourses = new List<Course>();
 
         // Static Collections
         public ObservableCollection<CourseStatus> StatusOptions { get; } = new ObservableCollection<CourseStatus>
@@ -77,23 +73,23 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnTermChanged(AcademicTerm value)
+        partial void OnNewTermChanged(AcademicTerm value)
         {
             if (value != null)
             {
-                TermId = value.Id;
-                _ = LoadCoursesAsync();
+                NewTerm = value;
+                _ = LoadCoursesAsync(NewTerm);
             }
         }
 
-        partial void OnCourseChanged(Course value)
-        {
-            // Refresh when returning from course details
-            if (value != null)
-            {
-                _ = LoadCoursesAsync();
-            }
-        }
+        //partial void OnNewCourseChanged(Course value)
+        //{
+        //    // Refresh when returning from course details
+        //    if (value != null)
+        //    {
+        //        _ = LoadCoursesAsync();
+        //    }
+        //}
 
         partial void OnSearchTextChanged(string value)
         {
@@ -128,14 +124,13 @@ namespace C_971.ViewModels
 
         // Data Loading
         [RelayCommand]
-        private async Task LoadCoursesAsync()
+        private async Task LoadCoursesAsync(AcademicTerm term)
         {
-            if (TermId == 0) return;
-
+            if(term == null) return;
             IsRefreshing = true;
             try
             {
-                _allCourses = await _database.GetCoursesByTermIdAsync(TermId);
+                _allCourses = await _database.GetCoursesByTermIdAsync(term.Id);
                 ApplySearchFilter();
             }
             finally
@@ -163,7 +158,7 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("//AcademicTermListView", new Dictionary<string, object>
                 {
-                    ["termId"] = TermId
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -193,22 +188,19 @@ namespace C_971.ViewModels
 
             try
             {
-                var newCourse = new Course
-                {
-                    Name = NewCourseName,
-                    StartDate = NewCourseStartDate,
-                    EndDate = NewCourseEndDate,
-                    Status = NewCourseStatus,
-                    TermId = TermId
-                };
+                NewCourse.Name = NewCourseName;
+                NewCourse.StartDate = NewCourseStartDate;
+                NewCourse.EndDate = NewCourseEndDate;
+                NewCourse.Status = NewCourseStatus;
+                NewCourse.TermId = NewTerm.Id;
 
-                await _database.SaveCourseAsync(newCourse);
+                await _database.SaveCourseAsync(NewCourse);
 
                 ClearForm();
                 IsAddingCourse = false;
 
                 await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
-                await LoadCoursesAsync();
+                await LoadCoursesAsync(NewTerm);
             }
             catch (Exception ex)
             {

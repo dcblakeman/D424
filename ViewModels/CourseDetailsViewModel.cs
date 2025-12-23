@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewTerm), "term")]
     [QueryProperty(nameof(NewInstructor), "instructor")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
@@ -17,6 +18,9 @@ namespace C_971.ViewModels
         // Core Properties
         [ObservableProperty]
         private Course newCourse;
+
+        [ObservableProperty]
+        private AcademicTerm newTerm;
 
         [ObservableProperty]
         private int newCourseId = 0;
@@ -52,7 +56,7 @@ namespace C_971.ViewModels
         private CourseInstructor newInstructor;
 
         [ObservableProperty]
-        private string name = "Course Details";
+        private string viewName = "Course Details";
 
         // UI State
         [ObservableProperty]
@@ -66,7 +70,7 @@ namespace C_971.ViewModels
         public string EditButtonColor => IsEditing ? "#4CAF50" : "#2196F3";
 
         // Static Collections
-        public ObservableCollection<CourseStatus> StatusOptions { get; } = new ObservableCollection<CourseStatus>
+        public ObservableCollection<CourseStatus> StatusOptions { get; set; } = new ObservableCollection<CourseStatus>
         {
             CourseStatus.NotEnrolled,
             CourseStatus.InProgress,
@@ -75,7 +79,7 @@ namespace C_971.ViewModels
             CourseStatus.Planned
         };
 
-        public ObservableCollection<AssessmentType> AssessmentTypeOptions { get; } = new ObservableCollection<AssessmentType>
+        public ObservableCollection<AssessmentType> AssessmentTypeOptions { get; set; } = new ObservableCollection<AssessmentType>
         {
             AssessmentType.Objective,
             AssessmentType.Performance
@@ -92,9 +96,18 @@ namespace C_971.ViewModels
         {
             if (value != null)
             {
-                Name = $"{value.Name} - Details";
+                NewCourse = value;
                 IsEditing = false;
                 _= LoadInstructorAsync();
+                _= PopulateFields();
+            }
+        }
+
+        partial void OnNewTermChanged(AcademicTerm value)
+        {
+            if (value != null)
+            {
+                NewTerm = value;
             }
         }
 
@@ -122,7 +135,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveCourse()
         {
-            if (NewCourse == null) return;
+            //if (NewCourse == null) return;
 
             try
             {
@@ -246,7 +259,8 @@ namespace C_971.ViewModels
 
                 await Shell.Current.GoToAsync("CourseListView", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -380,6 +394,24 @@ namespace C_971.ViewModels
         {
             // Refresh data when returning to this page
             await RefreshData();
+        }
+
+        public async Task PopulateFields()
+        {
+            if (NewCourse != null)
+            {
+                NewCourseId = NewCourse.Id;
+                NewCourseName = NewCourse.Name;
+                NewCourseDescription = NewCourse.Description;
+                NewCourseStartDate = NewCourse.StartDate;
+                NewCourseEndDate = NewCourse.EndDate;
+                NewCourseStatus = NewCourse.Status;
+                NewCourseStartDateNotifications = NewCourse.StartDateNotifications;
+                NewCourseEndDateNotifications = NewCourse.EndDateNotifications;
+                NewCourseTermId = NewCourse.TermId;
+                NewCourseInstructorId = (int)NewCourse.InstructorId;
+                await LoadInstructorAsync();
+            }
         }
     }
 }

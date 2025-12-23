@@ -24,7 +24,7 @@ namespace C_971.ViewModels
         public int courseId;
 
         [ObservableProperty]
-        public string name = "Performance Assessment";
+        public string viewName = "Performance Assessment";
 
         [ObservableProperty]
         public string searchText = string.Empty;
@@ -216,7 +216,9 @@ namespace C_971.ViewModels
                     Assessment.Description = AssessmentDescription;
                     Assessment.StartDateNotifications = AssessmentStartDateNotifications;
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
-                    Assessment.IsActive = true;
+                    AssessmentIsActive = true;
+                    Assessment.IsActive = AssessmentIsActive;
+
                 }
                 else
                 {
@@ -231,7 +233,8 @@ namespace C_971.ViewModels
                     Assessment.Description = AssessmentDescription;
                     Assessment.StartDateNotifications = AssessmentStartDateNotifications;
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
-                    Assessment.IsActive = true;
+                    AssessmentIsActive = true;
+                    Assessment.IsActive = AssessmentIsActive;
                     await Shell.Current.DisplayAlertAsync("Test", $"Assessment ID: {Assessment.Id}", "OK");
                 }
 

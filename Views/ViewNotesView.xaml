@@ -7,7 +7,7 @@
              x:DataType="vm:ViewNotesViewModel">
 
     <Shell.TitleView>
-        <Label Text="{Binding Name}" 
+        <Label Text="{Binding ViewName}" 
                FontSize="24" 
                FontAttributes="Bold"
                TextColor="Black"

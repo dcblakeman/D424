@@ -18,6 +18,19 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private CourseInstructor newInstructor;
 
+        // New Instructor Form
+        [ObservableProperty]
+        private int newInstructorId = 0;
+
+        [ObservableProperty]
+        private string newInstructorName = string.Empty;
+
+        [ObservableProperty]
+        private string newInstructorPhone = string.Empty;
+
+        [ObservableProperty]
+        private string newInstructorEmail = string.Empty;
+
         [ObservableProperty]
         private string viewName = "Course Instructor";
 
@@ -45,19 +58,6 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string searchText = string.Empty;
 
-        // New Instructor Form
-        [ObservableProperty]
-        private int newInstructorId = 0;
-
-        [ObservableProperty]
-        private string newInstructorName = string.Empty;
-
-        [ObservableProperty]
-        private string newInstructorPhone = string.Empty;
-
-        [ObservableProperty]
-        private string newInstructorEmail = string.Empty;
-
         public CourseInstructorViewModel(DatabaseService database)
         {
             _database = database;
@@ -68,7 +68,6 @@ namespace C_971.ViewModels
         {
             if (value != null)
             {
-                ViewName = $"{value.Name} - Instructors";
                 _ = LoadInstructorsAsync();
 
                 NewCourse = value;

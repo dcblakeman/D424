@@ -21,7 +21,7 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
-        private string name = "Assessment Selection";
+        private string viewName = "Assessment Selection";
 
         [RelayCommand]
         private async Task GoBack()

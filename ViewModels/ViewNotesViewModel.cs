@@ -27,10 +27,10 @@ namespace C_971.ViewModels
 		private List<CourseNote> notes = [];
 
 		[ObservableProperty]
-        private string name = "View Notes";
+        private string viewName = "View Notes";
 
         [ObservableProperty]
-        private CourseNote note;
+        private CourseNote newNote;
 
         public ViewNotesViewModel(DatabaseService databaseService)
         {

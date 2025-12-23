@@ -8,7 +8,7 @@
              Title="Add Note">
 
     <Shell.TitleView>
-        <Label Text="{Binding Name}" 
+        <Label Text="{Binding ViewName}" 
             FontSize="24" 
             FontAttributes="Bold"
             TextColor="Black"

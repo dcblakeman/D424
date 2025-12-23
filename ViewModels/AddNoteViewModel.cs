@@ -15,14 +15,17 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
-        private string name = "Add Note";
+        private CourseNote newNote = new CourseNote();
+
+        [ObservableProperty]
+        private string viewName = "Add Note";
 
         // Form Properties
         [ObservableProperty]
         private string newNoteContent = string.Empty;
 
         [ObservableProperty]
-        private DateTime createdDate = DateTime.Now;
+        private DateTime newCreatedDate = DateTime.Now;
 
         public AddNoteViewModel(DatabaseService database)
         {
@@ -34,8 +37,6 @@ namespace C_971.ViewModels
         {
             if (value != null)
             {
-                Name = $"Add Note - {value.Name}";
-                System.Diagnostics.Debug.WriteLine($"Course received: {value.Name}");
             }
         }
 
@@ -47,14 +48,11 @@ namespace C_971.ViewModels
 
             try
             {
-                var newNote = new CourseNote
-                {
-                    CreatedDate = DateTime.Now,
-                    NoteContent = NewNoteContent.Trim(),
-                    CourseId = NewCourse.Id
-                };
+                NewNote.CreatedDate = DateTime.Now;
+                NewNote.NoteContent = NewNoteContent.Trim();
+                NewNote.CourseId = NewCourse.Id;
 
-                await _database.SaveCourseNoteAsync(newNote);
+                await _database.SaveCourseNoteAsync(NewNote);
 
                 await Shell.Current.DisplayAlertAsync("Success", "Note saved successfully!", "OK");
                 await GoBack();

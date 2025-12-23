@@ -15,7 +15,6 @@
     <ShellContent
         ContentTemplate="{DataTemplate views:AcademicTermListView}"
         Route="AcademicTermListView"/>
-    <!-- Additional routes for navigation -->
     <ShellContent
         ContentTemplate="{DataTemplate views:CourseListView}"
         Route="CourseListView"/>

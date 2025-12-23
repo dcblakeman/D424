@@ -12,7 +12,10 @@ namespace C_971.ViewModels
 
         // Core Properties
         [ObservableProperty]
-        private string name = "Academic Terms";
+        private string viewName = "Academic Terms";
+
+        [ObservableProperty]
+        private AcademicTerm newTerm = new AcademicTerm();
 
         [ObservableProperty]
         private ObservableCollection<AcademicTerm> academicTerms = new();
@@ -138,17 +141,14 @@ namespace C_971.ViewModels
 
             try
             {
-                var newTerm = new AcademicTerm
-                {
-                    Name = NewTermName,
-                    StartDate = NewTermStartDate,
-                    EndDate = NewTermEndDate
-                };
+                NewTerm.Name = NewTermName;
+                NewTerm.StartDate = NewTermStartDate;
+                NewTerm.EndDate = NewTermEndDate;
 
-                await _database.SaveTermAsync(newTerm);
+                await _database.SaveTermAsync(NewTerm);
 
                 // Add to cache and refresh display
-                _allTerms.Add(newTerm);
+                _allTerms.Add(NewTerm);
                 ApplySearchFilter();
 
                 ClearForm();
@@ -163,19 +163,19 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private void RemoveTerm()
+        public void RemoveTerm()
         {
             IsRemovingTerm = true;
         }
 
         [RelayCommand]
-        private void CancelRemoveTerm()
+        public void CancelRemoveTerm()
         {
             IsRemovingTerm = false;
         }
 
         [RelayCommand]
-        private async Task DeleteTerm(AcademicTerm term)
+        public async Task DeleteTerm(AcademicTerm term)
         {
             if (term == null) return;
 
@@ -200,7 +200,7 @@ namespace C_971.ViewModels
 
         // Application Management
         [RelayCommand]
-        private async Task ExitApp()
+        public async Task ExitApp()
         {
             bool confirmed = await Shell.Current.DisplayAlertAsync(
                 "Exit Application",

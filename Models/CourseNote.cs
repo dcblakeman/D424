@@ -22,9 +22,6 @@ namespace C_971.Models
         // Created Date
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        // Modified Date
-        public DateTime? ModifiedDate { get; set; }
-
         // Foreign key to Course
         [Indexed]
         public int CourseId { get; set; }
