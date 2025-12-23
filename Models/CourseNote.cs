@@ -16,6 +16,7 @@ namespace C_971.Models
         public int Id { get; set; }
 
         // Note Content
+        [NotNull]
         public string NoteContent { get; set; } = string.Empty;
 
         // Created Date

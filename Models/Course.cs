@@ -21,30 +21,42 @@ namespace C_971.Models
 
         // Name
         [MaxLength(100)]
+        [NotNull]
         public string Name { get; set; } = string.Empty;
 
 
         // Description
         [MaxLength(250)]
+        [NotNull]
         public string Description { get; set; } = string.Empty;
 
 
         // Start and End Dates
+        [NotNull]
         public DateTime StartDate { get; set; } = DateTime.Now;
+
+        [NotNull]
         public DateTime EndDate { get; set; } = DateTime.Now;
 
 
         // Course Status
+        [NotNull]
         public CourseStatus Status { get; set; } = NotEnrolled;
 
 
         // Notifications
+        [NotNull]
         public bool StartDateNotifications { get; set; } = true;
+
+        [NotNull]
         public bool EndDateNotifications { get; set; }  = true;
 
         // Foreign Keys
         [Indexed]
+        [NotNull]
         public int TermId { get; set; }
+
+        [NotNull]
         public int? InstructorId { get; set; }  
     }
 }

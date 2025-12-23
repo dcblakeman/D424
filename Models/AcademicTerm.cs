@@ -18,10 +18,14 @@ namespace C_971.Models
 
         // Name
         [MaxLength(100)]
+        [NotNull]
         public string Name { get; set; } = string.Empty;
 
         // Start and End Dates
+        [NotNull]
         public DateTime StartDate { get; set; } = DateTime.Now;
+
+        [NotNull]
         public DateTime EndDate { get; set; } = DateTime.Now;
     }
 }
