@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.Maui.Controls;
+using BCrypt.Net;
 
 namespace C_971.Services
 {
@@ -23,6 +26,7 @@ namespace C_971.Services
                 await _database.CreateTableAsync<CourseNote>();
                 await _database.CreateTableAsync<CourseAssessment>();
                 await _database.CreateTableAsync<CourseInstructor>();
+                await _database.CreateTableAsync<User>();
             }
             catch (Exception ex)
             {
@@ -343,6 +347,72 @@ namespace C_971.Services
             var assessment = _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId && a.Type == performance && a.IsActive == assessmentIsActive);
             return await assessment.FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> CreateUserAsync(string email, string password)
+        {
+            await InitializeAsync();
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+            User newUser = new User();
+
+            newUser.Email = email;
+            newUser.HashedPassword = hashedPassword;
+
+            try
+            {
+                await _database.InsertAsync(newUser);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        internal async Task<int> GetUserIdByEmailAsync(string email)
+        {
+            await InitializeAsync();
+            var user = await _database.Table<User>()
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                int userId = user.Id;
+                return userId;
+            }
+            else
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "User not found.", "OK");
+                return -1; // Indicate user not found
+            }
+
+        }
+
+        internal async Task<bool> AuthenticateUserAsync(string email, string password)
+        {
+            await InitializeAsync();
+            User user = await _database.Table<User>()
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                // Here you would normally hash the input password and compare it to the stored hash
+                //BCrypt.Net.BCrypt.HashPassword(password);
+                bool isValid = BCrypt.Net.BCrypt.Verify(password, user.HashedPassword);
+                return isValid;
+            }
+            return false;
+        }
+
+        internal async Task<bool> IsEmailRegisteredAsync(string email)
+        {
+            await InitializeAsync();
+            var user = await _database.Table<User>()
+                .Where(u => u.Email == email)
+                .FirstOrDefaultAsync();
+            return user != null;
         }
     }
 }

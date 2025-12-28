@@ -1,0 +1,142 @@
+﻿using C_971.Models;
+using C_971.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace C_971.ViewModels;
+
+[QueryProperty(nameof(NewUserId), "newuserid")]
+public partial class LoginViewModel : ObservableObject
+{
+    private DatabaseService _database;
+
+    [ObservableProperty]
+    private string viewName = "Login";
+
+    [ObservableProperty]
+    private User newUser = new User();
+
+    [ObservableProperty]
+    private int newUserId;
+
+    [ObservableProperty]
+    private string newRegisterUserEmail = string.Empty;
+
+    [ObservableProperty]
+    private string newRegisterUserPassword = string.Empty;
+
+    [ObservableProperty]    
+    public string newLoginUserEmail = string.Empty;
+
+    [ObservableProperty]
+    public string newLoginUserPassword = string.Empty;
+
+    public LoginViewModel(DatabaseService database)
+    {
+        _database = database;
+    }
+
+    internal async Task<int> GetUserIdByEmailAsync(string email)
+    {
+        int userId =  await _database.GetUserIdByEmailAsync(email);
+        return userId;
+    }
+
+    [RelayCommand]
+    public async Task LoginUser()
+    {
+        //Validate email format using regex
+        if (!System.Text.RegularExpressions.Regex.IsMatch(NewLoginUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+            return;
+        }
+
+        //Verify that password is not empty
+        if (string.IsNullOrWhiteSpace(NewLoginUserPassword))
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter your password.", "OK");
+            return;
+        }
+
+        bool isAuthenticated = await AuthenticateAsync(NewLoginUserEmail, NewLoginUserPassword);
+
+        if (isAuthenticated)
+        {
+            NewUserId = await GetUserIdByEmailAsync(NewLoginUserEmail);
+
+            // Pass the dictionary directly as an argument to GoToAsync
+            await Shell.Current.GoToAsync("AcademicTermListView", new Dictionary<string, object>
+                {
+                    { "newuserId", NewUserId }
+                });
+        }
+        else
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Invalid email or password. Please try again.", "OK");
+        }
+    }
+
+    [RelayCommand]
+    public async Task RegisterUser()
+    {
+        // Validate email format using regex
+        if (!System.Text.RegularExpressions.Regex.IsMatch(NewRegisterUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+            return;
+        }
+
+
+        //Verify that password is not empty
+        if (string.IsNullOrWhiteSpace(NewRegisterUserPassword))
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter a password.", "OK");
+            return;
+        }
+
+        bool isRegistered = await IsEmailRegisteredAsync(NewRegisterUserEmail);
+
+        if (isRegistered)
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Email is already registered. Please use a different email.", "OK");
+            return;
+        }
+
+        //Register user in database
+        await _database.CreateUserAsync(NewRegisterUserEmail, NewRegisterUserPassword);
+
+        await Shell.Current.DisplayAlertAsync("Success", "Registration successful. You can now log in.", "OK");
+    }
+
+    internal async Task<bool> IsEmailRegisteredAsync(string email)
+    {
+        bool isRegistered = await _database.IsEmailRegisteredAsync(email);
+        return isRegistered;
+    }
+
+    internal async Task<bool> AuthenticateAsync(string email, string password)
+    {
+        bool isAuthenticated = await _database.AuthenticateUserAsync(email, password);
+        return isAuthenticated;
+    }
+
+    [RelayCommand]
+    public async Task Exit()
+    {
+        bool confirmed = await Shell.Current.DisplayAlertAsync(
+            "Exit Application",
+            "Are you sure you want to exit the application?",
+            "Yes",
+            "No");
+
+        if (confirmed)
+        {
+            Application.Current?.Quit();
+        }
+    }
+
+}

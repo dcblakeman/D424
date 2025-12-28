@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.LoginView"
+             xmlns:model="clr-namespace:C_971.Models"  
+             xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
+             x:DataType="viewmodel:LoginViewModel">
+    
+    <Shell.TitleView>
+        <Label Text="{Binding ViewName}" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+    </Shell.TitleView>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    
+    <VerticalStackLayout Spacing="15" Padding="20" VerticalOptions="Center">
+        <Label Text="Welcome!" FontSize="Title" HorizontalOptions="Center" />
+        <Entry Placeholder="Email" Text="{Binding NewLoginUserEmail}" />
+        <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewLoginUserPassword}" />
+        <Button Text="Log In" Command="{Binding LoginUserCommand}" />
+
+        <VerticalStackLayout Spacing="15">
+        </VerticalStackLayout>
+        <VerticalStackLayout Spacing="15" VerticalOptions="Center">
+            <Label Text="Register User" FontSize="Header" HorizontalOptions="Center" />
+            <Entry Placeholder="Email" Text="{Binding NewRegisterUserEmail}" />
+            <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewRegisterUserPassword}" />
+            <Button BackgroundColor="Blue"  Text="Register User" Command="{Binding RegisterUserCommand}" />
+        </VerticalStackLayout>
+        <VerticalStackLayout Spacing="15" Padding="0,150,0,0" VerticalOptions="End">
+            <Button BackgroundColor="MediumVioletRed"  Text="Exit" Command="{Binding ExitCommand}" />
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+
+
+</ContentPage>

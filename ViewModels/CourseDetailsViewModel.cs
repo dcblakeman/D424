@@ -135,8 +135,6 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveCourse()
         {
-            //if (NewCourse == null) return;
-
             try
             {
                 //Refresh the page

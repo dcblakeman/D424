@@ -57,8 +57,8 @@
                     TextColor="White"
                     IsVisible="{Binding IsNotAddingTerm}"/>
             <Button Grid.Column="2"
-                Text="Exit"
-                Command="{Binding ExitAppCommand}"
+                Text="Logout"
+                Command="{Binding LogoutCommand}"
                 BackgroundColor="#9E9E9E"
                 TextColor="White"
                 IsVisible="{Binding IsNotAddingTerm}"/>

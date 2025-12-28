@@ -29,6 +29,9 @@ namespace C_971
             // Register database service and interface
             builder.Services.AddSingleton<DatabaseService>();
 
+            builder.Services.AddTransient<LoginView>();
+            builder.Services.AddTransient<LoginViewModel>();
+
             builder.Services.AddTransient<AcademicTermListView>();
             builder.Services.AddTransient<AcademicTermListViewModel>();
 

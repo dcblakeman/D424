@@ -9,6 +9,7 @@ namespace C_971
             InitializeComponent();
 
             // Register your routes
+            Routing.RegisterRoute("LoginView", typeof(LoginView));
             Routing.RegisterRoute("AcademicTermListView", typeof(AcademicTermListView));
             Routing.RegisterRoute("CourseListView", typeof(CourseListView));
             Routing.RegisterRoute("CourseDetailsView", typeof(CourseDetailsView));

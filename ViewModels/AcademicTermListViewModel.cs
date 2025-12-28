@@ -6,6 +6,8 @@ using C_971.Services;
 
 namespace C_971.ViewModels
 {
+    [QueryProperty(nameof(NewTerm), "term")]
+    [QueryProperty(nameof(NewUserId), "newuserid")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -16,6 +18,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private AcademicTerm newTerm = new AcademicTerm();
+
+        [ObservableProperty]
+        private int newUserId;
 
         [ObservableProperty]
         private ObservableCollection<AcademicTerm> academicTerms = new();
@@ -198,22 +203,6 @@ namespace C_971.ViewModels
             }
         }
 
-        // Application Management
-        [RelayCommand]
-        public async Task ExitApp()
-        {
-            bool confirmed = await Shell.Current.DisplayAlertAsync(
-                "Exit Application",
-                "Are you sure you want to exit the application?",
-                "Yes",
-                "No");
-
-            if (confirmed)
-            {
-                Application.Current?.Quit();
-            }
-        }
-
         // Helper Methods
         private bool ValidateNewTerm()
         {
@@ -244,6 +233,13 @@ namespace C_971.ViewModels
             NewTermName = string.Empty;
             NewTermStartDate = DateTime.Now;
             NewTermEndDate = DateTime.Now.AddMonths(6);
+        }
+
+        [RelayCommand]
+        public async Task Logout()
+        {
+            // Navigate back to login page
+            await Shell.Current.GoToAsync("///LoginView",true);
         }
     }
 }
