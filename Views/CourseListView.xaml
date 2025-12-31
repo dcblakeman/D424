@@ -117,7 +117,7 @@
                 </Border.StrokeShape>
 
             <!-- New Course View Row Defitions-->
-            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="8">
                 
                 <!-- Header -->
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
@@ -131,25 +131,34 @@
                 <!-- Course Name -->
                 <Label Grid.Row="1" Grid.Column="0" Text="Name:" FontAttributes="Bold" VerticalOptions="Center"/>
                 <Entry Grid.Row="1" Grid.Column="1" Text="{Binding NewCourseName}" Placeholder="Enter course name" VerticalOptions="Center"/>
+                
+                <!-- Course Description -->
+                <Label Grid.Row="2" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Editor Grid.Row="2" Grid.Column="1"
+                        Text="{Binding NewCourseDescription}"
+                        Placeholder="Enter your note here..."
+                        HeightRequest="200"
+                        AutoSize="TextChanges"
+                        />
 
                 <!-- Start Date -->
-                <Label Grid.Row="2" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <DatePicker Grid.Row="2" Grid.Column="1" Date="{Binding NewCourseStartDate}" VerticalOptions="Center"/>
+                <Label Grid.Row="3" Grid.Column="0" Text="Start Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="3" Grid.Column="1" Date="{Binding NewCourseStartDate}" VerticalOptions="Center"/>
 
                 <!-- End Date -->
-                <Label Grid.Row="3" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <DatePicker Grid.Row="3" Grid.Column="1" Date="{Binding NewCourseEndDate}" VerticalOptions="Center"/>
+                <Label Grid.Row="4" Grid.Column="0" Text="End Date:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <DatePicker Grid.Row="4" Grid.Column="1" Date="{Binding NewCourseEndDate}" VerticalOptions="Center"/>
 
                 <!-- Status -->
-                <Label Grid.Row="4" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
-                <Picker Grid.Row="4" Grid.Column="1" 
+                <Label Grid.Row="5" Grid.Column="0" Text="Status:" FontAttributes="Bold" VerticalOptions="Center"/>
+                <Picker Grid.Row="5" Grid.Column="1" 
                         SelectedItem="{Binding NewCourseStatus}"
                         ItemsSource="{Binding StatusOptions}"
                         VerticalOptions="Center"/>
                 <!-- End New Course Entries -->
 
                 <!-- Save/Cancel Button Grid Definitions -->
-                <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                <Grid Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
 
                     <!-- Save Course Button -->
                     <Button Text="Save"

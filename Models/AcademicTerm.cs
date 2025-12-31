@@ -27,5 +27,13 @@ namespace C_971.Models
 
         [NotNull]
         public DateTime EndDate { get; set; } = DateTime.Now;
+
+        public bool IsActive { get; set; }
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        // Navigation properties - ignored by SQLite
+        [Ignore]
+        public List<Course> Courses { get; set; } = new();
     }
 }

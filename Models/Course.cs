@@ -8,35 +8,45 @@ namespace C_971.Models
     public partial class Course : ObservableObject
     {
         [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        public int Id { get; set; } = 0;
 
-        [Column("name"), MaxLength(100), NotNull]
+        [NotNull]
         public string Name { get; set; } = string.Empty;
 
-        [Column("course_status"), MaxLength(20), NotNull]
-        public CourseStatus Status { get; set; } = CourseStatus.NotEnrolled;
-
-        [Column("description"), MaxLength(250), NotNull]
         public string Description { get; set; } = string.Empty;
 
-        [Column("credit_hours")]
-        public int CreditHours { get; set; }
+        public int CreditUnits { get; set; } = 3;
 
-        [Column("instructor_id")]
-        public int? InstructorId { get; set; }
+        public CourseStatus Status { get; set; } = CourseStatus.NotEnrolled;
 
-        // Course belongs to ONE specific term
-        [Column("term_id"), NotNull, Indexed]
-        public int TermId { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.Now;
 
-        // Navigation properties
+        public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(6);
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        // Notification settings
+        public bool StartDateNotifications { get; set; } = false;
+
+        public bool EndDateNotifications { get; set; } = false;
+
+        // Foreign keys
+        [NotNull]
+        public int TermId { get; set; } = 0;
+
+        public int? InstructorId { get; set; } = null;
+
+        // Navigation properties - ignored by SQLite
         [Ignore]
-        public AcademicTerm Term { get; set; }
+        public AcademicTerm Term { get; set; } = null!;
 
         [Ignore]
-        public CourseInstructor Instructor { get; set; }
+        public CourseInstructor Instructor { get; set; } = null!;
 
         [Ignore]
-        public List<UserCourse> UserCourses { get; set; } = new();
+        public List<CourseAssessment> Assessments { get; set; } = new();
+
+        [Ignore]
+        public List<CourseNote> Notes { get; set; } = new();
     }
 }

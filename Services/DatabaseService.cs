@@ -18,6 +18,14 @@ namespace C_971.Services
         {
             if (_database is not null) return;
 
+            // For development - delete and recreate if schema changed
+            if (File.Exists(Constants.DatabasePath))
+            {
+                File.Delete(Constants.DatabasePath);
+            }
+
+            _database = new SQLiteAsyncConnection(Constants.DatabasePath);
+
             try
             {
                 _database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
@@ -96,7 +104,7 @@ namespace C_971.Services
         public async Task<int> SaveCourseAsync(Course course)
         {
             await InitializeAsync();
-
+            await Shell.Current.DisplayAlertAsync("Test","testing","OK");
             try
             {
                 System.Diagnostics.Debug.WriteLine($"Database saving course: {course.Id}, Status: {course.Status}");
@@ -105,7 +113,7 @@ namespace C_971.Services
                     ? await _database.UpdateAsync(course)
                     : await _database.InsertAsync(course);
 
-                System.Diagnostics.Debug.WriteLine($"Database save complete: {result} rows affected");
+                await Shell.Current.DisplayAlertAsync("Test", $"Database save complete: {result} rows affected","OK");
                 return result;
             }
             catch (Exception ex)

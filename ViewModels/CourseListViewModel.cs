@@ -28,6 +28,9 @@ namespace C_971.ViewModels
         private string newCourseName = string.Empty;
 
         [ObservableProperty]
+        private string newCourseDescription = string.Empty;
+
+        [ObservableProperty]
         private DateTime newCourseStartDate = DateTime.Now;
 
         [ObservableProperty]
@@ -189,6 +192,7 @@ namespace C_971.ViewModels
             try
             {
                 NewCourse.Name = NewCourseName;
+                NewCourse.Description = NewCourseDescription;
                 NewCourse.StartDate = NewCourseStartDate;
                 NewCourse.EndDate = NewCourseEndDate;
                 NewCourse.Status = NewCourseStatus;
@@ -204,7 +208,7 @@ namespace C_971.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to add course: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("test", $"Failed to add course: {ex.Message}", "OK");
                 System.Diagnostics.Debug.WriteLine($"Add course error: {ex}");
             }
         }
