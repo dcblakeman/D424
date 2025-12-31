@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
+    [QueryProperty(nameof(NewUserId), "newuserid")]
     [QueryProperty(nameof(NewCourse), "course")]
     public partial class AssessmentSelectionViewModel : ObservableObject
     {
@@ -18,10 +19,13 @@ namespace C_971.ViewModels
         }
 
         [ObservableProperty]
+        private int newUserId;
+
+        [ObservableProperty]
         private Course newCourse;
 
         [ObservableProperty]
-        private string viewName = "Assessment Selection";
+        private string viewName = "Assessment Selection / Reports";
 
         [RelayCommand]
         private async Task GoBack()
@@ -67,6 +71,24 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
                 {
                     ["course"] = NewCourse
+                });
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToReportView()
+        {
+            if (NewCourse == null) return;
+            try
+            {
+                await Shell.Current.GoToAsync($"///{nameof(ReportView)}", true, new Dictionary<string, object>
+                {
+                    ["course"] = NewCourse,
+                    ["newuserid"] = NewUserId
                 });
             }
             catch (Exception ex)

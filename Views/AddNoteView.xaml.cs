@@ -7,6 +7,6 @@ public partial class AddNoteView : ContentPage
 	public AddNoteView(AddNoteViewModel viewModel)
 	{
 		InitializeComponent();
-		BindingContext = viewModel;
+        BindingContext = viewModel;
     }
 }

@@ -59,6 +59,13 @@ namespace C_971
             builder.Services.AddSingleton<ObjectiveAssessmentView>();
             builder.Services.AddSingleton<ObjectiveAssessmentViewModel>();
 
+            builder.Services.AddSingleton<ReportView>();
+            builder.Services.AddSingleton<ReportViewModel>();
+
+#if DEBUG
+            builder.Logging.AddDebug();
+#endif
+
             var app = builder.Build();
 
             return app;

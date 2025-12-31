@@ -42,4 +42,7 @@
     <ShellContent
         ContentTemplate="{DataTemplate views:ObjectiveAssessmentView}"
         Route="AssessmentSelectionView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:ReportView}"
+        Route="ReportView"/>
 </Shell>

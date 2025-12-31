@@ -157,7 +157,6 @@ namespace C_971.ViewModels
                     await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
                 }
             }
-
         }
 
         private async Task RequestNotificationPermissions()

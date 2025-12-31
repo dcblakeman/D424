@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.ReportView"
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:ReportViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+
+            <!-- Header -->
+            <Label Text="Generate Reports" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" 
+                   Margin="0,0,0,20"/>
+
+            <!-- Report Buttons -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+                   HasShadow="True" 
+                   CornerRadius="10" 
+                   Padding="20">
+
+                <VerticalStackLayout Spacing="15">
+
+                    <!-- Users Report -->
+                    <Button Text="Print All Users Report"
+                            Command="{Binding GenerateAllUsersReportCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
+                            TextColor="White"
+                            FontSize="16"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+
+                    <!-- Assessments Report -->
+                    <Button Text="Print All Assessments Report"
+                            Command="{Binding GenerateAllAssessmentsReportCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#28A745, Dark=#198754}"
+                            TextColor="White"
+                            FontSize="16"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+
+                    <!-- Courses Report -->
+                    <Button Text="Print All Courses Report"
+                            Command="{Binding GenerateAllsCourseReportCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#FD7E14, Dark=#E8630A}"
+                            TextColor="White"
+                            FontSize="16"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+
+                    <!-- Generate All Reports -->
+                    <Button Text="Generate All Reports"
+                            Command="{Binding GenerateAllReportsCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#6F42C1, Dark=#5A2D91}"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="50"
+                            CornerRadius="8"
+                            Margin="0,10,0,0"/>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Status and Progress -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+                   HasShadow="True" 
+                   CornerRadius="10" 
+                   Padding="20"
+                   IsVisible="{Binding IsGeneratingReport}">
+
+                <VerticalStackLayout Spacing="10">
+                    <ActivityIndicator IsRunning="{Binding IsGeneratingReport}" 
+                                       Color="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"/>
+                    <Label Text="{Binding StatusMessage}" 
+                           HorizontalOptions="Center"
+                           FontSize="14"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Recent Reports -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+                   HasShadow="True" 
+                   CornerRadius="10" 
+                   Padding="20"
+                   IsVisible="{Binding HasRecentReports}">
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Recent Reports" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+
+                    <CollectionView ItemsSource="{Binding RecentReports}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="5" x:DataType="{x:Type x:String}">
+                                    <Label Text="{Binding .}" 
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#6C757D, Dark=#ADB5BD}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Button Text="Open Reports Folder"
+                            Command="{Binding OpenReportsFolderCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#6C757D, Dark=#495057}"
+                            TextColor="White"
+                            FontSize="14"
+                            HeightRequest="40"
+                            CornerRadius="6"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
