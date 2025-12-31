@@ -12,7 +12,7 @@ namespace C_971.Models
     public partial class CourseInstructor
     {
         // Primary Key
-        [PrimaryKey, AutoIncrement, Unique, NotNull]
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
         // Instructor Name
@@ -27,7 +27,8 @@ namespace C_971.Models
         // Instructor Phone
         [SQLite.MaxLength(20)]
         [NotNull]
-        [Phone(ErrorMessage = "Invalid phone number format")]
+        [RegularExpression(@"^(\+[1-9]\d{10,14}|[1-9]\d{2}-\d{3}-\d{4})$",
+            ErrorMessage = "Phone must be in format 555-123-4567")]
         public string Phone { get; set; }
     }
 }

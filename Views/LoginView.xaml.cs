@@ -10,4 +10,20 @@ public partial class LoginView : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    private void OnButtonPressed(object sender, EventArgs e)
+    {
+        if (sender is Button button)
+        {
+            button.BackgroundColor = Color.FromArgb("#808080");
+        }
+    }
+
+    private void OnButtonReleased(object sender, EventArgs e)
+    {
+        if (sender is Button button)
+        {
+            button.BackgroundColor = Color.FromArgb("#1976D2");
+        }
+    }
 }

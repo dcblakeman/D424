@@ -18,20 +18,30 @@
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
-    
+
     <VerticalStackLayout Spacing="15" Padding="20" VerticalOptions="Center">
-        <Label Text="Welcome!" FontSize="Title" HorizontalOptions="Center" />
         <Entry Placeholder="Email" Text="{Binding NewLoginUserEmail}" />
         <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewLoginUserPassword}" />
-        <Button Text="Log In" Command="{Binding LoginUserCommand}" />
+        <Button Text="Log In" 
+                Command="{Binding LoginUserCommand}" 
+                Pressed="OnButtonPressed"
+                Released="OnButtonReleased"
+                BackgroundColor="#1976D2"/>
 
-        <VerticalStackLayout Spacing="15">
-        </VerticalStackLayout>
-        <VerticalStackLayout Spacing="15" VerticalOptions="Center">
+
+        <BoxView HeightRequest="1" 
+         BackgroundColor="LightGray" 
+         Margin="0,60,0,20" />
+        
+        <VerticalStackLayout Spacing="15" VerticalOptions="Center" Margin="0,30,0,0">
             <Label Text="Register User" FontSize="Header" HorizontalOptions="Center" />
             <Entry Placeholder="Email" Text="{Binding NewRegisterUserEmail}" />
             <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewRegisterUserPassword}" />
-            <Button BackgroundColor="Blue"  Text="Register User" Command="{Binding RegisterUserCommand}" />
+            <Button BackgroundColor="#1976D2"
+                    Text="Register User" 
+                    Command="{Binding RegisterUserCommand}" 
+                    Pressed="OnButtonPressed"
+                    Released="OnButtonReleased"/>
         </VerticalStackLayout>
         <VerticalStackLayout Spacing="15" Padding="0,150,0,0" VerticalOptions="End">
             <Button BackgroundColor="MediumVioletRed"  Text="Exit" Command="{Binding ExitCommand}" />

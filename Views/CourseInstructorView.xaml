@@ -4,6 +4,7 @@
              x:Class="C_971.Views.CourseInstructorView"
              xmlns:vm="clr-namespace:C_971.ViewModels"
              xmlns:model="clr-namespace:C_971.Models"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:DataType="vm:CourseInstructorViewModel">
 
     <Shell.TitleView>
@@ -136,8 +137,13 @@
                 <VerticalStackLayout Spacing="3">
                     <Label Text="Phone:" FontAttributes="Bold"/>
                     <Entry Text="{Binding NewInstructorPhone, Mode=TwoWay}" 
-                   Placeholder="Enter phone number"
-                   Keyboard="Telephone"/>
+                           Placeholder="Enter phone number"
+                           Keyboard="Telephone">
+                        <Entry.Behaviors>
+                            <toolkit:MaskedBehavior Mask="XXX-XXX-XXXX"
+                                                    UnmaskedCharacter="X"/>
+                        </Entry.Behaviors>
+                    </Entry>
                 </VerticalStackLayout>
 
                 <!-- Save/Cancel Buttons -->

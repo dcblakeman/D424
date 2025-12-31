@@ -22,8 +22,7 @@ namespace C_971.Models
         [NotNull]
         public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(6);
 
-        [NotNull]
-        public DateTime? CompletedDate { get; set; } = null;
+        public DateTime CompletedDate { get; set; } = DateTime.Today.AddMonths(6);
 
         [NotNull]
         public AssessmentType Type { get; set; } = AssessmentType.Performance;

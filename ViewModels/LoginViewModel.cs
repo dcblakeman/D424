@@ -48,19 +48,34 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     public async Task LoginUser()
     {
-        //Validate email format using regex
-        if (!System.Text.RegularExpressions.Regex.IsMatch(NewLoginUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        try
         {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+            // Verify that email is not empty
+            if (string.IsNullOrWhiteSpace(NewLoginUserEmail))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter your email.", "OK");
+                return;
+            }
+
+            //Validate email format using regex
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewLoginUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+                return;
+            }
+
+            //Verify that password is not empty
+            if (string.IsNullOrWhiteSpace(NewLoginUserPassword))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter your password.", "OK");
+                return;
+            }
+        } catch
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter your email.", "OK");
             return;
         }
 
-        //Verify that password is not empty
-        if (string.IsNullOrWhiteSpace(NewLoginUserPassword))
-        {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter your password.", "OK");
-            return;
-        }
 
         bool isAuthenticated = await AuthenticateAsync(NewLoginUserEmail, NewLoginUserPassword);
 
@@ -83,19 +98,32 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     public async Task RegisterUser()
     {
-        // Validate email format using regex
-        if (!System.Text.RegularExpressions.Regex.IsMatch(NewRegisterUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        try
         {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
-            return;
+            // Verify that the email is not empty
+            if (string.IsNullOrWhiteSpace(NewRegisterUserEmail))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter an email address.", "OK");
+                return;
+            }
+
+            // Validate email format using regex
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewRegisterUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+                return;
+            }
+
+            //Verify that password is not empty
+            if (string.IsNullOrWhiteSpace(NewRegisterUserPassword))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter a password.", "OK");
+                return;
+            }
         }
-
-
-        //Verify that password is not empty
-        if (string.IsNullOrWhiteSpace(NewRegisterUserPassword))
+        catch
         {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter a password.", "OK");
-            return;
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter an email address.", "OK");
         }
 
         bool isRegistered = await IsEmailRegisteredAsync(NewRegisterUserEmail);

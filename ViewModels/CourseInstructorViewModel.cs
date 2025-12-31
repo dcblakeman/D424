@@ -16,7 +16,7 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
-        private CourseInstructor newInstructor;
+        private CourseInstructor newInstructor = new();
 
         // New Instructor Form
         [ObservableProperty]
@@ -267,7 +267,7 @@ namespace C_971.ViewModels
             }
 
             // Check for correct phone number format
-            if (!System.Text.RegularExpressions.Regex.IsMatch(NewInstructorPhone.Trim(), @"^\+?[1-9]\d{1,14}$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewInstructorPhone.Trim(), @"^(\+[1-9]\d{10,14}|[1-9]\d{2}-\d{3}-\d{4})$"))
             {
             _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number", "OK");
             return false;
@@ -294,6 +294,8 @@ namespace C_971.ViewModels
             NewInstructorName = string.Empty;
             NewInstructorPhone = string.Empty;
             NewInstructorEmail = string.Empty;
+
+            NewInstructor = new CourseInstructor();
         }
 
         private void ApplySearchFilter()

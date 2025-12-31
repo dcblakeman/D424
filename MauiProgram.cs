@@ -1,11 +1,10 @@
-﻿using C_971.Models;
-using C_971.Services;
+﻿using C_971.Services;
 using C_971.ViewModels;
 using C_971.Views;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui;
 using Plugin.LocalNotification;
 using System.Runtime.Versioning;
+using CommunityToolkit.Maui;
 
 namespace C_971
 {
@@ -17,14 +16,17 @@ namespace C_971
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
-            builder
+#pragma warning disable CA1416 // Validate platform compatibility
+            MauiAppBuilder mauiAppBuilder = builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .UseLocalNotification()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+#pragma warning restore CA1416 // Validate platform compatibility
 
             // Register database service and interface
             builder.Services.AddSingleton<DatabaseService>();
