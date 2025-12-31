@@ -414,14 +414,5 @@ namespace C_971.Services
                 .FirstOrDefaultAsync();
             return user != null;
         }
-
-        internal async Task<List<Course>> GetCoursesByUserId(int newUserId)
-        {
-            // Retrieve courses by user ID
-            await InitializeAsync();
-            return await _database.Table<Course>()
-                .Where(c => c.UserId == newUserId)
-                .ToListAsync();
-        }
     }
 }

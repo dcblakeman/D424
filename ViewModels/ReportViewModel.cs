@@ -68,7 +68,7 @@ namespace C_971.ViewModels
         {
             // Get all of the courses in a list
             //for each course, generate a report
-            var courses = _database.GetCoursesByUserId(NewUserId);
+            //var courses = _database.GetCoursesByUserId(NewUserId);
 
             if (NewCourse == null) return;
             StringBuilder reportBuilder = new StringBuilder();
