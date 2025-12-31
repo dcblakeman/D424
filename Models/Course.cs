@@ -1,62 +1,42 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SQLite;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static C_971.Models.CourseStatus;
 
 namespace C_971.Models
 {
-    [Table("Course")]
-    public partial class Course
+    [Table("Courses")]
+    public partial class Course : ObservableObject
     {
-        // Primary Key
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-
-        // Name
-        [MaxLength(100)]
-        [NotNull]
+        [Column("name"), MaxLength(100), NotNull]
         public string Name { get; set; } = string.Empty;
 
+        [Column("course_status"), MaxLength(20), NotNull]
+        public CourseStatus Status { get; set; } = CourseStatus.NotEnrolled;
 
-        // Description
-        [MaxLength(250)]
-        [NotNull]
+        [Column("description"), MaxLength(250), NotNull]
         public string Description { get; set; } = string.Empty;
 
+        [Column("credit_hours")]
+        public int CreditHours { get; set; }
 
-        // Start and End Dates
-        [NotNull]
-        public DateTime StartDate { get; set; } = DateTime.Now;
+        [Column("instructor_id")]
+        public int? InstructorId { get; set; }
 
-        [NotNull]
-        public DateTime EndDate { get; set; } = DateTime.Now;
-
-
-        // Course Status
-        [NotNull]
-        public CourseStatus Status { get; set; } = NotEnrolled;
-
-
-        // Notifications
-        [NotNull]
-        public bool StartDateNotifications { get; set; } = true;
-
-        [NotNull]
-        public bool EndDateNotifications { get; set; }  = true;
-
-        // Foreign Keys
-        [Indexed]
-        [NotNull]
+        // Course belongs to ONE specific term
+        [Column("term_id"), NotNull, Indexed]
         public int TermId { get; set; }
 
-        [NotNull]
-        public int? InstructorId { get; set; }  
+        // Navigation properties
+        [Ignore]
+        public AcademicTerm Term { get; set; }
+
+        [Ignore]
+        public CourseInstructor Instructor { get; set; }
+
+        [Ignore]
+        public List<UserCourse> UserCourses { get; set; } = new();
     }
 }
