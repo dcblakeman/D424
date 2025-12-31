@@ -115,6 +115,30 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Go Back Button -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+                   HasShadow="True" 
+                   CornerRadius="10" 
+                   Padding="20"
+                   IsVisible="{Binding HasRecentReports}">
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Back" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+
+                    <Button Text="Open Reports Folder"
+                            Command="{Binding OpenReportsFolderCommand}"
+                            BackgroundColor="{AppThemeBinding Light=DarkRed, Dark=Red}"
+                            TextColor="White"
+                            FontSize="14"
+                            HeightRequest="40"
+                            CornerRadius="6"/>
+                </VerticalStackLayout>
+            </Frame>
+
+
+
         </VerticalStackLayout>
     </ScrollView>
 

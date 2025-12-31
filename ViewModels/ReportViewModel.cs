@@ -64,8 +64,12 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private void GenerateCourseReport()
+        private async Task GenerateAllCoursesReport()
         {
+            // Get all of the courses in a list
+            //for each course, generate a report
+            var courses = _database.GetCoursesByUserId(NewUserId);
+
             if (NewCourse == null) return;
             StringBuilder reportBuilder = new StringBuilder();
             
