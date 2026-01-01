@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(NewTerm), "term")]
     public partial class ViewNotesViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -19,6 +21,12 @@ namespace C_971.ViewModels
 
 		[ObservableProperty]
         public Course newCourse;
+
+        [ObservableProperty]
+        public int newUserId;
+
+        [ObservableProperty]
+        public AcademicTerm newTerm;
 
         public ObservableCollection<CourseNote> CourseNotesList { get; private set; } = [];
 
@@ -68,7 +76,9 @@ namespace C_971.ViewModels
                 // Use relative navigation (no leading slash)
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["userid"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)

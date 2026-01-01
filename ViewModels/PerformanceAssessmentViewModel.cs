@@ -12,6 +12,8 @@ using System.Text;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewTerm), "term")]
+    [QueryProperty(nameof(NewUserId), "userid")]
     public partial class PerformanceAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -19,6 +21,12 @@ namespace C_971.ViewModels
         // Core Properties
         [ObservableProperty]
         public Course newCourse;
+
+        [ObservableProperty]
+        public AcademicTerm newTerm;
+
+        [ObservableProperty]
+        public int newUserId;
 
         [ObservableProperty]
         public int courseId;
@@ -149,7 +157,9 @@ namespace C_971.ViewModels
                     // Use relative navigation (no leading slash)
                     await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
                     {
-                        ["course"] = NewCourse
+                        ["course"] = NewCourse,
+                        ["term"] = NewTerm,
+                        ["userid"] = NewUserId
                     });
                 }
                 catch (Exception ex)

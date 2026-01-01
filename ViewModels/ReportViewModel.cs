@@ -8,8 +8,9 @@ using System.Text;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewUserId), "newuserid")]
-    [QueryProperty(nameof(NewCourse), "newcourse")]
+    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewTerm), "term")]
     public partial class ReportViewModel : ObservableObject
     {
 
@@ -20,6 +21,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private Course newCourse;
+
+        [ObservableProperty]
+        private AcademicTerm newTerm;
 
         [ObservableProperty]
         private string reportText;
@@ -54,7 +58,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["newuserid"] = NewUserId
+                    ["newuserid"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)

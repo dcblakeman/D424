@@ -8,8 +8,9 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewUserId), "newuserid")]
+    [QueryProperty(nameof(NewTerm), "term")]
     [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewUserId), "userid")]
     public partial class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -25,6 +26,9 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
+        private AcademicTerm newTerm;
+
+        [ObservableProperty]
         private string viewName = "Assessment Selection / Reports";
 
         [RelayCommand]
@@ -34,7 +38,9 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["userid"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -52,7 +58,9 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["userId"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -70,7 +78,9 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["term"] = NewTerm,
+                    ["course"] = NewCourse,
+                    ["userid"] = NewUserId
                 });
             }
             catch (Exception ex)
@@ -87,6 +97,7 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"///{nameof(ReportView)}", true, new Dictionary<string, object>
                 {
+                    ["term"] = NewTerm,
                     ["course"] = NewCourse,
                     ["newuserid"] = NewUserId
                 });

@@ -12,14 +12,16 @@ namespace C_971.Views
             BindingContext = courseListViewModel;
         }
 
-        protected override async void OnAppearing()
+        protected override async void OnNavigatedTo(NavigatedToEventArgs args)
         {
-            base.OnAppearing();
+            base.OnNavigatedTo(args);
 
             if (BindingContext is CourseListViewModel viewModel)
             {
-                // Fix: Pass the instance property, not the type
-                await viewModel.LoadCoursesCommand.ExecuteAsync(null);
+                if (viewModel.NewTerm != null)
+                {
+                    await viewModel.LoadCoursesAsync(viewModel.NewTerm);
+                }
             }
         }
 
@@ -63,7 +65,8 @@ namespace C_971.Views
                 // Normal navigation behavior
                 await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
                 {
-                    { "course", newCourse }
+                    { "course", newCourse },
+                    { "term" , viewModel.NewTerm }
                 });
             }
         }

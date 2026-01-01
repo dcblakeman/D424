@@ -7,19 +7,26 @@
              x:DataType="viewmodel:LoginViewModel">
     
     <Shell.TitleView>
-        <Label Text="{Binding ViewName}" 
+        <Label Text="College Course Tracker" 
                FontSize="24" 
                FontAttributes="Bold"
                TextColor="Black"
                VerticalOptions="Center"
                HorizontalOptions="Center" />
+               
     </Shell.TitleView>
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
-    <VerticalStackLayout Spacing="15" Padding="20" VerticalOptions="Center">
+    <VerticalStackLayout Spacing="15" Padding="20,60,20,0" VerticalOptions="Center">
+        <Label Text="Login" 
+               FontSize="Header" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
         <Entry Placeholder="Email" Text="{Binding NewLoginUserEmail}" />
         <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewLoginUserPassword}" />
         <Button Text="Log In" 
@@ -27,7 +34,6 @@
                 Pressed="OnButtonPressed"
                 Released="OnButtonReleased"
                 BackgroundColor="#1976D2"/>
-
 
         <BoxView HeightRequest="1" 
          BackgroundColor="LightGray" 
@@ -43,7 +49,7 @@
                     Pressed="OnButtonPressed"
                     Released="OnButtonReleased"/>
         </VerticalStackLayout>
-        <VerticalStackLayout Spacing="15" Padding="0,150,0,0" VerticalOptions="End">
+        <VerticalStackLayout Spacing="15" Padding="0,100,0,0" VerticalOptions="End">
             <Button BackgroundColor="MediumVioletRed"  Text="Exit" Command="{Binding ExitCommand}" />
         </VerticalStackLayout>
     </VerticalStackLayout>

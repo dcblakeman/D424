@@ -3,6 +3,7 @@ using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Plugin.LocalNotification;
 using System.Collections.ObjectModel;
 
@@ -11,6 +12,7 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(NewCourse), "course")]
     [QueryProperty(nameof(NewTerm), "term")]
     [QueryProperty(nameof(NewInstructor), "instructor")]
+    [QueryProperty(nameof(NewUserId), "userid")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -21,6 +23,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private AcademicTerm newTerm;
+
+        [ObservableProperty]
+        private int newUserId;
 
         [ObservableProperty]
         private int newCourseId = 0;
@@ -133,7 +138,7 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private async Task SaveCourse()
+        public async Task SaveCourse()
         {
             try
             {
@@ -217,7 +222,9 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"{nameof(AddNoteView)}", new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["userid"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -233,9 +240,11 @@ namespace C_971.ViewModels
 
             try
             {
-                await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["userid"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -255,10 +264,11 @@ namespace C_971.ViewModels
                     await SaveCourse();
                 }
 
-                await Shell.Current.GoToAsync("CourseListView", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"{nameof(CourseListView)}", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["userid"] = NewUserId
                 });
             }
             catch (Exception ex)
@@ -266,6 +276,8 @@ namespace C_971.ViewModels
                 await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation failed: {ex.Message}", "OK");
             }
         }
+
+        public class RefreshCoursesMessage { }
 
         // Notification Management
         private async Task ScheduleCourseNotifications()

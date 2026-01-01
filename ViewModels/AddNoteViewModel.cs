@@ -5,10 +5,18 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace C_971.ViewModels
 {
+    [QueryProperty(nameof(NewTerm), "term")]
     [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewUserId), "userid")]
     public partial class AddNoteViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
+
+        [ObservableProperty]
+        private int newUserId;
+
+        [ObservableProperty]
+        private AcademicTerm newTerm;
 
         // Core Properties
         [ObservableProperty]
@@ -30,14 +38,6 @@ namespace C_971.ViewModels
         public AddNoteViewModel(DatabaseService database)
         {
             _database = database;
-        }
-
-        // Property Change Handlers
-        partial void OnNewCourseChanged(Course value)
-        {
-            if (value != null)
-            {
-            }
         }
 
         // Commands
@@ -91,7 +91,9 @@ namespace C_971.ViewModels
                 // Navigate back to previous page with course context
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["term"] = NewTerm,
+                    ["userid"] = NewUserId
                 });
             }
             catch (Exception ex)

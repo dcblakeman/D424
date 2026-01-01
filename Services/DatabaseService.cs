@@ -19,10 +19,10 @@ namespace C_971.Services
             if (_database is not null) return;
 
             //For development -delete and recreate if schema changed
-            if (File.Exists(Constants.DatabasePath))
-            {
-                File.Delete(Constants.DatabasePath);
-            }
+            //if (File.Exists(Constants.DatabasePath))
+            //{
+            //    File.Delete(Constants.DatabasePath);
+            //}
 
             try
             {

@@ -1,4 +1,5 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,16 +10,23 @@ namespace C_971.ViewModels
 {
     [QueryProperty(nameof(NewTerm), "term")]
     [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(NewUserId), "userid")]
     public partial class CourseListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
+
+        [ObservableProperty]
+        private bool isPopulated = false; 
 
         [ObservableProperty]
         private string viewName = "Course List";
 
         // Core Properties
         [ObservableProperty]
-        private AcademicTerm newTerm = new AcademicTerm();
+        private AcademicTerm newTerm;
+
+        [ObservableProperty]
+        private int newUserId;
 
         [ObservableProperty]
         private Course newCourse = new Course(); 
@@ -58,7 +66,7 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private ObservableCollection<Course> courses = new();
 
-        private List<Course> _allCourses = new List<Course>();
+        public List<Course> _allCourses = new List<Course>();
 
         // Static Collections
         public ObservableCollection<CourseStatus> StatusOptions { get; } = new ObservableCollection<CourseStatus>
@@ -78,21 +86,13 @@ namespace C_971.ViewModels
         // Property Change Handlers
         partial void OnNewTermChanged(AcademicTerm value)
         {
-            if (value != null)
+            //if (value == null) return;
             {
+                OnPropertyChanged(nameof(NewCourseStatus));
                 NewTerm = value;
-                _ = LoadCoursesAsync(NewTerm);
+                _ = LoadCoursesAsync(value);
             }
         }
-
-        //partial void OnNewCourseChanged(Course value)
-        //{
-        //    // Refresh when returning from course details
-        //    if (value != null)
-        //    {
-        //        _ = LoadCoursesAsync();
-        //    }
-        //}
 
         partial void OnSearchTextChanged(string value)
         {
@@ -127,31 +127,19 @@ namespace C_971.ViewModels
 
         // Data Loading
         [RelayCommand]
-        private async Task LoadCoursesAsync(AcademicTerm term)
+        public async Task LoadCoursesAsync(AcademicTerm term)
         {
-            if(term == null) return;
-            IsRefreshing = true;
-            try
+            //Courses.Clear();
+            if (term == null) return;
+            if (term != null)
             {
+                NewTerm = term;
                 _allCourses = await _database.GetCoursesByTermIdAsync(term.Id);
                 ApplySearchFilter();
             }
-            finally
-            {
-                IsRefreshing = false;
-            }
-        }
 
-        // Navigation
-        [RelayCommand]
-        private async Task GetCourseDetails(Course course)
-        {
-            if (course == null) return;
+            IsPopulated = true;
 
-            await Shell.Current.GoToAsync($"{nameof(CourseDetailsView)}", true, new Dictionary<string, object>
-            {
-                { "course", course }
-            });
         }
 
         [RelayCommand]
@@ -161,6 +149,7 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("//AcademicTermListView", true, new Dictionary<string, object>
                 {
+                    ["userid"] = NewUserId,
                     ["term"] = NewTerm
                 });
             }
@@ -237,6 +226,9 @@ namespace C_971.ViewModels
             NewCourseStartDate = DateTime.Now;
             NewCourseEndDate = DateTime.Now.AddMonths(6);
             NewCourseStatus = CourseStatus.Planned;
+            NewCourseDescription = string.Empty;
+
+            NewCourse = new Course();
         }
          
         [RelayCommand]
@@ -245,5 +237,7 @@ namespace C_971.ViewModels
             IsRemovingCourse = true;
             _database.DeleteCourseAsync(newCourse);
         }
+
+
     }
 }

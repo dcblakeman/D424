@@ -8,7 +8,7 @@ using System.Text;
 
 namespace C_971.ViewModels;
 
-[QueryProperty(nameof(NewUserId), "newuserid")]
+[QueryProperty(nameof(NewUserId), "userid")]
 public partial class LoginViewModel : ObservableObject
 {
     private DatabaseService _database;
@@ -85,9 +85,9 @@ public partial class LoginViewModel : ObservableObject
 
             // Pass the dictionary directly as an argument to GoToAsync
             await Shell.Current.GoToAsync("AcademicTermListView", new Dictionary<string, object>
-                {
-                    { "newuserId", NewUserId }
-                });
+            {
+                ["userid"] = NewUserId
+            });
         }
         else
         {

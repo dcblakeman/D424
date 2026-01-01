@@ -67,7 +67,8 @@ public partial class AcademicTermListView : ContentPage
             // Normal navigation behavior
             await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
             {
-                { "term", term }
+                { "term", term },
+                {  "userid", viewModel.NewUserId }
             });
         }
     }

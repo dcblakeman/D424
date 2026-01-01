@@ -4,10 +4,10 @@ namespace C_971.Views;
 
 public partial class CourseDetailsView : ContentPage
 {
-	public CourseDetailsView(CourseDetailsViewModel	courseDetailsViewModel)
+	public CourseDetailsView(CourseDetailsViewModel	viewModel)
 	{
 		InitializeComponent();
-		BindingContext = courseDetailsViewModel;
+		BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()

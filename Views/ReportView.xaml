@@ -127,8 +127,8 @@
                            FontSize="18" 
                            FontAttributes="Bold"/>
 
-                    <Button Text="Open Reports Folder"
-                            Command="{Binding OpenReportsFolderCommand}"
+                    <Button Text="Back"
+                            Command="{Binding GoBackCommand}"
                             BackgroundColor="{AppThemeBinding Light=DarkRed, Dark=Red}"
                             TextColor="White"
                             FontSize="14"
