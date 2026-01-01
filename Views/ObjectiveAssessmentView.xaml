@@ -98,8 +98,8 @@
                             <Entry Grid.Row="1" Grid.Column="1" Text="{Binding AssessmentName}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
                             <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
-                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
-                            <Picker Grid.Row="2" Grid.Column="1" ItemsSource="{Binding AssessmentTypeOptions}" SelectedItem="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
+                            <Label Grid.Row="2" Grid.Column="1" Text="{Binding AssessmentType}" VerticalOptions="Center"/>
+                            <!-- <Picker Grid.Row="2" Grid.Column="1" ItemsSource="{Binding AssessmentTypeOptions}" SelectedItem="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/> -->
 
                             <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
                             <Label Grid.Row="3" Grid.Column="1" Text="{Binding AssessmentDescription}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
@@ -197,7 +197,11 @@
                                                 <Label Text="Course ID:" FontAttributes="Bold"/>
                                                 <Label Text="{Binding CourseId}"/>
                                             </HorizontalStackLayout>
-                                            <HorizontalStackLayout Spacing="10">
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="Type:" FontAttributes="Bold"/>
+                                            <Label Text="{Binding Type}"/>
+                                        </HorizontalStackLayout>
+                                        <HorizontalStackLayout Spacing="10">
                                                 <Label Text="Status:" FontAttributes="Bold"/>
                                                 <Label Text="{Binding Status}" TextColor="DarkBlue"/>
                                             </HorizontalStackLayout>

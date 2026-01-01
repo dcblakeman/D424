@@ -84,7 +84,7 @@ public partial class LoginViewModel : ObservableObject
             NewUserId = await GetUserIdByEmailAsync(NewLoginUserEmail);
 
             // Pass the dictionary directly as an argument to GoToAsync
-            await Shell.Current.GoToAsync("AcademicTermListView", new Dictionary<string, object>
+            await Shell.Current.GoToAsync("AcademicTermListView", true, new Dictionary<string, object>
             {
                 ["userid"] = NewUserId
             });

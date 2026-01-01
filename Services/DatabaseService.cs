@@ -19,10 +19,10 @@ namespace C_971.Services
             if (_database is not null) return;
 
             //For development -delete and recreate if schema changed
-            //if (File.Exists(Constants.DatabasePath))
-            //{
-            //    File.Delete(Constants.DatabasePath);
-            //}
+            if (File.Exists(Constants.DatabasePath))
+            {
+                File.Delete(Constants.DatabasePath);
+            }
 
             try
             {
@@ -296,11 +296,11 @@ namespace C_971.Services
             }
         }
 
-        public async Task<List<CourseAssessment>> GetAssessmentsByTypeAsync(AssessmentType performance)
+        public async Task<List<CourseAssessment>> GetAssessmentsByTypeAsync(AssessmentType assessmentType)
         {
             await InitializeAsync();
             return await _database.Table<CourseAssessment>()
-                .Where(a => a.Type == performance)
+                .Where(a => a.Type == assessmentType)
                 .ToListAsync();
         }
 
@@ -312,11 +312,11 @@ namespace C_971.Services
                 .FirstOrDefaultAsync(a => a.CourseId == courseId && a.Type == type);
         }
 
-        internal async Task<IEnumerable<CourseAssessment>> GetCourseAssessmentsByType(AssessmentType performance)
+        internal async Task<IEnumerable<CourseAssessment>> GetCourseAssessmentsByType(AssessmentType assessmentType)
         {
             await InitializeAsync();
             return await _database.Table<CourseAssessment>()
-                .Where(a => a.Type == performance)
+                .Where(a => a.Type == assessmentType)
                 .ToListAsync();
         }
 
@@ -344,11 +344,11 @@ namespace C_971.Services
 
         }
 
-        internal async Task<CourseAssessment> GetAssessmentbyCourseIdAndTypeAndIsActive(int courseId, AssessmentType performance, bool assessmentIsActive)
+        internal async Task<CourseAssessment> GetAssessmentbyCourseIdAndTypeAndIsActive(int courseId, AssessmentType assessmentType, bool assessmentIsActive)
         {
             await InitializeAsync();
             var assessment = _database.Table<CourseAssessment>()
-                .Where(a => a.CourseId == courseId && a.Type == performance && a.IsActive == assessmentIsActive);
+                .Where(a => a.CourseId == courseId && a.Type == assessmentType && a.IsActive == assessmentIsActive);
             return await assessment.FirstOrDefaultAsync();
         }
 

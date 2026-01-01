@@ -431,15 +431,17 @@ namespace C_971.ViewModels
                     AssessmentIsActive = Assessment.IsActive;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
-
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to populate assessment properties: {ex.Message}", "OK");
-                    System.Diagnostics.Debug.WriteLine($"PopulateAssessmentProperties error: {ex}");
+                    await Shell.Current.DisplayAlertAsync("Error", $"Failed to populate assessment properties", "OK");
                 }
-
+            } else
+            {
+                
             }
+                
         }
 
         [RelayCommand]

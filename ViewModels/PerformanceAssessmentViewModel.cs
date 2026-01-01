@@ -244,7 +244,6 @@ namespace C_971.ViewModels
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
-                    await Shell.Current.DisplayAlertAsync("Test", $"Assessment ID: {Assessment.Id}", "OK");
                 }
 
                 await _database.SaveCourseAssessmentAsync(Assessment);
