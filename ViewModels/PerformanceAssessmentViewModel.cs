@@ -11,25 +11,31 @@ using System.Text;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(UserId), "userid")]
     public partial class PerformanceAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        public Course newCourse;
-
-        [ObservableProperty]
-        public AcademicTerm newTerm;
+        public int userId;
 
         [ObservableProperty]
         public int newUserId;
 
         [ObservableProperty]
-        public int courseId;
+        public Course course;
+
+        [ObservableProperty]
+        public Course newCourse;
+
+        [ObservableProperty]
+        public AcademicTerm term;
+
+        [ObservableProperty]
+        public AcademicTerm newTerm;
 
         [ObservableProperty]
         public string viewName = "Performance Assessment";
@@ -69,6 +75,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         public bool assessmentIsActive = false;
+
+        [ObservableProperty]
+        public int assessmentCourseId = 0;
 
         [ObservableProperty]
         public ObservableCollection<CourseAssessment> assessments = new();
@@ -131,6 +140,30 @@ namespace C_971.ViewModels
             _database = database;
 
             _ = RequestNotificationPermissions();
+            //_ = PopulateAssessmentProperties();
+        }
+
+        partial void OnUserIdChanged(int value)
+        {
+            NewUserId = value;
+            Shell.Current.DisplayAlertAsync("UserId Selected", $"You have selected the UserId: {value}", "OK");
+        }
+
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            NewTerm = value;
+            Shell.Current.DisplayAlertAsync("Term Selected", $"You have selected the UserId: {NewUserId}", "OK");
+
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+            AssessmentCourseId = NewCourse.Id;
+            AssessmentType = AssessmentType.Performance;
+            Shell.Current.DisplayAlertAsync("Course Selected", $"You have selected the UserId: {NewUserId}", "OK");
+
+            // Populate assessment properties
             _ = PopulateAssessmentProperties();
         }
 
@@ -157,8 +190,8 @@ namespace C_971.ViewModels
                     // Use relative navigation (no leading slash)
                     await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
                     {
-                        ["course"] = NewCourse,
                         ["term"] = NewTerm,
+                        ["course"] = NewCourse,
                         ["userid"] = NewUserId
                     });
                 }
@@ -216,7 +249,7 @@ namespace C_971.ViewModels
                     await _database.SaveCourseAssessmentAsync(Assessment);
 
                     Assessment.Id = AssessmentId;
-                    Assessment.CourseId = CourseId;
+                    Assessment.CourseId = AssessmentCourseId;
                     Assessment.Name = AssessmentName;
                     Assessment.Type = AssessmentType.Performance;
                     Assessment.Status = AssessmentStatus;
@@ -233,7 +266,7 @@ namespace C_971.ViewModels
                 {
                     Assessment = new CourseAssessment();
                     Assessment.Id = 0;
-                    Assessment.CourseId = CourseId;
+                    Assessment.CourseId = AssessmentCourseId;
                     Assessment.Name = AssessmentName;
                     Assessment.Type = AssessmentType.Performance;
                     Assessment.Status = AssessmentStatus;
@@ -352,6 +385,7 @@ namespace C_971.ViewModels
                     AssessmentStartDate = DateTime.Now;
                     AssessmentEndDate = DateTime.Now.AddMonths(6);
                     AssessmentStatus = AssessmentStatus.Pending;
+                    AssessmentCourseId = NewCourse.Id;
 
                 }
                 catch (Exception ex)
@@ -365,27 +399,12 @@ namespace C_971.ViewModels
         public async Task FindAssessment()
         {
             // Show the search bar and switch to search mode
-            IsSearching = true; // This will show the search bar
+            IsSearching = true;
             OnPropertyChanged(nameof(IsNotSearching));
 
             _ = LoadAllPerformanceAssessments();
 
-            SearchText = string.Empty; // Clear any existing search textq
-        }
-
-        partial void OnNewCourseChanged(Course value)
-        {
-            if (value != null)
-            {
-                CourseId = value.Id;
-                AssessmentType = AssessmentType.Performance;
-
-                // Load existing assessments for this course
-                _ = LoadAllPerformanceAssessments();
-
-                // Populate assessment properties
-                _ = PopulateAssessmentProperties();
-            }
+            SearchText = string.Empty; // Clear any existing search text
         }
 
         partial void OnSearchTextChanged(string value)
@@ -416,7 +435,7 @@ namespace C_971.ViewModels
 
         private async Task PopulateAssessmentProperties()
         {
-            Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(CourseId, AssessmentType.Performance, Assessment.IsActive = true);
+            Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(NewCourse.Id, AssessmentType.Performance, Assessment.IsActive = true);
 
             if (Assessment != null)
             {
@@ -432,8 +451,9 @@ namespace C_971.ViewModels
                     AssessmentStartDateNotifications = Assessment.StartDateNotifications;
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                     AssessmentIsActive = Assessment.IsActive;
+                    AssessmentCourseId = NewCourse.Id;
 
-                    await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
+                    //await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
 
                 }
                 catch (Exception ex)
@@ -484,6 +504,7 @@ namespace C_971.ViewModels
             AssessmentEndDate = DateTime.Now.AddMonths(6);
             AssessmentStatus = AssessmentStatus.Pending;
             AssessmentIsActive = true;
+            AssessmentCourseId = NewCourse.Id;
         }
     }
 }

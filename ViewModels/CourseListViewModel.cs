@@ -92,18 +92,14 @@ namespace C_971.ViewModels
         // Property Change Handlers
         partial void OnTermChanged(AcademicTerm value)
         {
-            //if (value == null) return;
-            {
-                OnPropertyChanged(nameof(NewCourseStatus));
-                Term = value;
-                _ = LoadCoursesAsync(value);
-            }
+            NewTerm = value;
+            Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{NewTerm.Id}'. Navigating to courses...", "OK");
+            _ = LoadCoursesAsync(value);
         }
 
         partial void OnUserIdChanged(int value)
         {
             NewUserId = value;
-            //Shell.Current.DisplayAlertAsync("User ID Set", $"User ID set to {NewUserId}", "OK");
         }
 
         partial void OnSearchTextChanged(string value)
@@ -187,6 +183,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewCourse()
         {
+            await Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{Term}'. Navigating to courses...", "OK");
             if (!ValidateNewCourse()) return;
             try
             {

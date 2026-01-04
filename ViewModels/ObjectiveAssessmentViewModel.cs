@@ -7,25 +7,31 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(UserId), "userid")]
     public partial class ObjectiveAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        private Course newCourse;
-
-        [ObservableProperty]
-        private AcademicTerm newTerm;
+        private int userId;
 
         [ObservableProperty]
         private int newUserId;
 
         [ObservableProperty]
-        private int courseId;
+        private Course course;
+
+        [ObservableProperty]
+        private Course newCourse;
+
+        [ObservableProperty]
+        private AcademicTerm term;
+
+        [ObservableProperty]
+        private AcademicTerm newTerm;
 
         [ObservableProperty]
         private string viewName = "Objective Assessment";
@@ -65,6 +71,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         public bool assessmentIsActive = false;
+
+        [ObservableProperty]
+        private int assessmentCourseId = 0;
 
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = new();
@@ -128,6 +137,29 @@ namespace C_971.ViewModels
             IsSearching = false; IsSearching = false;
 
             _ = RequestNotificationPermissions();
+            _ = PopulateAssessmentProperties();
+        }
+
+        partial void OnUserIdChanged(int value)
+        {
+            NewUserId = value;
+        }
+
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            NewTerm = value;
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+            AssessmentCourseId = NewCourse.Id;
+            AssessmentType = AssessmentType.Objective;
+
+            // Load existing assessments for this course
+            _ = LoadAllObjectiveAssessments();
+
+            // Populate assessment properties
             _ = PopulateAssessmentProperties();
         }
 
@@ -214,7 +246,7 @@ namespace C_971.ViewModels
                     await _database.SaveCourseAssessmentAsync(Assessment);
 
                     Assessment.Id = AssessmentId;
-                    Assessment.CourseId = CourseId;
+                    Assessment.CourseId = AssessmentCourseId;
                     Assessment.Name = AssessmentName;
                     Assessment.Type = AssessmentType.Objective;
                     Assessment.Status = AssessmentStatus;
@@ -230,7 +262,7 @@ namespace C_971.ViewModels
                 {
                     Assessment = new CourseAssessment();
                     Assessment.Id = 0;
-                    Assessment.CourseId = CourseId;
+                    Assessment.CourseId = AssessmentCourseId;
                     Assessment.Name = AssessmentName;
                     Assessment.Type = AssessmentType.Objective;
                     Assessment.Status = AssessmentStatus;
@@ -350,6 +382,7 @@ namespace C_971.ViewModels
                     AssessmentStartDate = DateTime.Now;
                     AssessmentEndDate = DateTime.Now.AddMonths(6);
                     AssessmentStatus = AssessmentStatus.Pending;
+                    AssessmentCourseId = NewCourse.Id;
 
                 }
                 catch (Exception ex)
@@ -369,21 +402,6 @@ namespace C_971.ViewModels
             _ = LoadAllObjectiveAssessments();
 
             SearchText = string.Empty; // Clear any existing search textq
-        }
-
-        partial void OnNewCourseChanged(Course value)
-        {
-            if (value != null)
-            {
-                CourseId = value.Id;
-                AssessmentType = AssessmentType.Objective;
-
-                // Load existing assessments for this course
-                _ = LoadAllObjectiveAssessments();
-
-                // Populate assessment properties
-                _ = PopulateAssessmentProperties();
-            }
         }
 
         partial void OnSearchTextChanged(string value)
@@ -413,7 +431,7 @@ namespace C_971.ViewModels
         }
         private async Task PopulateAssessmentProperties()
         {
-            Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(CourseId, AssessmentType.Objective, Assessment.IsActive = true);
+            Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(AssessmentCourseId, AssessmentType.Objective, Assessment.IsActive = true);
 
             if (Assessment != null)
             {
@@ -429,6 +447,7 @@ namespace C_971.ViewModels
                     AssessmentStartDateNotifications = Assessment.StartDateNotifications;
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                     AssessmentIsActive = Assessment.IsActive;
+                    AssessmentCourseId = Assessment.CourseId;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
                     return;

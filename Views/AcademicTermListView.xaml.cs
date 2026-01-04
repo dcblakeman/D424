@@ -64,10 +64,12 @@ public partial class AcademicTermListView : ContentPage
         }
         else
         {
+            await Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{term.Id}'. Navigating to courses...", "OK");
+
             // Normal navigation behavior
             await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
             {
-                ["term"] = term ,
+                ["term"] = term,
                 ["userid"] = viewModel.UserId
             });
         }

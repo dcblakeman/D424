@@ -43,7 +43,6 @@ namespace C_971.ViewModels
         partial void OnUserIdChanged(int value)
         {
             NewUserId = value;
-            
         }
 
         partial void OnCourseChanged(Course value)
@@ -54,6 +53,7 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
+            
         }
 
         [RelayCommand]
@@ -78,14 +78,13 @@ namespace C_971.ViewModels
         private async Task NavigateToPerformanceAssessmentView()
         {
             if (NewCourse == null) return;
-
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
                 {
+                    ["term"] = NewTerm,
                     ["course"] = NewCourse,
                     ["userId"] = NewUserId,
-                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)

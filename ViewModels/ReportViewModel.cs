@@ -62,6 +62,8 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
+            Shell.Current.DisplayAlertAsync("Updated Values",
+                $"New Term: {NewTerm?.Name}\nNew UserId: {NewUserId}\nNew Course: {NewCourse?.Name}", "OK"  );
         }
 
         [RelayCommand]

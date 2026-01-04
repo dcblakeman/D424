@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewUserId), "userid")]
-    [QueryProperty(nameof(NewTerm), "term")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(Term), "term")]
     public partial class ViewNotesViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -19,11 +19,20 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isRefreshing;
 
-		[ObservableProperty]
+        [ObservableProperty]
+        public Course course;
+
+        [ObservableProperty]
         public Course newCourse;
 
         [ObservableProperty]
+        public int userId;
+
+        [ObservableProperty]
         public int newUserId;
+
+        [ObservableProperty]
+        public AcademicTerm term;
 
         [ObservableProperty]
         public AcademicTerm newTerm;
@@ -45,13 +54,19 @@ namespace C_971.ViewModels
             _database = databaseService;
         }
 
-        partial void OnNewCourseChanged(Course value)
+        partial void OnUserIdChanged(int value)
         {
-            // Called automatically when Course property changes
-            if (value?.Id > 0)
-            {
-                _ = LoadCourseNotes();
-            }
+            NewUserId = value;
+        }
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            NewTerm = value;
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+            _ = LoadCourseNotes();
         }
 
         [RelayCommand]

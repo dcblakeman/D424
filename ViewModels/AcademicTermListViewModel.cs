@@ -64,9 +64,6 @@ namespace C_971.ViewModels
         partial void OnUserIdChanged(int value)
         {
             NewUserId = value;
-
-            //Make this async method to await the DisplayAlertAsync
-            //Shell.Current.DisplayAlertAsync("User ID Set", $"User ID set to {NewUserId}", "OK");
         }
 
         // Initialization
@@ -166,6 +163,8 @@ namespace C_971.ViewModels
                 // Reload the term from database to get the assigned ID
                 AcademicTerm savedTerm = await _database.GetTermByNameAsync(NewTerm.Name);
                 NewTerm.Id = savedTerm.Id;
+
+                await Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{NewTerm.Id}'. Navigating to courses...", "OK");
 
                 AcademicTerms.Clear();
                 _allTerms.Add(savedTerm);  // Add the complete database term

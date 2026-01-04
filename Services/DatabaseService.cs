@@ -546,7 +546,7 @@ namespace C_971.Services
         {
             var query = @"
                 SELECT DISTINCT a.*
-                FROM Assessment a
+                FROM CourseAssessment a
                 INNER JOIN Course c ON a.CourseId = c.Id
                 INNER JOIN UserCourse uc ON c.Id = uc.CourseId
                 WHERE uc.UserId = ? AND c.TermId = ?
