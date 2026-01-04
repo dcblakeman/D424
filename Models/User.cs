@@ -16,6 +16,10 @@ namespace C_971.Models
         [EmailAddress(ErrorMessage = "Invalid email address format")]
         public string Email { get; set; } = string.Empty;
 
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
         [SQLite.MaxLength(100)]
         [NotNull]
         public string HashedPassword { get; set; } = string.Empty;

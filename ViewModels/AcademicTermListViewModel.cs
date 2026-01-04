@@ -6,8 +6,7 @@ using C_971.Services;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewUserId), "newuserid")]
+    [QueryProperty(nameof(UserId), "userid")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -20,7 +19,10 @@ namespace C_971.ViewModels
         private AcademicTerm newTerm = new AcademicTerm();
 
         [ObservableProperty]
-        private int newUserId;
+        private int userId;
+
+        [ObservableProperty]
+        public int newUserId;
 
         [ObservableProperty]
         private ObservableCollection<AcademicTerm> academicTerms = new();
@@ -57,6 +59,14 @@ namespace C_971.ViewModels
         {
             _database = database;
             Console.WriteLine($"Database Path: {C_971.Constants.DatabasePath}");
+        }
+
+        partial void OnUserIdChanged(int value)
+        {
+            NewUserId = value;
+
+            //Make this async method to await the DisplayAlertAsync
+            //Shell.Current.DisplayAlertAsync("User ID Set", $"User ID set to {NewUserId}", "OK");
         }
 
         // Initialization
@@ -143,23 +153,28 @@ namespace C_971.ViewModels
         private async Task SaveNewTerm()
         {
             if (!ValidateNewTerm()) return;
-
             try
             {
+                NewTerm.Id = 0;
                 NewTerm.Name = NewTermName;
                 NewTerm.StartDate = NewTermStartDate;
                 NewTerm.EndDate = NewTermEndDate;
 
+                // Insert Term Into database
                 await _database.SaveTermAsync(NewTerm);
 
-                // Add to cache and refresh display
-                _allTerms.Add(NewTerm);
+                // Reload the term from database to get the assigned ID
+                AcademicTerm savedTerm = await _database.GetTermByNameAsync(NewTerm.Name);
+                NewTerm.Id = savedTerm.Id;
+
+                AcademicTerms.Clear();
+                _allTerms.Add(savedTerm);  // Add the complete database term
+  
                 ApplySearchFilter();
+                await Shell.Current.DisplayAlertAsync("Success", "Term added successfully!", "OK");
 
                 ClearForm();
                 IsAddingTerm = false;
-
-                await Shell.Current.DisplayAlertAsync("Success", "Term added successfully!", "OK");
             }
             catch (Exception ex)
             {

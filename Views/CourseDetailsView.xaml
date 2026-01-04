@@ -62,7 +62,10 @@
                 </Border.StrokeShape>
 
                 <VerticalStackLayout Spacing="8">
-
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Id" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding NewCourseId}"/>
+                    </VerticalStackLayout>
                     <!-- Course Name -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Name" FontAttributes="Bold" TextDecorations="Underline"/>
@@ -193,7 +196,7 @@
                         Grid.ColumnSpan="2"/>
 
             </Grid>
-            <Button Text="Assessments"
+            <Button Text="Assessments | Reports"
                         FontAttributes="Bold"
                         Command="{Binding ViewAssessmentsCommand}"
                         BackgroundColor="#4CAF50"

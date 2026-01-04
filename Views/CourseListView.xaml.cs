@@ -65,8 +65,9 @@ namespace C_971.Views
                 // Normal navigation behavior
                 await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
                 {
-                    { "course", newCourse },
-                    { "term" , viewModel.NewTerm }
+                    ["userid"] = viewModel.UserId,
+                    ["course"] = newCourse,
+                    ["term"] = viewModel.Term
                 });
             }
         }

@@ -16,7 +16,8 @@ namespace C_971.Models
     public enum AssessmentType 
     { 
         Objective = 0, 
-        Performance = 1 
+        Performance = 1,
+        Unknown = 2
     }
     public enum AssessmentStatus 
     { 
@@ -24,5 +25,22 @@ namespace C_971.Models
         InProgress = 1, 
         Completed = 2, 
         Overdue = 3 
+    }
+
+    public enum FinalGrade
+    {
+        A,
+        AMinus,
+        BPlus,
+        B,
+        BMinus,
+        CPlus,
+        C,
+        CMinus,
+        DPlus,
+        D,
+        DMinus,
+        F,
+        NotGraded
     }
 }

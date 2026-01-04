@@ -39,7 +39,7 @@ namespace C_971.Models
         public DateTime EnrollmentDate { get; set; } = DateTime.Now;
 
         [Column("grade")]
-        public string? Grade { get; set; }
+        public FinalGrade? Grade { get; set; }
 
         // Navigation properties
         [Ignore]

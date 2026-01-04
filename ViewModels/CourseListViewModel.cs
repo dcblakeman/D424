@@ -1,4 +1,5 @@
 ﻿
+
 using C_971.Models;
 using C_971.Services;
 using C_971.Views;
@@ -8,9 +9,8 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(UserId), "userid")]
     public partial class CourseListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -23,8 +23,14 @@ namespace C_971.ViewModels
 
         // Core Properties
         [ObservableProperty]
+        private AcademicTerm term;
+
+        [ObservableProperty]
         private AcademicTerm newTerm;
 
+        [ObservableProperty]
+        private int userId;
+        
         [ObservableProperty]
         private int newUserId;
 
@@ -84,14 +90,20 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnNewTermChanged(AcademicTerm value)
+        partial void OnTermChanged(AcademicTerm value)
         {
             //if (value == null) return;
             {
                 OnPropertyChanged(nameof(NewCourseStatus));
-                NewTerm = value;
+                Term = value;
                 _ = LoadCoursesAsync(value);
             }
+        }
+
+        partial void OnUserIdChanged(int value)
+        {
+            NewUserId = value;
+            //Shell.Current.DisplayAlertAsync("User ID Set", $"User ID set to {NewUserId}", "OK");
         }
 
         partial void OnSearchTextChanged(string value)
@@ -133,7 +145,6 @@ namespace C_971.ViewModels
             if (term == null) return;
             if (term != null)
             {
-                NewTerm = term;
                 _allCourses = await _database.GetCoursesByTermIdAsync(term.Id);
                 ApplySearchFilter();
             }
@@ -177,9 +188,9 @@ namespace C_971.ViewModels
         private async Task SaveNewCourse()
         {
             if (!ValidateNewCourse()) return;
-
             try
             {
+                NewCourse.Id = 0;
                 NewCourse.Name = NewCourseName;
                 NewCourse.Description = NewCourseDescription;
                 NewCourse.StartDate = NewCourseStartDate;
@@ -189,15 +200,22 @@ namespace C_971.ViewModels
 
                 await _database.SaveCourseAsync(NewCourse);
 
+                // Reload the term from database to get the assigned ID
+                Course savedCourse = await _database.GetCourseByNameAsync(NewCourse.Name);
+                NewCourse.Id = savedCourse.Id;
+
+                Courses.Clear();
+                _allCourses.Add(savedCourse);
+
+                ApplySearchFilter();
+                await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
+
                 ClearForm();
                 IsAddingCourse = false;
-
-                await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
-                await LoadCoursesAsync(NewTerm);
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("test", $"Failed to add course: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to add course: {ex.Message}", "OK");
                 System.Diagnostics.Debug.WriteLine($"Add course error: {ex}");
             }
         }
@@ -232,12 +250,16 @@ namespace C_971.ViewModels
         }
          
         [RelayCommand]
-        private void RemoveCourse(Course newCourse)
+        private async Task RemoveCourse(Course newCourse)
         {
             IsRemovingCourse = true;
-            _database.DeleteCourseAsync(newCourse);
+            await _database.DeleteCourseAsync(newCourse);
         }
 
-
+        public async Task CancelRemoveCourse()
+        {
+            IsRemovingCourse = false;
+            await Task.CompletedTask;   
+        }
     }
 }

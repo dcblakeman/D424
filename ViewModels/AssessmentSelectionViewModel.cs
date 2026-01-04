@@ -8,9 +8,9 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(UserId), "userid")]
     public partial class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -20,16 +20,41 @@ namespace C_971.ViewModels
         }
 
         [ObservableProperty]
+        private int userId;
+
+        [ObservableProperty]
         private int newUserId;
+
+        [ObservableProperty]
+        private Course course;
 
         [ObservableProperty]
         private Course newCourse;
 
         [ObservableProperty]
+        private AcademicTerm term;
+
+        [ObservableProperty]
         private AcademicTerm newTerm;
 
         [ObservableProperty]
-        private string viewName = "Assessment Selection / Reports";
+        private string viewName = "Assessments | Reports";
+
+        partial void OnUserIdChanged(int value)
+        {
+            NewUserId = value;
+            
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+        }
+
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            NewTerm = value;
+        }
 
         [RelayCommand]
         private async Task GoBack()
@@ -93,13 +118,14 @@ namespace C_971.ViewModels
         private async Task NavigateToReportView()
         {
             if (NewCourse == null) return;
+
             try
             {
                 await Shell.Current.GoToAsync($"///{nameof(ReportView)}", true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
-                    ["newuserid"] = NewUserId
+                    ["userid"] = NewUserId
                 });
             }
             catch (Exception ex)

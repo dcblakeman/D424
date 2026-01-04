@@ -19,10 +19,10 @@ namespace C_971.Services
             if (_database is not null) return;
 
             //For development -delete and recreate if schema changed
-            if (File.Exists(Constants.DatabasePath))
-            {
-                File.Delete(Constants.DatabasePath);
-            }
+            //if (File.Exists(Constants.DatabasePath))
+            //{
+            //    File.Delete(Constants.DatabasePath);
+            //}
 
             try
             {
@@ -33,6 +33,9 @@ namespace C_971.Services
                 await _database.CreateTableAsync<CourseAssessment>();
                 await _database.CreateTableAsync<CourseInstructor>();
                 await _database.CreateTableAsync<User>();
+                await _database.CreateTableAsync<UserCourse>();
+                await _database.CreateTableAsync<UserAssessment>();
+
             }
             catch (Exception ex)
             {
@@ -416,6 +419,184 @@ namespace C_971.Services
                 .Where(u => u.Email == email)
                 .FirstOrDefaultAsync();
             return user != null;
+        }
+
+        internal async Task<AcademicTerm> GetTermByNameAsync(string name)
+        {
+
+            await InitializeAsync();
+            var term = await _database.Table<AcademicTerm>()
+                .Where(t => t.Name == name)
+                .FirstOrDefaultAsync();
+            if (term != null)
+            {
+                return term;
+            }
+            else
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Term not found.", "OK");
+                return null;
+            }
+        }
+
+        internal async Task<Course> GetCourseByNameAsync(string name)
+        {
+            await InitializeAsync();
+            var course = await _database.Table<Course>()
+                .Where(c => c.Name == name)
+                .FirstOrDefaultAsync();
+            if (course != null)
+            {
+                return course;
+            }
+            else
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Course not found.", "OK");
+                return null;
+            }
+        }
+
+        public async Task<List<UserCourse>> GetUserCoursesAsync(int userId)
+        {
+            return await _database.Table<UserCourse>()
+                .Where(uc => uc.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<List<UserCourse>> GetUserCoursesWithDetailsAsync(int userId)
+        {
+            var userCourses = await _database.Table<UserCourse>()
+                .Where(uc => uc.UserId == userId)
+                .ToListAsync();
+
+            // Load the actual course data for each enrollment
+            foreach (var userCourse in userCourses)
+            {
+                userCourse.Course = await _database.Table<Course>()
+                    .FirstOrDefaultAsync(c => c.Id == userCourse.CourseId);
+            }
+
+            return userCourses;
+        }
+
+        // Add this to your DatabaseService
+        public async Task<bool> AddAssessmentToUserCourseAsync(int userCourseId, int assessmentId)
+        {
+            try
+            {
+                // Check if assessment already exists for this enrollment
+                var existing = await _database.Table<UserAssessment>()
+                    .FirstOrDefaultAsync(ua => ua.UserCourseId == userCourseId && ua.AssessmentId == assessmentId);
+
+                if (existing != null)
+                    return false; // Already exists
+
+                var userAssessment = new UserAssessment
+                {
+                    UserCourseId = userCourseId,
+                    AssessmentId = assessmentId,
+                    IsCompleted = false
+                };
+
+                await _database.InsertAsync(userAssessment);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateAssessmentGradeAsync(int userAssessmentId, FinalGrade grade)
+        {
+            try
+            {
+                var userAssessment = await _database.Table<UserAssessment>()
+                    .FirstOrDefaultAsync(ua => ua.Id == userAssessmentId);
+
+                if (userAssessment == null)
+                    return false;
+
+                userAssessment.Grade = grade;
+                userAssessment.IsCompleted = true;
+                userAssessment.CompletedDate = DateTime.Now;
+
+                await _database.UpdateAsync(userAssessment);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<CourseAssessment>> GetAssessmentsForUserAsync(int userId)
+        {
+            var query = @"
+                SELECT DISTINCT a.*
+                FROM Assessment a
+                INNER JOIN Course c ON a.CourseId = c.Id
+                INNER JOIN UserCourse uc ON c.Id = uc.CourseId
+                WHERE uc.UserId = ?";
+
+            return await _database.QueryAsync<CourseAssessment>(query, userId);
+        }
+
+        public async Task<List<CourseAssessment>> GetAssessmentsForUserAndTermAsync(int userId, int termId)
+        {
+            var query = @"
+                SELECT DISTINCT a.*
+                FROM Assessment a
+                INNER JOIN Course c ON a.CourseId = c.Id
+                INNER JOIN UserCourse uc ON c.Id = uc.CourseId
+                WHERE uc.UserId = ? AND c.TermId = ?
+                ORDER BY a.EndDate ASC";
+
+            return await _database.QueryAsync<CourseAssessment>(query, userId, termId);
+        }
+        public async Task<List<UserAssessment>> GetAssessmentsForUserCourseAsync(int userCourseId)
+        {
+            await InitializeAsync();
+
+            var userAssessments = await _database.Table<UserAssessment>()
+                .Where(ua => ua.UserCourseId == userCourseId)
+                .ToListAsync();
+
+            // Load navigation properties
+            await LoadUserAssessmentDetails(userAssessments);
+
+            return userAssessments;
+        }
+
+        private async Task LoadUserAssessmentDetails(List<UserAssessment> userAssessments)
+        {
+            foreach (var userAssessment in userAssessments)
+            {
+                // Load UserCourse (enrollment)
+                userAssessment.UserCourse = await _database.Table<UserCourse>()
+                    .FirstOrDefaultAsync(uc => uc.Id == userAssessment.UserCourseId);
+
+                if (userAssessment.UserCourse != null)
+                {
+                    // Load Course details
+                    userAssessment.UserCourse.Course = await _database.Table<Course>()
+                        .FirstOrDefaultAsync(c => c.Id == userAssessment.UserCourse.CourseId);
+                }
+
+                // Load Assessment template details
+                userAssessment.Assessment = await _database.Table<CourseAssessment>()
+                    .FirstOrDefaultAsync(a => a.Id == userAssessment.AssessmentId);
+            }
+        }
+
+        internal async Task<List<UserAssessment>> GetUserAssessmentsAsync(int newUserId)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal async Task LoadAssessmentDetailsAsync(List<CourseAssessment> assessments)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -345,7 +345,7 @@ namespace C_971.ViewModels
                     //Clear the Assessment Fields
                     AssessmentId = 0;
                     AssessmentName = String.Empty;
-                    AssessmentType = AssessmentType.Performance;
+                    AssessmentType = AssessmentType.Objective;
                     AssessmentDescription = String.Empty;
                     AssessmentStartDate = DateTime.Now;
                     AssessmentEndDate = DateTime.Now.AddMonths(6);

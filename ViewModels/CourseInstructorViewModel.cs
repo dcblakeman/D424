@@ -6,23 +6,35 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewUserId), "userid")]
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewInstructor), "instructor")]
+    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(Instructor), "instructor")]
     public partial class CourseInstructorViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
+        private int userId;
+
+        [ObservableProperty]
+        private int newUserId;
+
+        [ObservableProperty]
+        private Course course;
+
+        [ObservableProperty]
         private Course newCourse;
+
+        [ObservableProperty]
+        private AcademicTerm term;
 
         [ObservableProperty]
         private AcademicTerm newTerm;
 
         [ObservableProperty]
-        private int newUserId;  
+        private CourseInstructor instructor;
 
         [ObservableProperty]
         private CourseInstructor newInstructor = new();
@@ -73,7 +85,7 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnNewCourseChanged(Course value)
+        partial void OnCourseChanged(Course value)
         {
             if (value != null)
             {
@@ -81,6 +93,20 @@ namespace C_971.ViewModels
 
                 NewCourse = value;
             }
+        }
+        
+        partial void OnInstructorChanged(CourseInstructor value)
+        {
+            if (value != null)
+            {
+                NewInstructor = value;
+            }
+        }
+
+        partial void OnUserIdChanged(int value)
+        {
+            NewUserId = value;
+
         }
 
         partial void OnIsAddingInstructorChanged(bool value)

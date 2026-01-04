@@ -48,6 +48,7 @@ namespace C_971.ViewModels
 
             try
             {
+                NewNote.Id = 0;
                 NewNote.CreatedDate = DateTime.Now;
                 NewNote.NoteContent = NewNoteContent.Trim();
                 NewNote.CourseId = NewCourse.Id;

@@ -9,20 +9,29 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewInstructor), "instructor")]
-    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(Instructor), "instructor")]
+    [QueryProperty(nameof(UserId), "userid")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
+
+        [ObservableProperty]
+        private Course course;
 
         // Core Properties
         [ObservableProperty]
         private Course newCourse;
 
         [ObservableProperty]
+        private AcademicTerm term;
+
+        [ObservableProperty]
         private AcademicTerm newTerm;
+
+        [ObservableProperty]
+        private int userId;
 
         [ObservableProperty]
         private int newUserId;
@@ -56,6 +65,9 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         public int newCourseInstructorId = 0;
+
+        [ObservableProperty]
+        private CourseInstructor instructor;
 
         [ObservableProperty]
         private CourseInstructor newInstructor;
@@ -96,24 +108,22 @@ namespace C_971.ViewModels
             _ = RequestNotificationPermissions();
         }
 
-        // Property Change Handlers
-        partial void OnNewCourseChanged(Course value)
+        partial void OnUserIdChanged(int value)
         {
-            if (value != null)
-            {
-                NewCourse = value;
-                IsEditing = false;
-                _= LoadInstructorAsync();
-                _= PopulateFields();
-            }
+            NewUserId = value;
+        }
+        // Property Change Handlers
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+            IsEditing = false;
+            _ = LoadInstructorAsync();
+            _= PopulateFields();
         }
 
-        partial void OnNewTermChanged(AcademicTerm value)
+        partial void OnTermChanged(AcademicTerm value)
         {
-            if (value != null)
-            {
-                NewTerm = value;
-            }
+            NewTerm = value;
         }
 
         partial void OnIsEditingChanged(bool value)
@@ -151,8 +161,8 @@ namespace C_971.ViewModels
                 NewCourse.Description = NewCourseDescription;
                 NewCourse.StartDate = NewCourseStartDate;
                 NewCourse.EndDate = NewCourseEndDate;
-                NewCourse.Status = NewCourseStatus;
                 NewCourse.StartDateNotifications = NewCourseStartDateNotifications;
+                NewCourse.Status = NewCourseStatus;
                 NewCourse.EndDateNotifications = NewCourseEndDateNotifications;
                 NewCourse.InstructorId = NewCourseInstructorId;
 
@@ -204,7 +214,9 @@ namespace C_971.ViewModels
 
                 await Shell.Current.GoToAsync($"{nameof(AssessmentSelectionView)}", new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["userid"] = NewUserId,
+                    ["term"] = NewTerm
                 });
             }
             catch (Exception ex)
@@ -242,8 +254,8 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse,
-                    ["userid"] = NewUserId,
+                    ["course"] = Course,
+                    ["userid"] = UserId,
                     ["term"] = NewTerm
                 });
             }
@@ -266,9 +278,9 @@ namespace C_971.ViewModels
 
                 await Shell.Current.GoToAsync($"{nameof(CourseListView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse,
-                    ["term"] = NewTerm,
-                    ["userid"] = NewUserId
+                    ["course"] = Course,
+                    ["term"] = Term,
+                    ["userid"] = UserId
                 });
             }
             catch (Exception ex)
