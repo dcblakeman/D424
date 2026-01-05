@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace C_971.Models
 {
-    [SQLite.Table("CourseInstructor")]
+    [SQLite.Table("course_instructor")]
     public partial class CourseInstructor
     {
         // Primary Key

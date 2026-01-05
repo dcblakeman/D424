@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace C_971.Models
 {
-    [Table("CourseNote")]
+    [Table("course_note")]
     public class CourseNote
     {
         // Primary Key

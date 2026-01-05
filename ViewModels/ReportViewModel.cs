@@ -66,25 +66,26 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        public async Task GenerateUserAssessmentReport()
+        public async Task<string> GenerateUserAssessmentReport()
         {
-            if (Term == null) return;
             try
             {
                 if (Term.Id == 0)
                 {
                     await Shell.Current.DisplayAlertAsync("No Term Selected",
                         "Please select a term first.", "OK");
-                    return;
+                    return string.Empty;
                 }
 
                 var assessments = await _database.GetAssessmentsForUserAndTermAsync(NewUser.Id, NewTerm.Id);
+
+                await Shell.Current.DisplayAlertAsync("Wait", $"Number of assessments: {assessments.Count}", "OK");
 
                 if (!assessments.Any())
                 {
                     await Shell.Current.DisplayAlertAsync("No Assessments",
                         "No assessments found for the selected term.", "OK");
-                    return;
+                    return string.Empty;
                 }
 
                 // Generate Report
@@ -97,20 +98,12 @@ namespace C_971.ViewModels
                                     $"Status: {assessment.Status}\n\n";
                 }
 
-                //Output ReportText to .text file
-                string folderPath = await GetOrSelectReportsFolder();
-                if (!string.IsNullOrEmpty(folderPath))
-                {
-                    string fileName = $"My_Assessments_Report_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                    string filePath = Path.Combine(folderPath, fileName);
-                    await File.WriteAllTextAsync(filePath, ReportText);
-                    await Shell.Current.DisplayAlertAsync("Report Saved",
-                        $"Report saved to:\n{filePath}", "OK");
-                }
+                return ReportText;
             }
             catch (Exception ex)
             {
                 await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
+                return string.Empty;
             }
         }
 
@@ -183,83 +176,6 @@ namespace C_971.ViewModels
             }
 
             return report.ToString();
-        }
-
-        [RelayCommand]
-        public async Task SaveAssessmentsReport()
-        {
-            try
-            {
-                var assessments = await _database.GetUserAssessmentsAsync(NewUser.Id);
-
-                if (assessments == null || assessments.Count == 0)
-                {
-                    await Shell.Current.DisplayAlertAsync("No Data",
-                        "No assessments found for this user.", "OK");
-                    return;
-                }
-
-                string content = GenerateAssessmentsReportContent(assessments);
-                await SaveReportToFile(content, "Assessments_Report");
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Error",
-                    $"Could not generate assessments report: {ex.Message}", "OK");
-            }
-        }
-
-        private async Task SaveReportToFile(string content, string v)
-        {
-            string folderPath = await GetOrSelectReportsFolder();
-            if (!string.IsNullOrEmpty(folderPath))
-            {
-                string fileName = $"{v}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                string filePath = Path.Combine(folderPath, fileName);
-                await File.WriteAllTextAsync(filePath, content);
-                await Shell.Current.DisplayAlertAsync("Report Saved",
-                    $"Report saved to:\n{filePath}", "OK");
-            }
-        }
-
-        [RelayCommand]
-        public async Task GenerateCoursesReportToFile()
-        {
-            try
-            {
-                IsBusy = true;
-
-                var userCourses = await _database.GetUserCoursesWithDetailsAsync(1);
-
-                if (userCourses.Count == 0)
-                {
-                    await Shell.Current.DisplayAlertAsync("No Courses", "No course enrollments found.", "OK");
-                    return;
-                }
-
-                // Get or select persistent folder
-                string folderPath = await GetOrSelectReportsFolder();
-
-                if (!string.IsNullOrEmpty(folderPath))
-                {
-                    string report = GenerateCoursesReport(userCourses);
-                    string fileName = $"My_Courses_Report_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                    string filePath = Path.Combine(folderPath, fileName);
-
-                    await File.WriteAllTextAsync(filePath, report);
-
-                    await Shell.Current.DisplayAlertAsync("Report Saved",
-                        $"Saved to: {filePath}\nTotal Courses: {userCourses.Count}", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
-            }
-            finally
-            {
-                IsBusy = false;
-            }
         }
 
         // Ran in GenerateCoursesReportToFile Method
@@ -356,19 +272,33 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        public async Task ChangeReportsFolder()
+        public async Task SaveAssessmentReport()
         {
             try
             {
-                var folderResult = await FolderPicker.PickAsync(CancellationToken.None);
+                var reportContent = await GenerateUserAssessmentReport();
 
-                if (folderResult != null && folderResult.IsSuccessful)
+                // DEBUG: Check if content is actually there
+                if (string.IsNullOrEmpty(reportContent))
                 {
-                    // Save the new folder path
-                    Preferences.Set(REPORTS_FOLDER_KEY, folderResult.Folder.Path);
+                    await Shell.Current.DisplayAlertAsync("Debug", "Report content is empty!", "OK");
+                    return;
+                }
 
-                    await Shell.Current.DisplayAlertAsync("Folder Updated",
-                        $"Reports will now be saved to:\n{folderResult.Folder.Path}", "OK");
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(reportContent));
+
+                var fileName = $"AssessmentReport_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                var result = await FileSaver.Default.SaveAsync(fileName, stream, CancellationToken.None);
+
+                if (result.IsSuccessful)
+                {
+                    await Shell.Current.DisplayAlertAsync("Success",
+                        $"Report saved successfully!", "OK");
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlertAsync("Error",
+                        "Failed to save report", "OK");
                 }
             }
             catch (Exception ex)
@@ -377,24 +307,39 @@ namespace C_971.ViewModels
             }
         }
 
-        private async Task<string> GetOrSelectReportsFolder()
+        [RelayCommand]
+        public async Task OpenReport()
         {
-            string savedPath = Preferences.Get(REPORTS_FOLDER_KEY, string.Empty);
-
-            if (!string.IsNullOrEmpty(savedPath) && Directory.Exists(savedPath))
+            try
             {
-                return savedPath;
-            }
+                // Open file picker to let user select a report file
+                var customFileType = new FilePickerFileType(
+                    new Dictionary<DevicePlatform, IEnumerable<string>>
+                    {
+                        { DevicePlatform.iOS, new[] { "public.text" } },
+                        { DevicePlatform.Android, new[] { "text/plain" } },
+                        { DevicePlatform.WinUI, new[] { ".txt" } },
+                        { DevicePlatform.MacCatalyst, new[] { "txt" } }
+                    });
 
-            // Need to select a folder
-            var folderResult = await FolderPicker.PickAsync(CancellationToken.None);
-            if (folderResult?.IsSuccessful == true)
+                var result = await FilePicker.PickAsync(new PickOptions
+                {
+                    FileTypes = customFileType,
+                    PickerTitle = "Select Assessment Report"
+                });
+
+                if (result != null)
+                {
+                    await Launcher.OpenAsync(new OpenFileRequest
+                    {
+                        File = new ReadOnlyFile(result.FullPath)
+                    });
+                }
+            }
+            catch (Exception ex)
             {
-                Preferences.Set(REPORTS_FOLDER_KEY, folderResult.Folder.Path);
-                return folderResult.Folder.Path;
+                await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
             }
-
-            return string.Empty;
         }
 
         [RelayCommand]

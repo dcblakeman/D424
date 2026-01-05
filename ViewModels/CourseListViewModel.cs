@@ -93,6 +93,7 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
+            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewTerm}", "OK");
             _ = LoadCoursesAsync(value);
         }
 

@@ -19,7 +19,6 @@ public partial class AssessmentSelectionView : ContentPage
             viewModel.NewCourse = viewModel.Course;
             viewModel.NewUser = viewModel.User;
             viewModel.NewTerm = viewModel.Term;
-            await Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {viewModel.NewTerm}", "OK");
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace C_971.Models
 {
-    [Table("UserCourse")]
+    [Table("user_course")]
     public partial class UserCourse : ObservableObject
     {
         [PrimaryKey, AutoIncrement]

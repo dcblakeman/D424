@@ -6,7 +6,7 @@ using SQLite;
 
 namespace C_971.Models
 {
-    [Table("User")]
+    [Table("user")]
     public class User
     {
         [PrimaryKey, AutoIncrement]

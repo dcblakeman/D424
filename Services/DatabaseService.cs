@@ -532,25 +532,37 @@ namespace C_971.Services
 
         public async Task<List<CourseAssessment>> GetAssessmentsForUserAsync(int userId)
         {
+            //var query = @"
+            //    SELECT DISTINCT a.*
+            //    FROM CourseAssessment a
+            //    INNER JOIN Course c ON a.Course_Id = c.Id
+            //    INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
+            //    WHERE uc.User_Id = ?";
+
             var query = @"
-                SELECT DISTINCT a.*
-                FROM Assessment a
-                INNER JOIN Course c ON a.Course_Id = c.Id
-                INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
-                WHERE uc.User_Id = ?";
+                SELECT *
+                FROM Assessment a";
 
             return await _database.QueryAsync<CourseAssessment>(query, userId);
         }
 
         public async Task<List<CourseAssessment>> GetAssessmentsForUserAndTermAsync(int userId, int termId)
         {
+            //var query = @"
+            //    SELECT DISTINCT a.*
+            //    FROM CourseAssessment a
+            //    INNER JOIN Course c ON a.Course_Id = c.Id
+            //    INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
+            //    WHERE uc.User_Id = ? AND c.Term_Id = ?
+            //    ORDER BY a.End_Date ASC";
+
             var query = @"
-                SELECT DISTINCT a.*
-                FROM CourseAssessment a
-                INNER JOIN Course c ON a.Course_Id = c.Id
-                INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
-                WHERE uc.User_Id = ? AND c.Term_Id = ?
-                ORDER BY a.End_Date ASC";
+                        SELECT *
+                        FROM course_assessment a
+                        INNER JOIN Course c ON a.course_id = c.id
+                        INNER JOIN user_course uc ON c.id = uc.course_id
+                        WHERE uc.user_id = ? AND c.term_id = ?
+                        ORDER BY a.end_date ASC";
 
             return await _database.QueryAsync<CourseAssessment>(query, userId, termId);
         }

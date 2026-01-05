@@ -89,7 +89,6 @@ namespace C_971.ViewModels
         partial void OnCourseChanged(Course value)
         {
             NewCourse = value;
-            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewCourse}", "OK");
             _ = LoadInstructorsAsync();
         }
         
@@ -101,6 +100,7 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
+            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnIsAddingInstructorChanged(bool value)

@@ -3,7 +3,7 @@ using SQLite;
 
 namespace C_971.Models
 {
-    [Table("CourseAssessment")]
+    [Table("course_assessment")]
     public partial class CourseAssessment
     {
         [PrimaryKey, AutoIncrement]
