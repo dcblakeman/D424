@@ -5,7 +5,7 @@ using System.Text;
 
 namespace C_971.Models
 {
-    [Table("UserAssessments")]
+    [Table("UserAssessment")]
     public class UserAssessment
     {
         [PrimaryKey, AutoIncrement]

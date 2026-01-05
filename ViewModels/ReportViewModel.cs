@@ -52,7 +52,6 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
@@ -63,11 +62,13 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
+            Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {Term}", "OK");
         }
 
         [RelayCommand]
         public async Task GenerateUserAssessmentReport()
         {
+            if (Term == null) return;
             try
             {
                 if (Term.Id == 0)
@@ -90,10 +91,10 @@ namespace C_971.ViewModels
                 foreach (CourseAssessment assessment in assessments)
                 {
                     ReportText += $"Assessment: {assessment.Name}\n" +
-                                  $"Type: {assessment.Type}\n" +
-                                  $"Start Date: {assessment.StartDate:d}\n" +
-                                  $"End Date: {assessment.EndDate:d}\n" +
-                                  $"Status: {assessment.Status}\n\n";
+                                    $"Type: {assessment.Type}\n" +
+                                    $"Start Date: {assessment.StartDate:d}\n" +
+                                    $"End Date: {assessment.EndDate:d}\n" +
+                                    $"Status: {assessment.Status}\n\n";
                 }
 
                 //Output ReportText to .text file

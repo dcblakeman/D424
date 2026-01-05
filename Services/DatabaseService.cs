@@ -535,9 +535,9 @@ namespace C_971.Services
             var query = @"
                 SELECT DISTINCT a.*
                 FROM Assessment a
-                INNER JOIN Course c ON a.CourseId = c.Id
-                INNER JOIN UserCourse uc ON c.Id = uc.CourseId
-                WHERE uc.UserId = ?";
+                INNER JOIN Course c ON a.Course_Id = c.Id
+                INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
+                WHERE uc.User_Id = ?";
 
             return await _database.QueryAsync<CourseAssessment>(query, userId);
         }
@@ -547,10 +547,10 @@ namespace C_971.Services
             var query = @"
                 SELECT DISTINCT a.*
                 FROM CourseAssessment a
-                INNER JOIN Course c ON a.CourseId = c.Id
-                INNER JOIN UserCourse uc ON c.Id = uc.CourseId
-                WHERE uc.UserId = ? AND c.TermId = ?
-                ORDER BY a.EndDate ASC";
+                INNER JOIN Course c ON a.Course_Id = c.Id
+                INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
+                WHERE uc.User_Id = ? AND c.Term_Id = ?
+                ORDER BY a.End_Date ASC";
 
             return await _database.QueryAsync<CourseAssessment>(query, userId, termId);
         }

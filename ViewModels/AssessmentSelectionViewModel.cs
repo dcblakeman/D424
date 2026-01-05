@@ -44,7 +44,6 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
@@ -55,7 +54,8 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            
+            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewTerm}", "OK");
+
         }
 
         [RelayCommand]

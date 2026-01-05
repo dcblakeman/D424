@@ -16,15 +16,18 @@ namespace C_971.Models
         public int Id { get; set; }
 
         // Instructor Name
+        [Column("name")]
         [SQLite.MaxLength(100), NotNull]
         public string Name { get; set; }
 
         // Instructor Email
+        [Column("email")]
         [SQLite.MaxLength(100)]
         [NotNull]
         public string Email { get; set; }
 
         // Instructor Phone
+        [Column("phone")]
         [SQLite.MaxLength(20)]
         [NotNull]
         [RegularExpression(@"^(\+[1-9]\d{10,14}|[1-9]\d{2}-\d{3}-\d{4})$",
