@@ -12,10 +12,16 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(Instructor), "instructor")]
-    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(User), "user")]
     public partial class CourseDetailsViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
+
+        [ObservableProperty]
+        public User user = new();
+
+        [ObservableProperty]
+        public User newUser;
 
         [ObservableProperty]
         private Course course;
@@ -29,12 +35,6 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private AcademicTerm newTerm;
-
-        [ObservableProperty]
-        private int userId;
-
-        [ObservableProperty]
-        private int newUserId;
 
         [ObservableProperty]
         private int newCourseId = 0;
@@ -108,9 +108,10 @@ namespace C_971.ViewModels
             _ = RequestNotificationPermissions();
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
+            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
         }
         // Property Change Handlers
         partial void OnCourseChanged(Course value)
@@ -189,7 +190,9 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"{nameof(CourseInstructorView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser,
                 });
             }
             catch (Exception ex)
@@ -215,8 +218,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync($"{nameof(AssessmentSelectionView)}", new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["userid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -235,8 +238,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync($"{nameof(AddNoteView)}", new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["userid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -254,9 +257,9 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync($"{nameof(ViewNotesView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course,
-                    ["userid"] = UserId,
-                    ["term"] = NewTerm
+                    ["course"] = NewCourse,
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -278,9 +281,9 @@ namespace C_971.ViewModels
 
                 await Shell.Current.GoToAsync($"{nameof(CourseListView)}", true, new Dictionary<string, object>
                 {
-                    ["course"] = Course,
-                    ["term"] = Term,
-                    ["userid"] = UserId
+                    ["course"] = NewCourse,
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

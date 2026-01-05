@@ -7,6 +7,7 @@ using C_971.Services;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(User), "user")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -17,6 +18,12 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         private AcademicTerm newTerm = new AcademicTerm();
+
+        [ObservableProperty]
+        public User user = new();
+
+        [ObservableProperty]
+        public User newUser;
 
         [ObservableProperty]
         private int userId;
@@ -58,12 +65,12 @@ namespace C_971.ViewModels
         public AcademicTermListViewModel(DatabaseService database)
         {
             _database = database;
-            Console.WriteLine($"Database Path: {C_971.Constants.DatabasePath}");
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
+            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
         }
 
         // Initialization
@@ -163,8 +170,6 @@ namespace C_971.ViewModels
                 // Reload the term from database to get the assigned ID
                 AcademicTerm savedTerm = await _database.GetTermByNameAsync(NewTerm.Name);
                 NewTerm.Id = savedTerm.Id;
-
-                await Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{NewTerm.Id}'. Navigating to courses...", "OK");
 
                 AcademicTerms.Clear();
                 _allTerms.Add(savedTerm);  // Add the complete database term

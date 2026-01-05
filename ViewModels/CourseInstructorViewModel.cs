@@ -6,23 +6,24 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(UserId), "userid")]
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(Instructor), "instructor")]
+    [QueryProperty(nameof(User), "user")]
     public partial class CourseInstructorViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
-        [ObservableProperty]
-        private int userId;
 
         [ObservableProperty]
-        private int newUserId;
+        public User user = new();
 
         [ObservableProperty]
-        private Course course;
+        public User newUser;
+
+        [ObservableProperty]
+        private Course course = new();
 
         [ObservableProperty]
         private Course newCourse;
@@ -87,26 +88,19 @@ namespace C_971.ViewModels
         // Property Change Handlers
         partial void OnCourseChanged(Course value)
         {
-            if (value != null)
-            {
-                _ = LoadInstructorsAsync();
-
-                NewCourse = value;
-            }
+            NewCourse = value;
+            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewCourse}", "OK");
+            _ = LoadInstructorsAsync();
         }
         
         partial void OnInstructorChanged(CourseInstructor value)
         {
-            if (value != null)
-            {
-                NewInstructor = value;
-            }
+            NewInstructor = value;
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
-
+            NewUser = value;
         }
 
         partial void OnIsAddingInstructorChanged(bool value)
@@ -250,8 +244,8 @@ namespace C_971.ViewModels
                 {
                     ["course"] = NewCourse,
                     ["instructor"] = NewInstructor,
-                    ["userid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

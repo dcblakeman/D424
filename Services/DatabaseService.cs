@@ -598,5 +598,22 @@ namespace C_971.Services
         {
             throw new NotImplementedException();
         }
+
+        internal async Task<User> GetUserByEmailAsync(string newLoginUserEmail)
+        {
+            await InitializeAsync();
+            var user = await _database.Table<User>()
+                .Where(u => u.Email == newLoginUserEmail)
+                .FirstOrDefaultAsync();
+            if (user != null)
+            {
+                return user;
+            }
+            else
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "User not found.", "OK");
+                return null;
+            }
+        }
     }
 }

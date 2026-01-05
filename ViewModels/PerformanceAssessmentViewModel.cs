@@ -13,17 +13,17 @@ namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(Term), "term")]
-    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(User), "user")]
     public partial class PerformanceAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
         [ObservableProperty]
-        public int userId;
+        public User user;
 
         [ObservableProperty]
-        public int newUserId;
+        public User newUser;
 
         [ObservableProperty]
         public Course course;
@@ -140,19 +140,17 @@ namespace C_971.ViewModels
             _database = database;
 
             _ = RequestNotificationPermissions();
-            //_ = PopulateAssessmentProperties();
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
-            Shell.Current.DisplayAlertAsync("UserId Selected", $"You have selected the UserId: {value}", "OK");
+            NewUser = value;
+            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("Term Selected", $"You have selected the UserId: {NewUserId}", "OK");
 
         }
 
@@ -161,7 +159,6 @@ namespace C_971.ViewModels
             NewCourse = value;
             AssessmentCourseId = NewCourse.Id;
             AssessmentType = AssessmentType.Performance;
-            Shell.Current.DisplayAlertAsync("Course Selected", $"You have selected the UserId: {NewUserId}", "OK");
 
             // Populate assessment properties
             _ = PopulateAssessmentProperties();
@@ -192,7 +189,7 @@ namespace C_971.ViewModels
                     {
                         ["term"] = NewTerm,
                         ["course"] = NewCourse,
-                        ["userid"] = NewUserId
+                        ["user"] = NewUser
                     });
                 }
                 catch (Exception ex)

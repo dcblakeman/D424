@@ -10,19 +10,19 @@ using System.Text;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(UserId), "userid")]
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(User), "user")]
     public partial class ReportViewModel : ObservableObject
     {
 
         private DatabaseService _database;
 
         [ObservableProperty]
-        private int userId;
+        public User user = new();
 
         [ObservableProperty]
-        private int newUserId;
+        public User newUser;
 
         [ObservableProperty]
         private Course course;
@@ -49,9 +49,10 @@ namespace C_971.ViewModels
             _database = database;
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
+            Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
@@ -62,8 +63,6 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("Updated Values",
-                $"New Term: {NewTerm?.Name}\nNew UserId: {NewUserId}\nNew Course: {NewCourse?.Name}", "OK"  );
         }
 
         [RelayCommand]
@@ -78,7 +77,7 @@ namespace C_971.ViewModels
                     return;
                 }
 
-                var assessments = await _database.GetAssessmentsForUserAndTermAsync(UserId, Term.Id);
+                var assessments = await _database.GetAssessmentsForUserAndTermAsync(NewUser.Id, NewTerm.Id);
 
                 if (!assessments.Any())
                 {
@@ -190,7 +189,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                var assessments = await _database.GetUserAssessmentsAsync(NewUserId);
+                var assessments = await _database.GetUserAssessmentsAsync(NewUser.Id);
 
                 if (assessments == null || assessments.Count == 0)
                 {
@@ -414,8 +413,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["newuserid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

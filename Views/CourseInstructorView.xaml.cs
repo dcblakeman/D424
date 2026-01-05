@@ -40,10 +40,15 @@ public partial class CourseInstructorView : ContentPage
             //Update the course in the databaes with the instructorid
             viewModel.NewCourse = await viewModel.UpdateCourseAsync(viewModel.NewCourse);
 
+            await Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {viewModel.NewCourse}", "OK");
+
             // Navigate to detail view - only pass course since that's what CourseDetailsView expects
             await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>
             {
-                ["course"] = viewModel.NewCourse
+                ["user"] = viewModel.NewUser,
+                ["course"] = viewModel.NewCourse,
+                ["instructor"] = instructor,
+                ["term"] = viewModel.NewTerm
             });
         }
     }

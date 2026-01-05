@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
-    [QueryProperty(nameof(UserId), "userid")]
     [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(User), "user")]
     public partial class ViewNotesViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -20,16 +20,16 @@ namespace C_971.ViewModels
         private bool isRefreshing;
 
         [ObservableProperty]
+        public User user;
+
+        [ObservableProperty]
+        public User newUser;
+
+        [ObservableProperty]
         public Course course;
 
         [ObservableProperty]
         public Course newCourse;
-
-        [ObservableProperty]
-        public int userId;
-
-        [ObservableProperty]
-        public int newUserId;
 
         [ObservableProperty]
         public AcademicTerm term;
@@ -54,9 +54,9 @@ namespace C_971.ViewModels
             _database = databaseService;
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
         }
         partial void OnTermChanged(AcademicTerm value)
         {
@@ -92,8 +92,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["userid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

@@ -9,17 +9,18 @@ namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(Term), "term")]
-    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(User), "user")]
     public partial class ObjectiveAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
-        [ObservableProperty]
-        private int userId;
 
         [ObservableProperty]
-        private int newUserId;
+        public User user;
+
+        [ObservableProperty]
+        public User newUser;
 
         [ObservableProperty]
         private Course course;
@@ -137,12 +138,11 @@ namespace C_971.ViewModels
             IsSearching = false; IsSearching = false;
 
             _ = RequestNotificationPermissions();
-            _ = PopulateAssessmentProperties();
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
         }
 
         partial void OnTermChanged(AcademicTerm value)
@@ -156,10 +156,6 @@ namespace C_971.ViewModels
             AssessmentCourseId = NewCourse.Id;
             AssessmentType = AssessmentType.Objective;
 
-            // Load existing assessments for this course
-            _ = LoadAllObjectiveAssessments();
-
-            // Populate assessment properties
             _ = PopulateAssessmentProperties();
         }
 
@@ -188,7 +184,7 @@ namespace C_971.ViewModels
                     {
                         ["course"] = NewCourse,
                         ["term"] = NewTerm,
-                        ["userid"] = NewUserId
+                        ["user"] = NewUser
                     });
                 }
                 catch (Exception ex)
@@ -196,7 +192,6 @@ namespace C_971.ViewModels
                     await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
                 }
             }
-
         }
 
         private async Task RequestNotificationPermissions()
@@ -452,7 +447,7 @@ namespace C_971.ViewModels
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
                     return;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     await Shell.Current.DisplayAlertAsync("Error", $"Failed to populate assessment properties", "OK");
                 }

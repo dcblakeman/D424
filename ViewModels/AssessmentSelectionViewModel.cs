@@ -1,4 +1,5 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -10,7 +11,7 @@ namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(Course), "course")]
-    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(User), "user")]
     public partial class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -20,10 +21,10 @@ namespace C_971.ViewModels
         }
 
         [ObservableProperty]
-        private int userId;
+        public User user;
 
         [ObservableProperty]
-        private int newUserId;
+        public User newUser;
 
         [ObservableProperty]
         private Course course;
@@ -40,9 +41,10 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string viewName = "Assessments | Reports";
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
+            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
@@ -64,8 +66,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["userid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -77,14 +79,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task NavigateToPerformanceAssessmentView()
         {
-            if (NewCourse == null) return;
             try
             {
-                await Shell.Current.GoToAsync($"{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync($"/{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
-                    ["userId"] = NewUserId,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -96,15 +97,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task NavigateToObjectiveAssessmentView()
         {
-            if (NewCourse == null) return;
-
             try
             {
                 await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
-                    ["userid"] = NewUserId
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -124,7 +123,7 @@ namespace C_971.ViewModels
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
-                    ["userid"] = NewUserId
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

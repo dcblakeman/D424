@@ -19,4 +19,16 @@ public partial class CourseDetailsView : ContentPage
             await viewModel.OnAppearingAsync();
         }
     }
+
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+
+        if (BindingContext is CourseDetailsViewModel viewModel)
+        {
+            viewModel.NewCourse = viewModel.Course;
+            viewModel.NewUser = viewModel.User;
+            viewModel.NewTerm = viewModel.Term;
+        }
+    }
 }

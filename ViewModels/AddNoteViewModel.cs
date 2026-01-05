@@ -1,24 +1,37 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewTerm), "term")]
-    [QueryProperty(nameof(NewCourse), "course")]
-    [QueryProperty(nameof(NewUserId), "userid")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(User), "user")]
     public partial class AddNoteViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         [ObservableProperty]
+        public User user = new();
+
+        [ObservableProperty]
+        public User newUser;
+
+        [ObservableProperty]
         private int newUserId;
+
+        [ObservableProperty]
+        private AcademicTerm term;
 
         [ObservableProperty]
         private AcademicTerm newTerm;
 
         // Core Properties
+        [ObservableProperty]
+        private Course course;
+
         [ObservableProperty]
         private Course newCourse;
 
@@ -38,6 +51,21 @@ namespace C_971.ViewModels
         public AddNoteViewModel(DatabaseService database)
         {
             _database = database;
+        }
+
+        partial void OnUserChanged(User value)
+        {
+            NewUser = value;
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+        }
+
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            NewTerm = value;
         }
 
         // Commands
@@ -94,7 +122,7 @@ namespace C_971.ViewModels
                 {
                     ["course"] = NewCourse,
                     ["term"] = NewTerm,
-                    ["userid"] = NewUserId
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

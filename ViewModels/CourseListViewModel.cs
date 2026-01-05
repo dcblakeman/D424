@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Term), "term")]
-    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(User), "user")]
     public partial class CourseListViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
@@ -29,10 +29,10 @@ namespace C_971.ViewModels
         private AcademicTerm newTerm;
 
         [ObservableProperty]
-        private int userId;
-        
+        public User user = new();
+
         [ObservableProperty]
-        private int newUserId;
+        public User newUser;
 
         [ObservableProperty]
         private Course newCourse = new Course(); 
@@ -93,13 +93,13 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{NewTerm.Id}'. Navigating to courses...", "OK");
             _ = LoadCoursesAsync(value);
         }
 
-        partial void OnUserIdChanged(int value)
+        partial void OnUserChanged(User value)
         {
-            NewUserId = value;
+            NewUser = value;
+            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
         }
 
         partial void OnSearchTextChanged(string value)
@@ -156,8 +156,8 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.GoToAsync("//AcademicTermListView", true, new Dictionary<string, object>
                 {
-                    ["userid"] = NewUserId,
-                    ["term"] = NewTerm
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -183,7 +183,6 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewCourse()
         {
-            await Shell.Current.DisplayAlertAsync("Term Selected", $"You selected '{Term}'. Navigating to courses...", "OK");
             if (!ValidateNewCourse()) return;
             try
             {
@@ -245,7 +244,7 @@ namespace C_971.ViewModels
 
             NewCourse = new Course();
         }
-         
+
         [RelayCommand]
         private async Task RemoveCourse(Course newCourse)
         {
@@ -253,6 +252,7 @@ namespace C_971.ViewModels
             await _database.DeleteCourseAsync(newCourse);
         }
 
+        [RelayCommand]
         public async Task CancelRemoveCourse()
         {
             IsRemovingCourse = false;
