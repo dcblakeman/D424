@@ -537,7 +537,7 @@ namespace C_971.Services
                         WHERE uc.user_id = ? AND c.term_id = ?
                         ORDER BY c.start_date ASC";
 
-            return await _database.QueryAsync<Course>(query, userId);
+            return await _database.QueryAsync<Course>(query, userId, termId);
         }
 
         public async Task<List<CourseAssessment>> GetAssessmentsForUserAndTermAsync(int userId, int termId)
@@ -572,9 +572,7 @@ namespace C_971.Services
             {
                 // Get assessments for each course
                 var assessmentsQuery = @"
-                    SELECT * FROM courseAssessment 
-                    WHERE courseId = ? 
-                    ORDER BY endDate ASC";
+                    SELECT * FROM course_assessment";
 
                 var assessments = await _database.QueryAsync<CourseAssessment>(assessmentsQuery, course.Id);
 

@@ -118,7 +118,7 @@ namespace C_971.ViewModels
             ReportText = string.Empty;
             try
             {
-                var courses = await _database.GetCoursesWithDetailsAsync(User.Id, Term.Id);
+                var courses = await _database.GetCoursesWithDetailsAsync(NewUser.Id, NewTerm.Id);
 
                 // Generate Report
                 foreach (Course course in courses)

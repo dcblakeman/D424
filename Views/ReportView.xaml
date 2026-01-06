@@ -79,7 +79,7 @@
                             TextColor="White"
                             HeightRequest="50"
                             CornerRadius="8"/>
-                    <Button Text="Generate Performance Report"
+                    <Button Text="Generate Courses with Assessments Report"
                             Command="{Binding GenerateCoursesWithAssessmentsReportCommand}"
                             BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
                             TextColor="White"

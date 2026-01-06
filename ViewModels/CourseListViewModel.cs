@@ -272,7 +272,7 @@ namespace C_971.ViewModels
             NewCourseEndDate = DateTime.Now.AddMonths(6);
             NewCourseStatus = CourseStatus.Planned;
             NewCourseDescription = string.Empty;
-
+            NewCourseGrade = FinalGrade.NotGraded;
             NewCourse = new Course();
         }
 
