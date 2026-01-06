@@ -55,6 +55,9 @@ namespace C_971.ViewModels
         public CourseStatus newCourseStatus = CourseStatus.Planned;
 
         [ObservableProperty]
+        public FinalGrade newCourseGrade = FinalGrade.NotGraded;
+
+        [ObservableProperty]
         public bool newCourseStartDateNotifications = true;
 
         [ObservableProperty]
@@ -94,6 +97,23 @@ namespace C_971.ViewModels
             CourseStatus.Completed,
             CourseStatus.Dropped,
             CourseStatus.Planned
+        };
+
+        public ObservableCollection<FinalGrade> GradeOptions { get; set; } = new ObservableCollection<FinalGrade>
+        {
+            FinalGrade.A,
+            FinalGrade.AMinus,
+            FinalGrade.BPlus,
+            FinalGrade.B,
+            FinalGrade.BMinus,
+            FinalGrade.CPlus,
+            FinalGrade.C,
+            FinalGrade.CMinus,
+            FinalGrade.DPlus,
+            FinalGrade.D,
+            FinalGrade.DMinus,
+            FinalGrade.F,
+            FinalGrade.NotGraded
         };
 
         public ObservableCollection<AssessmentType> AssessmentTypeOptions { get; set; } = new ObservableCollection<AssessmentType>
@@ -164,6 +184,7 @@ namespace C_971.ViewModels
                 NewCourse.EndDate = NewCourseEndDate;
                 NewCourse.StartDateNotifications = NewCourseStartDateNotifications;
                 NewCourse.Status = NewCourseStatus;
+                NewCourse.Grade = NewCourseGrade;
                 NewCourse.EndDateNotifications = NewCourseEndDateNotifications;
                 NewCourse.InstructorId = NewCourseInstructorId;
 

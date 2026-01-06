@@ -72,7 +72,7 @@
                         <Label Text="{Binding NewCourseName}" IsVisible="{Binding IsNotEditing}"/>
                         <Entry Text="{Binding NewCourseName, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
-                    
+
                     <!-- Course Description -->
                     <VerticalStackLayout Spacing="3">
                         <Label Text="Description" FontAttributes="Bold" TextDecorations="Underline"/>
@@ -105,6 +105,19 @@
                         <Picker Grid.Row="4" Grid.Column="1" 
                         SelectedItem="{Binding NewCourseStatus, Mode=TwoWay}"
                         ItemsSource="{Binding StatusOptions}"
+                        IsVisible="{Binding IsEditing}"        
+                        VerticalOptions="Center"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="3">
+                        <!-- Course Grade -->
+                        <Label Grid.Row="5" Grid.Column="0" Text="Grade" FontAttributes="Bold" VerticalOptions="Center" TextDecorations="Underline"/>
+                        <Label Grid.Row="5" Grid.Column="1" 
+                               Text="{Binding NewCourseGrade, Mode=TwoWay}" 
+                               VerticalOptions="Center"
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Picker Grid.Row="4" Grid.Column="1" 
+                        SelectedItem="{Binding NewCourseGrade, Mode=TwoWay}"
+                        ItemsSource="{Binding GradeOptions}"
                         IsVisible="{Binding IsEditing}"        
                         VerticalOptions="Center"/>
                     </VerticalStackLayout>

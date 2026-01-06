@@ -210,13 +210,26 @@
 
                                 <!-- Course Entries -->
                                 <VerticalStackLayout Spacing="5">
-                                    
-                                    <!-- ID -->
-                                    <HorizontalStackLayout Spacing="10">
-                                        <Label Text="ID:" FontAttributes="Bold"/>
-                                        <Label Text="{Binding Id}"/>
-                                    </HorizontalStackLayout>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <!-- ID -->
+                                        <HorizontalStackLayout Spacing="10">
+                                            <Label Text="ID:" FontAttributes="Bold"/>
+                                            <Label Text="{Binding Id}"/>
 
+                                        </HorizontalStackLayout>
+                                        <!-- Grade -->
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="10">
+                                            <Label Grid.Column="2"
+                                                Text="{Binding Grade}" 
+                                                FontAttributes="Bold" 
+                                                TextColor="DarkBlue"
+                                                HorizontalOptions="End"/>
+                                        </HorizontalStackLayout>
+                                    </Grid>
                                     <!-- Name -->
                                     <HorizontalStackLayout Spacing="10">
                                         <Label Text="Name:" FontAttributes="Bold"/>
@@ -242,12 +255,13 @@
                                                 </Label.FormattedText>
                                             </Label>
                                         </HorizontalStackLayout>
-
-                                        <!-- Status Column -->
-                                        <Label Grid.Column="1"
+                                        <HorizontalStackLayout Grid.Column="1" Spacing="10">
+                                            <!-- Status Column -->
+                                            <Label Grid.Column="1"
                                                Text="{Binding Status}" 
                                                FontAttributes="Bold" 
                                                TextColor="DarkBlue"/>
+                                        </HorizontalStackLayout>
                                     </Grid>
                                 </VerticalStackLayout>
                             </Border>

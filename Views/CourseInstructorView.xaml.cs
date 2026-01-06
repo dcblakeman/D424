@@ -54,8 +54,6 @@ public partial class CourseInstructorView : ContentPage
             //Update the course in the databaes with the instructorid
             viewModel.NewCourse = await viewModel.UpdateCourseAsync(viewModel.NewCourse);
 
-            
-
             viewModel.NewTerm = viewModel.Term;
             viewModel.NewCourse = viewModel.Course;
             viewModel.NewUser = viewModel.User;
