@@ -495,7 +495,6 @@ namespace C_971.Services
                 {
                     UserCourseId = userCourseId,
                     AssessmentId = assessmentId,
-                    IsCompleted = false
                 };
 
                 await _database.InsertAsync(userAssessment);
@@ -518,8 +517,6 @@ namespace C_971.Services
                     return false;
 
                 userAssessment.Grade = grade;
-                userAssessment.IsCompleted = true;
-                userAssessment.CompletedDate = DateTime.Now;
 
                 await _database.UpdateAsync(userAssessment);
                 return true;

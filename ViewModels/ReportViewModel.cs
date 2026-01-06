@@ -99,7 +99,8 @@ namespace C_971.ViewModels
                                     $"Type: {assessment.Type}\n" +
                                     $"Start Date: {assessment.StartDate:d}\n" +
                                     $"End Date: {assessment.EndDate:d}\n" +
-                                    $"Status: {assessment.Status}\n\n";
+                                    $"Status: {assessment.Status}\n\n" + 
+                                    $"Grade: {assessment.Grade}\n\n";
                 }
 
                 return ReportText;
@@ -109,77 +110,6 @@ namespace C_971.ViewModels
                 await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
                 return string.Empty;
             }
-        }
-
-        private string GenerateAssessmentsReportContent(List<UserAssessment> assessments)
-        {
-            var report = new StringBuilder();
-
-            // Header
-            report.AppendLine("ASSESSMENTS REPORT");
-            report.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-            report.AppendLine($"Total Assessments: {assessments.Count}");
-            report.AppendLine(new string('=', 60));
-            report.AppendLine();
-
-            if (assessments.Count == 0)
-            {
-                report.AppendLine("No assessments found.");
-                return report.ToString();
-            }
-
-            // Group by course
-            var groupedByCourse = assessments.GroupBy(a => a.UserCourse?.Course?.Name ?? "Unknown Course")
-                                            .OrderBy(g => g.Key);
-
-            foreach (var courseGroup in groupedByCourse)
-            {
-                report.AppendLine($"COURSE: {courseGroup.Key}");
-                report.AppendLine(new string('-', 40));
-
-                foreach (var assessment in courseGroup.OrderBy(a => a.Assessment?.Name))
-                {
-                    report.AppendLine($"  Assessment: {assessment.Assessment?.Name ?? "Unknown Assessment"}");
-                    report.AppendLine($"  Type: {assessment.Assessment?.Type ?? AssessmentType.Unknown}");
-                    report.AppendLine($"  Grade: {assessment.Grade ?? FinalGrade.NotGraded}");
-                    report.AppendLine($"  Status: {(assessment.IsCompleted ? "Completed" : "In Progress")}");
-
-                    if (assessment.CompletedDate.HasValue)
-                    {
-                        report.AppendLine($"  Completed: {assessment.CompletedDate.Value:yyyy-MM-dd}");
-                    }
-
-                    report.AppendLine();
-                }
-                report.AppendLine();
-            }
-
-            // Summary Statistics
-            report.AppendLine("SUMMARY STATISTICS");
-            report.AppendLine(new string('=', 30));
-            report.AppendLine($"Total Assessments: {assessments.Count}");
-            report.AppendLine($"Completed: {assessments.Count(a => a.IsCompleted)}");
-            report.AppendLine($"In Progress: {assessments.Count(a => !a.IsCompleted)}");
-            report.AppendLine($"Graded: {assessments.Count(a => a.Grade.HasValue)}");
-
-            // Grade breakdown (if you want it)
-            var gradedAssessments = assessments.Where(a => a.Grade.HasValue).ToList();
-            if (gradedAssessments.Count > 0)
-            {
-                report.AppendLine();
-                report.AppendLine("GRADE BREAKDOWN");
-                report.AppendLine(new string('-', 20));
-
-                var gradeGroups = gradedAssessments.GroupBy(a => a.Grade.Value)
-                                                  .OrderByDescending(g => g.Key);
-
-                foreach (var gradeGroup in gradeGroups)
-                {
-                    report.AppendLine($"{gradeGroup.Key}: {gradeGroup.Count()} assessment(s)");
-                }
-            }
-
-            return report.ToString();
         }
 
         // Ran in GenerateCoursesReportToFile Method

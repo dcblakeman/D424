@@ -38,6 +38,10 @@ namespace C_971.Models
         public AssessmentStatus Status { get; set; } = AssessmentStatus.Pending;
 
         [NotNull]
+        [Column("grade")]
+        public FinalGrade Grade { get; set; } = FinalGrade.NotGraded;
+
+        [NotNull]
         [Column("start_date_notifications")]
         public bool StartDateNotifications { get; set; } = true;
 

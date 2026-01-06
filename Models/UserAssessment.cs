@@ -20,12 +20,6 @@ namespace C_971.Models
         [Column("grade")]
         public FinalGrade? Grade { get; set; }
 
-        [Column("completed")]
-        public bool IsCompleted { get; set; } = false;
-
-        [Column("completed_date")]
-        public DateTime? CompletedDate { get; set; }
-
         // Optional: Add these for more functionality
         [Column("start_date")]
         public DateTime? StartDate { get; set; }
@@ -46,8 +40,5 @@ namespace C_971.Models
         // Computed properties
         [Ignore]
         public string GradeDisplay => Grade?.ToString() ?? "Not Graded";
-
-        [Ignore]
-        public string StatusDisplay => IsCompleted ? "Completed" : "In Progress";
     }
 }
