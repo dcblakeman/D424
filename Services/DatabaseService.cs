@@ -527,32 +527,21 @@ namespace C_971.Services
             }
         }
 
-        public async Task<List<CourseAssessment>> GetAssessmentsForUserAsync(int userId)
+        public async Task<List<Course>> GetCoursesWithDetailsAsync(int userId, int termId)
         {
-            //var query = @"
-            //    SELECT DISTINCT a.*
-            //    FROM CourseAssessment a
-            //    INNER JOIN Course c ON a.Course_Id = c.Id
-            //    INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
-            //    WHERE uc.User_Id = ?";
-
             var query = @"
-                SELECT *
-                FROM Assessment a";
+                        SELECT *
+                        FROM course c
+                        INNER JOIN user_course uc ON c.id = uc.course_id
+                        INNER JOIN academic_term t ON c.term_id = t.id
+                        WHERE uc.user_id = ? AND c.term_id = ?
+                        ORDER BY c.start_date ASC";
 
-            return await _database.QueryAsync<CourseAssessment>(query, userId);
+            return await _database.QueryAsync<Course>(query, userId);
         }
 
         public async Task<List<CourseAssessment>> GetAssessmentsForUserAndTermAsync(int userId, int termId)
         {
-            //var query = @"
-            //    SELECT DISTINCT a.*
-            //    FROM CourseAssessment a
-            //    INNER JOIN Course c ON a.Course_Id = c.Id
-            //    INNER JOIN UserCourse uc ON c.Id = uc.Course_Id
-            //    WHERE uc.User_Id = ? AND c.Term_Id = ?
-            //    ORDER BY a.End_Date ASC";
-
             var query = @"
                         SELECT *
                         FROM course_assessment a
@@ -563,49 +552,40 @@ namespace C_971.Services
 
             return await _database.QueryAsync<CourseAssessment>(query, userId, termId);
         }
-        public async Task<List<UserAssessment>> GetAssessmentsForUserCourseAsync(int userCourseId)
+
+        public async Task<List<CourseWithAssessments>> GetCoursesWithAssessmentsAsync(int userId, int termId)
         {
-            await InitializeAsync();
+            // First get all courses for the user and term
+            var coursesQuery = @"
+                SELECT *
+                FROM course c
+                INNER JOIN user_course uc ON c.id = uc.course_id
+                INNER JOIN academic_term t ON c.term_id = t.id
+                WHERE uc.user_id = ? AND c.term_id = ?
+                ORDER BY c.start_date ASC";
 
-            var userAssessments = await _database.Table<UserAssessment>()
-                .Where(ua => ua.UserCourseId == userCourseId)
-                .ToListAsync();
+            var courses = await _database.QueryAsync<Course>(coursesQuery, userId, termId);
 
-            // Load navigation properties
-            await LoadUserAssessmentDetails(userAssessments);
+            var result = new List<CourseWithAssessments>();
 
-            return userAssessments;
-        }
-
-        private async Task LoadUserAssessmentDetails(List<UserAssessment> userAssessments)
-        {
-            foreach (var userAssessment in userAssessments)
+            foreach (var course in courses)
             {
-                // Load UserCourse (enrollment)
-                userAssessment.UserCourse = await _database.Table<UserCourse>()
-                    .FirstOrDefaultAsync(uc => uc.Id == userAssessment.UserCourseId);
+                // Get assessments for each course
+                var assessmentsQuery = @"
+                    SELECT * FROM courseAssessment 
+                    WHERE courseId = ? 
+                    ORDER BY endDate ASC";
 
-                if (userAssessment.UserCourse != null)
+                var assessments = await _database.QueryAsync<CourseAssessment>(assessmentsQuery, course.Id);
+
+                result.Add(new CourseWithAssessments
                 {
-                    // Load Course details
-                    userAssessment.UserCourse.Course = await _database.Table<Course>()
-                        .FirstOrDefaultAsync(c => c.Id == userAssessment.UserCourse.CourseId);
-                }
-
-                // Load Assessment template details
-                userAssessment.Assessment = await _database.Table<CourseAssessment>()
-                    .FirstOrDefaultAsync(a => a.Id == userAssessment.AssessmentId);
+                    Course = course,
+                    Assessments = assessments
+                });
             }
-        }
 
-        internal async Task<List<UserAssessment>> GetUserAssessmentsAsync(int newUserId)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal async Task LoadAssessmentDetailsAsync(List<CourseAssessment> assessments)
-        {
-            throw new NotImplementedException();
+            return result;
         }
 
         internal async Task<User> GetUserByEmailAsync(string newLoginUserEmail)

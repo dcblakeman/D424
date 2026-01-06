@@ -53,6 +53,9 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private CourseStatus newCourseStatus = CourseStatus.Planned;
 
+        [ObservableProperty]
+        public FinalGrade newCourseGrade = FinalGrade.NotGraded;
+
         // UI State
         [ObservableProperty]
         private bool isAddingCourse;
@@ -82,6 +85,23 @@ namespace C_971.ViewModels
             CourseStatus.Completed,
             CourseStatus.Dropped,
             CourseStatus.Planned
+        };
+
+        public ObservableCollection<FinalGrade> GradeOptions { get; set; } = new ObservableCollection<FinalGrade>
+        {
+            FinalGrade.A,
+            FinalGrade.AMinus,
+            FinalGrade.BPlus,
+            FinalGrade.B,
+            FinalGrade.BMinus,
+            FinalGrade.CPlus,
+            FinalGrade.C,
+            FinalGrade.CMinus,
+            FinalGrade.DPlus,
+            FinalGrade.D,
+            FinalGrade.DMinus,
+            FinalGrade.F,
+            FinalGrade.NotGraded
         };
 
         public CourseListViewModel(DatabaseService database)
@@ -193,6 +213,7 @@ namespace C_971.ViewModels
                 NewCourse.StartDate = NewCourseStartDate;
                 NewCourse.EndDate = NewCourseEndDate;
                 NewCourse.Status = NewCourseStatus;
+                NewCourse.Grade = NewCourseGrade;
                 NewCourse.TermId = NewTerm.Id;
 
                 await _database.SaveCourseAsync(NewCourse);

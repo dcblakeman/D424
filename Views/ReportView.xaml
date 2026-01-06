@@ -25,15 +25,6 @@
                    Padding="20">
                 
                 <VerticalStackLayout Spacing="15">
-
-                    <!-- Report Folder Configuration Settings Buttons -->
-                    <Button Text="Generate User Assessments Report"
-                            Command="{Binding SaveAssessmentReportCommand }"
-                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
-                            TextColor="White"
-                            HeightRequest="50"
-                            CornerRadius="8"/>
-
                     <!-- View Reports Button -->
                         <Button Text="Open Report" 
                             Command="{Binding OpenReportCommand}"
@@ -77,19 +68,19 @@
                     
                     <!-- Buttons Section -->
                     <Button Text="Generate Courses Report"
-                            Command="{Binding GenerateCoursesReportToFileCommand}"
+                            Command="{Binding GenerateCourseReportCommand}"
                             BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
                             TextColor="White"
                             HeightRequest="50"
                             CornerRadius="8"/>
                     <Button Text="Generate Assessments Report"
-                            Command="{Binding GenerateAssessmentsReportToFileCommand}"
+                            Command="{Binding GenerateAssessmentReportCommand}"
                             BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
                             TextColor="White"
                             HeightRequest="50"
                             CornerRadius="8"/>
                     <Button Text="Generate Performance Report"
-                            Command="{Binding GeneratePerformanceReportToFileCommand}"
+                            Command="{Binding GenerateCoursesWithAssessmentsReportCommand}"
                             BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
                             TextColor="White"
                             HeightRequest="50"

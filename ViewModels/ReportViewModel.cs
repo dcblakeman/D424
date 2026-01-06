@@ -42,6 +42,9 @@ namespace C_971.ViewModels
         private string reportText;
 
         [ObservableProperty]
+        private string reportTitle;
+
+        [ObservableProperty]
         private bool isBusy;
 
         private const string REPORTS_FOLDER_KEY = "reports_default_folder";
@@ -69,18 +72,16 @@ namespace C_971.ViewModels
             Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {NewTerm}", "OK");
         }
 
+
+        // Generate a report to output all of the assessments with grades
         [RelayCommand]
-        public async Task<string> GenerateUserAssessmentReport()
+        public async Task GenerateAssessmentReport()
         {
+            ReportTitle= "Assessment_Report";
+            ReportText = string.Empty;
+
             try
             {
-                if (Term.Id == 0)
-                {
-                    await Shell.Current.DisplayAlertAsync("No Term Selected",
-                        "Please select a term first.", "OK");
-                    return string.Empty;
-                }
-
                 var assessments = await _database.GetAssessmentsForUserAndTermAsync(NewUser.Id, NewTerm.Id);
 
                 await Shell.Current.DisplayAlertAsync("Wait", $"Number of assessments: {assessments.Count}", "OK");
@@ -89,7 +90,6 @@ namespace C_971.ViewModels
                 {
                     await Shell.Current.DisplayAlertAsync("No Assessments",
                         "No assessments found for the selected term.", "OK");
-                    return string.Empty;
                 }
 
                 // Generate Report
@@ -102,34 +102,138 @@ namespace C_971.ViewModels
                                     $"Status: {assessment.Status}\n\n" + 
                                     $"Grade: {assessment.Grade}\n\n";
                 }
-
-                return ReportText;
             }
             catch (Exception ex)
             {
                 await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
-                return string.Empty;
+            }
+            await ReportViewModel.SaveReport(ReportText, ReportTitle);
+        }
+
+        // Generate a report to output all of the courses with grades
+        [RelayCommand]
+        public async Task GenerateCourseReport()
+        {
+            ReportTitle = "Course_Report";
+            ReportText = string.Empty;
+            try
+            {
+                var courses = await _database.GetCoursesWithDetailsAsync(User.Id, Term.Id);
+
+                // Generate Report
+                foreach (Course course in courses)
+                {
+                    ReportText += $"Course: {course.Name}\n" +
+                                    $"Start Date: {course.StartDate:d}\n" +
+                                    $"End Date: {course.EndDate:d}\n" +
+                                    $"Status: {course.Status}\n\n" +
+                                    $"Grade: {course.Grade}\n\n";
+                }
+
+                await Shell.Current.DisplayAlertAsync("Course Report", ReportText, "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to generate report: {ex.Message}", "OK");
+            }
+
+            await ReportViewModel.SaveReport(ReportText, ReportTitle);
+        }
+
+        [RelayCommand]
+        public async Task GenerateCoursesWithAssessmentsReport()
+        {
+            ReportTitle = "Courses_And_Assessments_Report";
+            ReportText = string.Empty; // Clear previous report
+
+            try
+            {
+                var coursesWithAssessments = await _database.GetCoursesWithAssessmentsAsync(User.Id, Term.Id);
+
+                // Generate Report Header
+                ReportText += $"=== COURSES AND ASSESSMENTS REPORT ===\n";
+                ReportText += $"Term: {Term.Name}\n";
+                ReportText += $"Generated: {DateTime.Now:yyyy-MM-dd HH:mm}\n";
+                ReportText += $"Total Courses: {coursesWithAssessments.Count}\n\n";
+
+                // Generate Report Body
+                foreach (var courseWithAssessments in coursesWithAssessments)
+                {
+                    var course = courseWithAssessments.Course;
+                    var assessments = courseWithAssessments.Assessments;
+
+                    ReportText += $"COURSE: {course.Name}\n" +
+                                 $"Description: {course.Description}\n" +
+                                 $"Start Date: {course.StartDate:d}\n" +
+                                 $"End Date: {course.EndDate:d}\n" +
+                                 $"Status: {course.Status}\n" +
+                                 $"Grade: {course.Grade}\n\n";
+
+                    if (assessments.Any())
+                    {
+                        ReportText += $"ASSESSMENTS ({assessments.Count}):\n";
+                        foreach (var assessment in assessments)
+                        {
+                            ReportText += $"  • {assessment.Name}\n" +
+                                         $"    Type: {assessment.Type}\n" +
+                                         $"    Start: {assessment.StartDate:d}\n" +
+                                         $"    Due: {assessment.EndDate:d}\n" +
+                                         $"    Score: {assessment.Grade}\n\n";
+                        }
+                    }
+                    else
+                    {
+                        ReportText += "No assessments found for this course.\n\n";
+                    }
+
+                    ReportText += "".PadRight(50, '-') + "\n\n";
+                }
+
+                await Shell.Current.DisplayAlertAsync("Courses & Assessments Report", "Report generated successfully!", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to generate report: {ex.Message}", "OK");
+            }
+
+            await ReportViewModel.SaveReport(ReportText, ReportTitle);
+        }
+
+        public static async Task SaveReport(string reportContent, string reportTitle)
+        {
+            try
+            {
+                //var reportContent = await GenerateUserAssessmentReport();
+
+                // DEBUG: Check if content is actually there
+                if (string.IsNullOrEmpty(reportContent))
+                {
+                    await Shell.Current.DisplayAlertAsync("Debug", "Report content is empty!", "OK");
+                    return;
+                }
+
+                var stream = new MemoryStream(Encoding.UTF8.GetBytes(reportContent));
+
+                var fileName = $"{reportTitle}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                var result = await FileSaver.Default.SaveAsync(fileName, stream, CancellationToken.None);
+
+                if (result.IsSuccessful)
+                {
+                    await Shell.Current.DisplayAlertAsync("Success",
+                        $"Report saved successfully!", "OK");
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlertAsync("Error",
+                        "Failed to save report", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
             }
         }
 
-        // Ran in GenerateCoursesReportToFile Method
-        private string GenerateCoursesReport(List<UserCourse> userCourses)
-        {
-            StringBuilder reportBuilder = new StringBuilder();
-            reportBuilder.AppendLine("=== My Courses Report ===");
-            reportBuilder.AppendLine($"Generated on: {DateTime.Now}");
-            reportBuilder.AppendLine();
-            foreach (var uc in userCourses)
-            {
-                reportBuilder.AppendLine($"Course: {uc.Course.Name}");
-                reportBuilder.AppendLine($"Term: {uc.Course.Term.Name}");
-                reportBuilder.AppendLine($"Start Date: {uc.StartDate:d}");
-                reportBuilder.AppendLine($"End Date: {uc.EndDate:d}");
-                reportBuilder.AppendLine($"Grade: {uc.Grade}");
-                reportBuilder.AppendLine(new string('-', 30));
-            }
-            return reportBuilder.ToString();
-        }
 
         [RelayCommand]
         public async Task ViewReports()
@@ -201,42 +305,6 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Reports Folder",
                     $"Previously set folder no longer exists:\n{savedPath}\n\nYou'll be prompted to choose a new one.", "OK");
-            }
-        }
-
-        [RelayCommand]
-        public async Task SaveAssessmentReport()
-        {
-            try
-            {
-                var reportContent = await GenerateUserAssessmentReport();
-
-                // DEBUG: Check if content is actually there
-                if (string.IsNullOrEmpty(reportContent))
-                {
-                    await Shell.Current.DisplayAlertAsync("Debug", "Report content is empty!", "OK");
-                    return;
-                }
-
-                var stream = new MemoryStream(Encoding.UTF8.GetBytes(reportContent));
-
-                var fileName = $"AssessmentReport_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                var result = await FileSaver.Default.SaveAsync(fileName, stream, CancellationToken.None);
-
-                if (result.IsSuccessful)
-                {
-                    await Shell.Current.DisplayAlertAsync("Success",
-                        $"Report saved successfully!", "OK");
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlertAsync("Error",
-                        "Failed to save report", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
             }
         }
 
