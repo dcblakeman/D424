@@ -199,6 +199,15 @@ namespace C_971.ViewModels
 
                 // Reload the term from database to get the assigned ID
                 Course savedCourse = await _database.GetCourseByNameAsync(NewCourse.Name);
+
+                // **ADD THIS: Auto-enroll the current user in the new course**
+                var userCourse = new UserCourse
+                {
+                    UserId = NewUser.Id,  // Use your User property
+                    CourseId = savedCourse.Id
+                };
+                await _database.SaveUserCourseAsync(userCourse);
+
                 NewCourse.Id = savedCourse.Id;
 
                 Courses.Clear();

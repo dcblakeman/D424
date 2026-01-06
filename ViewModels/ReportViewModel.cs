@@ -1,4 +1,5 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -7,6 +8,7 @@ using Microsoft.Maui.Storage;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using SQLite;
 
 namespace C_971.ViewModels
 {
@@ -52,17 +54,19 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
+            Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
         {
             NewCourse = value;
+            Shell.Current.DisplayAlertAsync("Updated Values", $"New Course: {NewCourse}", "OK");
         }
 
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {Term}", "OK");
+            Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {NewTerm}", "OK");
         }
 
         [RelayCommand]
@@ -189,10 +193,9 @@ namespace C_971.ViewModels
             {
                 reportBuilder.AppendLine($"Course: {uc.Course.Name}");
                 reportBuilder.AppendLine($"Term: {uc.Course.Term.Name}");
-                reportBuilder.AppendLine($"Status: {uc.Status}");
                 reportBuilder.AppendLine($"Start Date: {uc.StartDate:d}");
                 reportBuilder.AppendLine($"End Date: {uc.EndDate:d}");
-                reportBuilder.AppendLine($"Grade: {uc.Grade ?? FinalGrade.NotGraded}");
+                reportBuilder.AppendLine($"Grade: {uc.Grade}");
                 reportBuilder.AppendLine(new string('-', 30));
             }
             return reportBuilder.ToString();
@@ -367,6 +370,13 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
             }
+        }
+
+        internal async Task OnAppearingAsync()
+        {
+            NewUser = User;
+            NewTerm = Term;
+            NewCourse = Course;
         }
     }
 }

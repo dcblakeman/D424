@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace C_971.Models
 {
-    [Table("Course")]
+    [Table("course")]
     public partial class Course
     {
         [PrimaryKey, AutoIncrement]

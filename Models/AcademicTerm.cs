@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace C_971.Models
 {
-    [Table("AcademicTerm")]
+    [Table("academic_term")]
     public partial class AcademicTerm
     {
         // Primary Key

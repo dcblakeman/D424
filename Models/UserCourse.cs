@@ -12,35 +12,17 @@ namespace C_971.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        // Foreign keys
-        [Column("user_id"), NotNull, Indexed]
+        [Column("user_id")]
         public int UserId { get; set; }
 
-        [Column("course_id"), NotNull, Indexed]
+        [Column("course_id")]
         public int CourseId { get; set; }
-
-        // User-specific enrollment data
-        [Column("start_date"), NotNull]
+        [Column("start_date")]
         public DateTime StartDate { get; set; } = DateTime.Now;
-
-        [Column("end_date"), NotNull]
-        public DateTime EndDate { get; set; } = DateTime.Now;
-
-        [Column("status"), NotNull]
-        public CourseStatus Status { get; set; } = CourseStatus.NotEnrolled;
-
-        [Column("start_date_notifications"), NotNull]
-        public bool StartDateNotifications { get; set; } = true;
-
-        [Column("end_date_notifications"), NotNull]
-        public bool EndDateNotifications { get; set; } = true;
-
-        [Column("enrollment_date")]
-        public DateTime EnrollmentDate { get; set; } = DateTime.Now;
-
+        [Column("end_date")]
+        public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(6);
         [Column("grade")]
-        public FinalGrade? Grade { get; set; }
-
+        public FinalGrade Grade { get; set; } = FinalGrade.NotGraded;
         // Navigation properties
         [Ignore]
         public User User { get; set; }

@@ -559,7 +559,7 @@ namespace C_971.Services
             var query = @"
                         SELECT *
                         FROM course_assessment a
-                        INNER JOIN Course c ON a.course_id = c.id
+                        INNER JOIN course c ON a.course_id = c.id
                         INNER JOIN user_course uc ON c.id = uc.course_id
                         WHERE uc.user_id = ? AND c.term_id = ?
                         ORDER BY a.end_date ASC";
@@ -625,6 +625,19 @@ namespace C_971.Services
             {
                 await Shell.Current.DisplayAlertAsync("Error", "User not found.", "OK");
                 return null;
+            }
+        }
+
+        internal async Task SaveUserCourseAsync(UserCourse userCourse)
+        {
+            await InitializeAsync();
+            if (userCourse.Id != 0)
+            {
+                await _database.UpdateAsync(userCourse);
+            }
+            else
+            {
+                await _database.InsertAsync(userCourse);
             }
         }
     }
