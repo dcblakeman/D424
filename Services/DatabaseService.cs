@@ -557,7 +557,7 @@ namespace C_971.Services
         {
             // First get all courses for the user and term
             var coursesQuery = @"
-                SELECT *
+                SELECT DISTINCT c.*
                 FROM course c
                 INNER JOIN user_course uc ON c.id = uc.course_id
                 INNER JOIN academic_term t ON c.term_id = t.id
@@ -570,9 +570,12 @@ namespace C_971.Services
 
             foreach (var course in courses)
             {
+                await Shell.Current.DisplayAlertAsync("Course Id", $"{course.Id}", "OK");
                 // Get assessments for each course
                 var assessmentsQuery = @"
-                    SELECT * FROM course_assessment";
+                    SELECT * FROM course_assessment
+                    WHERE course_id = ?
+                    ORDER BY end_date ASC";
 
                 var assessments = await _database.QueryAsync<CourseAssessment>(assessmentsQuery, course.Id);
 

@@ -30,6 +30,8 @@ namespace C_971
 
             // Register database service and interface
             builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddSingleton<NotificationService>();
+            builder.Services.AddSingleton<PermissionService>();
 
             builder.Services.AddTransient<LoginView>();
             builder.Services.AddTransient<LoginViewModel>();

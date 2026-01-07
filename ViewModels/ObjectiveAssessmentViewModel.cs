@@ -13,6 +13,7 @@ namespace C_971.ViewModels
     public partial class ObjectiveAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
+        private readonly NotificationService _notification;
 
         // Core Properties
 
@@ -132,12 +133,11 @@ namespace C_971.ViewModels
             AssessmentType.Performance
         };
 
-        public ObjectiveAssessmentViewModel(DatabaseService database)
+        public ObjectiveAssessmentViewModel(DatabaseService database, NotificationService notification)
         {
             _database = database;
+            _notification = notification;
             IsSearching = false; IsSearching = false;
-
-            _ = RequestNotificationPermissions();
         }
 
         partial void OnUserChanged(User value)
@@ -195,16 +195,26 @@ namespace C_971.ViewModels
             }
         }
 
-        private async Task RequestNotificationPermissions()
+
+        [RelayCommand]
+        public async Task SetReminderAsync()
         {
-            try
+            var reminderDate = Assessment.EndDate.AddDays(-1);
+
+            if (reminderDate <= DateTime.Now)
             {
-                await LocalNotificationCenter.Current.RequestNotificationPermission();
+                await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
+                    "This assessment is due too soon.", "OK");
+                return;
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to request notification permissions: {ex.Message}");
-            }
+
+            var success = await _notification.ScheduleAssessmentReminderAsync(Assessment, reminderDate);
+
+            var message = success
+                ? $"Reminder set for {reminderDate:MM/dd/yyyy}"
+                : "Permission required. Check device settings.";
+
+            await Shell.Current.DisplayAlertAsync("Reminder", message, "OK");
         }
 
         partial void OnIsEditingChanged(bool value)

@@ -1,5 +1,4 @@
-﻿
-using C_971.Models;
+﻿using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -169,7 +168,11 @@ namespace C_971.ViewModels
                                  $"Status: {course.Status}\n" +
                                  $"Grade: {course.Grade}\n\n";
 
-                    if (assessments.Any())
+                    if (assessments.Count == 0)
+                    {
+                        ReportText += "No assessments found for this course.\n\n";
+                    }
+                    else
                     {
                         ReportText += $"ASSESSMENTS ({assessments.Count}):\n";
                         foreach (var assessment in assessments)
@@ -181,15 +184,11 @@ namespace C_971.ViewModels
                                          $"    Score: {assessment.Grade}\n\n";
                         }
                     }
-                    else
-                    {
-                        ReportText += "No assessments found for this course.\n\n";
-                    }
 
                     ReportText += "".PadRight(50, '-') + "\n\n";
                 }
 
-                await Shell.Current.DisplayAlertAsync("Courses & Assessments Report", "Report generated successfully!", "OK");
+                await Shell.Current.DisplayAlertAsync("Courses & Assessments Report", ReportText, "OK");
             }
             catch (Exception ex)
             {
@@ -203,7 +202,6 @@ namespace C_971.ViewModels
         {
             try
             {
-                //var reportContent = await GenerateUserAssessmentReport();
 
                 // DEBUG: Check if content is actually there
                 if (string.IsNullOrEmpty(reportContent))

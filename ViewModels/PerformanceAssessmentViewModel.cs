@@ -17,6 +17,7 @@ namespace C_971.ViewModels
     public partial class PerformanceAssessmentViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
+        private readonly NotificationService _notification;
 
         // Core Properties
         [ObservableProperty]
@@ -134,12 +135,11 @@ namespace C_971.ViewModels
             AssessmentType.Performance
         };
 
-        public PerformanceAssessmentViewModel(DatabaseService database)
+        public PerformanceAssessmentViewModel(DatabaseService database, NotificationService notification)
         {
-            IsSearching = false;
             _database = database;
-
-            _ = RequestNotificationPermissions();
+            _notification = notification;
+            IsSearching = false;
         }
 
         partial void OnUserChanged(User value)
@@ -196,18 +196,6 @@ namespace C_971.ViewModels
                 {
                     await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
                 }
-            }
-        }
-
-        private async Task RequestNotificationPermissions()
-        {
-            try
-            {
-                await LocalNotificationCenter.Current.RequestNotificationPermission();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to request notification permissions: {ex.Message}");
             }
         }
 
