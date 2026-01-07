@@ -7,18 +7,47 @@
              x:DataType="vm:ReportViewModel">
 
     <ScrollView>
+        <!-- Reports Section -->
         <VerticalStackLayout Spacing="20" Padding="20">
-
-            <!-- Header -->
+            
             <Label Text="Generate Reports" 
                    FontSize="24" 
                    FontAttributes="Bold" 
                    HorizontalOptions="Center" 
                    Margin="0,0,0,20"/>
 
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+                   HasShadow="True" 
+                   CornerRadius="10" 
+                   Padding="20">
+                
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Generate Reports" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
 
+                    <Button Text="Generate Courses Report"
+                            Command="{Binding GenerateCourseReportCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
+                            TextColor="White"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+                    <Button Text="Generate Assessments Report"
+                            Command="{Binding GenerateAssessmentReportCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
+                            TextColor="White"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+                    <Button Text="Generate Courses with Assessments Report"
+                            Command="{Binding GenerateCoursesWithAssessmentsReportCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
+                            TextColor="White"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+                </VerticalStackLayout>
+            </Frame>
 
-            <!-- Report Folder Configuration Settings Frame -->
+            <!-- Folder Configuration -->
             <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
                    HasShadow="True" 
                    CornerRadius="10" 
@@ -26,7 +55,10 @@
                 
                 <VerticalStackLayout Spacing="15">
                     <!-- View Reports Button -->
-                        <Button Text="Open Report" 
+                    <Label Text="Folder Configuration" 
+                           FontSize="18" 
+                           FontAttributes="Bold"/>
+                    <Button Text="Open Report" 
                             Command="{Binding OpenReportCommand}"
                             BackgroundColor="{StaticResource SecondaryDarkText}" />
 
@@ -53,96 +85,7 @@
             </Frame>
             <!-- End Report Configuration Settings Frame -->
             
-            
-            
-            
-            <!-- Reports Buttons Section Frame -->
-            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
-                   HasShadow="True" 
-                   CornerRadius="10" 
-                   Padding="20">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Generate Reports" 
-                           FontSize="18" 
-                           FontAttributes="Bold"/>
-                    
-                    <!-- Buttons Section -->
-                    <Button Text="Generate Courses Report"
-                            Command="{Binding GenerateCourseReportCommand}"
-                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
-                            TextColor="White"
-                            HeightRequest="50"
-                            CornerRadius="8"/>
-                    <Button Text="Generate Assessments Report"
-                            Command="{Binding GenerateAssessmentReportCommand}"
-                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
-                            TextColor="White"
-                            HeightRequest="50"
-                            CornerRadius="8"/>
-                    <Button Text="Generate Courses with Assessments Report"
-                            Command="{Binding GenerateCoursesWithAssessmentsReportCommand}"
-                            BackgroundColor="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"
-                            TextColor="White"
-                            HeightRequest="50"
-                            CornerRadius="8"/>
-                    
-                </VerticalStackLayout>
-            </Frame>
-            <!-- End Reports Section / Frame -->
-            
-            
-            
-            <!-- Status and Progress Frame / Section -->
-            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
-                   HasShadow="True" 
-                   CornerRadius="10" 
-                   Padding="20"
-                   IsVisible="{Binding IsGeneratingReport}">
-
-                <VerticalStackLayout Spacing="10">
-                    <ActivityIndicator IsRunning="{Binding IsGeneratingReport}" 
-                                       Color="{AppThemeBinding Light=#007ACC, Dark=#0078D4}"/>
-                    <Label Text="{Binding StatusMessage}" 
-                           HorizontalOptions="Center"
-                           FontSize="14"/>
-                </VerticalStackLayout>
-            </Frame>
-            <!-- End of Status and Progress Frame/Section -->
-
-            
-            
            
-
-            <!-- Not sure what this is?? -->
-            <!-- Recent Reports -->
-            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
-                   HasShadow="True" 
-                   CornerRadius="10" 
-                   Padding="20"
-                   IsVisible="{Binding HasRecentReports}">
-
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Recent Reports" 
-                           FontSize="18" 
-                           FontAttributes="Bold"/>
-
-                    <CollectionView ItemsSource="{Binding RecentReports}">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Padding="5" x:DataType="{x:Type x:String}">
-                                    <Label Text="{Binding .}" 
-                                           FontSize="12"
-                                           TextColor="{AppThemeBinding Light=#6C757D, Dark=#ADB5BD}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </Frame>
-
-            
-            
-
             <!-- Save and Go Back Buttons Frame -->
             <!-- Go Back Button -->
             <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
@@ -152,13 +95,6 @@
                    IsVisible="{Binding HasRecentReports}">
 
                 <VerticalStackLayout Spacing="10">
-                    
-                    <!-- Save Button -->
-                    <Button Text="Save Report To Custom Folder"
-                            Command="{Binding SaveReportToCustomFolderCommand}"
-                            BackgroundColor="DarkGreen"
-                            TextColor="White"/>
-                    
                     <!-- Back Button -->
                     <Button Text="Back"
                             Command="{Binding GoBackCommand}"
@@ -171,8 +107,6 @@
                 </VerticalStackLayout>
             </Frame>
             <!-- End Save and Go Back Buttons Frame -->
-
-
         </VerticalStackLayout>
     </ScrollView>
 
