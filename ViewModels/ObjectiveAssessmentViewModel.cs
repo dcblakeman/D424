@@ -66,10 +66,16 @@ namespace C_971.ViewModels
         private DateTime assessmentEndDate = DateTime.Now.AddMonths(6);
 
         [ObservableProperty]
-        public bool assessmentStartDateNotifications = true;
+        public bool assessmentStartDateNotifications = false;
 
         [ObservableProperty]
-        public bool assessmentEndDateNotifications = true;
+        public bool assessmentEndDateNotifications = false;
+
+        [ObservableProperty]
+        public int startDateNotificationDays = 1; // Default to 1 day
+
+        [ObservableProperty]
+        public int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
         public bool assessmentIsActive = false;
@@ -106,6 +112,8 @@ namespace C_971.ViewModels
         
         [ObservableProperty]
         private bool isSearching;
+
+        private bool _isLoadingData;
 
         public bool IsNotSearching => !IsSearching;
 
@@ -195,6 +203,200 @@ namespace C_971.ViewModels
             }
         }
 
+        partial void OnAssessmentStartDateNotificationsChanged(bool value)
+        {
+            if (_isLoadingData) return;
+            if (value && Assessment?.Id > 0)
+            {
+                _ = Task.Run(async () => await HandleStartDateNotificationToggle());
+            }
+            else if (!value && Assessment?.Id > 0) // Toggled OFF
+            {
+                _ = Task.Run(async () => await _notification.CancelNotificationAsync(Assessment.Id));
+            }
+        }
+
+        partial void OnAssessmentEndDateNotificationsChanged(bool value)
+        {
+            if (_isLoadingData) return;
+            if (value && Assessment?.Id > 0) //
+            {
+                _ = Task.Run(async () => await HandleEndDateNotificationToggle());
+            }
+            else if (!value && Assessment?.Id > 0) // Toggled OFF
+            {
+                _ = Task.Run(async () => await _notification.CancelNotificationAsync(10000 + Assessment.Id));
+            }
+        }
+
+        [RelayCommand]
+        public async Task ToggleStartNotificationsAsync()
+        {
+            if (AssessmentStartDateNotifications && Assessment?.Id > 0)
+            {
+                await HandleStartDateNotificationToggle();
+            }
+            else if (!AssessmentStartDateNotifications && Assessment?.Id > 0)
+            {
+                await _notification.CancelNotificationAsync(Assessment.Id);
+            }
+        }
+
+        [RelayCommand]
+        public async Task ToggleEndNotificationsAsync()
+        {
+            if (AssessmentEndDateNotifications && Course?.Id > 0)
+            {
+                await HandleEndDateNotificationToggle();
+            }
+            else if (!AssessmentEndDateNotifications && Course?.Id > 0)
+            {
+                await _notification.CancelNotificationAsync(10000 + Course.Id);
+            }
+        }
+
+        private async Task HandleStartDateNotificationToggle()
+        {
+            try
+            {
+                // Ask user for number of days
+                var daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+                    await Shell.Current.DisplayPromptAsync(
+                        "Start Date Notification",
+                        "How many days in advance would you like to be notified?",
+                        "OK",
+                        "Cancel",
+                        "Enter number of days",
+                        3, // Max length
+                        Keyboard.Numeric,
+                        "1" // Default value
+                    ));
+
+                if (string.IsNullOrWhiteSpace(daysInput))
+                {
+                    // User canceled - turn switch back off
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
+                    return;
+                }
+
+                if (!int.TryParse(daysInput, out int days) || days < 1 || days > 30)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Invalid Input",
+                            "Please enter a number between 1 and 30 days.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
+                    return;
+                }
+
+                // Store the preference
+                StartDateNotificationDays = days;
+
+                // Calculate reminder date
+                var reminderDate = Assessment.StartDate.AddDays(-days);
+
+                if (reminderDate <= DateTime.Now)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
+                            $"This assessment starts too soon for a {days}-day advance notice.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
+                    return;
+                }
+
+                // Schedule notification
+                var success = await _notification.ScheduleAssessmentStartReminderAsync(Assessment, reminderDate);
+
+                if (!success)
+                {
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Permission Required",
+                            "Please enable notifications in your device settings.", "OK"));
+                }
+                else
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Reminder Set",
+                            $"You'll be reminded {days} day(s) before the assessment starts.", "OK"));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error handling start date notification: {ex.Message}");
+                MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
+            }
+        }
+
+        private async Task HandleEndDateNotificationToggle()
+        {
+            try
+            {
+                var daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+                    await Shell.Current.DisplayPromptAsync(
+                        "Due Date Notification",
+                        "How many days in advance would you like to be notified?",
+                        "OK",
+                        "Cancel",
+                        "Enter number of days",
+                        3,
+                        Keyboard.Numeric,
+                        "1"
+                    ));
+
+                if (string.IsNullOrWhiteSpace(daysInput))
+                {
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+                    return;
+                }
+
+                if (!int.TryParse(daysInput, out int days) || days < 1 || days > 30)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Invalid Input",
+                            "Please enter a number between 1 and 30 days.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+                    return;
+                }
+
+                EndDateNotificationDays = days;
+
+                var reminderDate = Assessment.EndDate.AddDays(-days);
+
+                if (reminderDate <= DateTime.Now)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
+                            $"This assessment is due too soon for a {days}-day advance notice.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+                    return;
+                }
+
+                var success = await _notification.ScheduleAssessmentDueReminderAsync(Assessment, reminderDate);
+
+                if (!success)
+                {
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Permission Required",
+                            "Please enable notifications in your device settings.", "OK"));
+                }
+                else
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Reminder Set",
+                            $"You'll be reminded {days} day(s) before the assessment is due.", "OK"));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error handling end date notification: {ex.Message}");
+                MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+            }
+        }
 
         [RelayCommand]
         public async Task SetReminderAsync()
@@ -437,6 +639,7 @@ namespace C_971.ViewModels
         }
         private async Task PopulateAssessmentProperties()
         {
+            _isLoadingData = true;
             Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(AssessmentCourseId, AssessmentType.Objective, Assessment.IsActive = true);
 
             if (Assessment != null)
@@ -462,10 +665,12 @@ namespace C_971.ViewModels
                 {
                     await Shell.Current.DisplayAlertAsync("Error", $"Failed to populate assessment properties", "OK");
                 }
-            } else
-            {
-                
+                finally
+                {
+                    _isLoadingData = false;
+                }
             }
+
                 
         }
 

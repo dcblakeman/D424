@@ -16,6 +16,7 @@ namespace C_971.Services
         }
         public async Task<bool> ScheduleCourseStartReminderAsync(Course course, DateTime reminderDate)
         {
+
             await Shell.Current.DisplayAlertAsync("Testing",$"Scheduling notification for {reminderDate:yyyy-MM-dd HH:mm:ss}","OK");
 
             await Shell.Current.DisplayAlertAsync("Testing",$"Current time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}","OK");
@@ -85,6 +86,55 @@ namespace C_971.Services
                 }
             };
 
+            await LocalNotificationCenter.Current.Show(request);
+            return true;
+        }
+
+        public async Task<bool> ScheduleAssessmentStartReminderAsync(CourseAssessment assessment, DateTime reminderDate)
+        {
+            if (!await EnsurePermissionAsync()) return false;
+
+            var request = new NotificationRequest
+            {
+                NotificationId = assessment.Id,
+                Title = "Assessment Starting Soon",
+                Subtitle = assessment.Name,
+                Description = $"{assessment.Type} '{assessment.Name}' starts on {assessment.StartDate:MM/dd/yyyy}",
+                Schedule = { NotifyTime = reminderDate }
+            };
+
+            await LocalNotificationCenter.Current.Show(request);
+            return true;
+        }
+
+        public async Task<bool> ScheduleAssessmentDueReminderAsync(CourseAssessment assessment, DateTime reminderDate)
+        {
+            if (!await EnsurePermissionAsync()) return false;
+
+            var request = new NotificationRequest
+            {
+                NotificationId = 10000 + assessment.Id, // Different offset for due date reminders
+                Title = "Assessment Due Soon",
+                Subtitle = assessment.Name,
+                Description = $"{assessment.Type} '{assessment.Name}' is due on {assessment.EndDate:MM/dd/yyyy}",
+                Schedule = { NotifyTime = reminderDate }
+            };
+
+            await LocalNotificationCenter.Current.Show(request);
+            return true;
+        }
+
+        public async Task<bool> ScheduleCourseDueReminderAsync(Course newCourse, DateTime reminderDate)
+        {
+            if (!await EnsurePermissionAsync()) return false;
+            var request = new NotificationRequest
+            {
+                NotificationId = 3000 + newCourse.Id,
+                Title = "Course Due Soon",
+                Subtitle = newCourse.Name,
+                Description = $"Course '{newCourse.Name}' is due on {newCourse.EndDate:MM/dd/yyyy}",
+                Schedule = { NotifyTime = reminderDate }
+            };
             await LocalNotificationCenter.Current.Show(request);
             return true;
         }

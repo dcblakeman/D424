@@ -17,6 +17,9 @@ public partial class CourseDetailsView : ContentPage
         if (BindingContext is CourseDetailsViewModel viewModel)
         {
             await viewModel.OnAppearingAsync();
+            viewModel.NewCourse = viewModel.Course;
+            viewModel.NewUser = viewModel.User;
+            viewModel.NewTerm = viewModel.Term;
         }
     }
 

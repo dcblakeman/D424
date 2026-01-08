@@ -35,6 +35,9 @@ namespace C_971.ViewModels
         public User newUser;
 
         [ObservableProperty]
+        private Course course;
+
+        [ObservableProperty]
         private Course newCourse = new Course(); 
 
         // New Course Form
@@ -113,14 +116,17 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewTerm}", "OK");
             _ = LoadCoursesAsync(value);
         }
 
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
         }
 
         partial void OnSearchTextChanged(string value)
@@ -178,7 +184,8 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync("//AcademicTermListView", true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
-                    ["user"] = NewUser
+                    ["user"] = NewUser,
+                    ["course"] = NewCourse
                 });
             }
             catch (Exception ex)

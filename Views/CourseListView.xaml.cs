@@ -18,10 +18,10 @@ namespace C_971.Views
 
             if (BindingContext is CourseListViewModel viewModel)
             {
-                if (viewModel.NewTerm != null)
-                {
-                    await viewModel.LoadCoursesAsync(viewModel.NewTerm);
-                }
+                viewModel.NewUser = viewModel.User;
+                viewModel.NewTerm = viewModel.Term;
+                viewModel.NewCourse = viewModel.Course;
+                await viewModel.LoadCoursesAsync(viewModel.NewTerm);
             }
         }
 
@@ -66,7 +66,7 @@ namespace C_971.Views
                 await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
                 {
                     ["user"] = viewModel.NewUser,
-                    ["course"] = newCourse,
+                    ["course"] = viewModel.NewCourse = newCourse,
                     ["term"] = viewModel.NewTerm
                 });
             }

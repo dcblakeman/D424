@@ -17,6 +17,7 @@ namespace C_971.ViewModels
     {
         private readonly DatabaseService _database;
         private readonly NotificationService _notification;
+        private readonly PermissionService _permission;
 
         [ObservableProperty]
         public User user = new();
@@ -29,7 +30,7 @@ namespace C_971.ViewModels
 
         // Core Properties
         [ObservableProperty]
-        private Course newCourse;
+        private Course newCourse = new();
 
         [ObservableProperty]
         private AcademicTerm term;
@@ -59,10 +60,16 @@ namespace C_971.ViewModels
         public FinalGrade newCourseGrade = FinalGrade.NotGraded;
 
         [ObservableProperty]
-        public bool newCourseStartDateNotifications = true;
+        public bool newCourseStartDateNotifications = false;
 
         [ObservableProperty]
-        public bool newCourseEndDateNotifications = true;
+        public bool newCourseEndDateNotifications = false;
+
+        [ObservableProperty]
+        private int startDateNotificationDays = 1; // Default to 1 day
+
+        [ObservableProperty]
+        private int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
         public int newCourseTermId = 0;
@@ -84,6 +91,8 @@ namespace C_971.ViewModels
         private bool isEditing;
 
         public bool IsNotEditing => !IsEditing;
+
+        private bool _isLoadingData = false; // Add this flag
 
         // Dynamic UI Properties
         public string Title => IsEditing ? "Edit Course Details" : "Course Details";
@@ -123,22 +132,152 @@ namespace C_971.ViewModels
             AssessmentType.Performance
         };
 
-        public CourseDetailsViewModel(DatabaseService databaseService)
+        public CourseDetailsViewModel(DatabaseService database, NotificationService notification, PermissionService permission)
         {
-            _database = databaseService;
-            _ = RequestNotificationPermissions();
+            _database = database;
+            _notification = notification;
+            _permission = permission;
+
+        }
+
+        partial void OnNewCourseStartDateNotificationsChanged(bool value)
+        {
+            if (_isLoadingData) return; // Skip during data loading
+
+            if (value && Course?.Id > 0)
+            {
+                _ = Task.Run(async () => await HandleStartDateNotificationToggle());
+            }
+            else if (!value && Course?.Id > 0)
+            {
+                _ = Task.Run(async () => await _notification.CancelNotificationAsync(Course.Id));
+            }
+        }
+
+        partial void OnNewCourseEndDateNotificationsChanged(bool value)
+        {
+            if (_isLoadingData) return; // Skip during data loading
+
+            if (value && Course?.Id > 0)
+            {
+                _ = Task.Run(async () => await HandleEndDateNotificationToggle());
+            }
+            else if (!value && Course?.Id > 0)
+            {
+                _ = Task.Run(async () => await _notification.CancelNotificationAsync(10000 + Course.Id));
+            }
+        }
+
+        [RelayCommand]
+        public async Task ToggleStartNotificationsAsync()
+        {
+            if (NewCourseStartDateNotifications && Course?.Id > 0)
+            {
+                await HandleStartDateNotificationToggle();
+            }
+            else if (!NewCourseStartDateNotifications && Course?.Id > 0)
+            {
+                await _notification.CancelNotificationAsync(Course.Id);
+            }
+        }
+
+        [RelayCommand]
+        public async Task ToggleEndNotificationsAsync()
+        {
+            if (NewCourseEndDateNotifications && Course?.Id > 0)
+            {
+                await HandleEndDateNotificationToggle();
+            }
+            else if (!NewCourseEndDateNotifications && Course?.Id > 0)
+            {
+                await _notification.CancelNotificationAsync(10000 + Course.Id);
+            }
+        }
+
+        private async Task HandleStartDateNotificationToggle()
+        {
+            try
+            {
+                // Ask user for number of days
+                var daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+                    await Shell.Current.DisplayPromptAsync(
+                        "Start Date Notification",
+                        "How many days in advance would you like to be notified?",
+                        "OK",
+                        "Cancel",
+                        "Enter number of days",
+                        3, // Max length
+                        Keyboard.Numeric,
+                        "1" // Default value
+                    ));
+
+                if (string.IsNullOrWhiteSpace(daysInput))
+                {
+                    // User canceled - turn switch back off
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+                    return;
+                }
+
+                if (!int.TryParse(daysInput, out int days) || days < 1 || days > 30)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Invalid Input",
+                            "Please enter a number between 1 and 30 days.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+                    return;
+                }
+
+                // Store the preference
+                StartDateNotificationDays = days;
+
+                // Calculate reminder date
+                var reminderDate = Course.StartDate.AddDays(-days);
+
+                if (reminderDate <= DateTime.Now)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
+                            $"This assessment starts too soon for a {days}-day advance notice."
+                            + $"Please change the start date and save before setting notifications.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+                    return;
+                }
+
+                // Schedule notification
+                var success = await _notification.ScheduleCourseStartReminderAsync(NewCourse, reminderDate);
+
+                if (!success)
+                {
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Permission Required",
+                            "Please enable notifications in your device settings.", "OK"));
+                }
+                else
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Reminder Set",
+                            $"You'll be reminded {days} day(s) before the assessment starts.", "OK"));
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Alert", $"Error handling start date notification: {ex.Message}","OK");
+                MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+            }
         }
 
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
         }
         // Property Change Handlers
         partial void OnCourseChanged(Course value)
         {
             NewCourse = value;
-            IsEditing = false;
+            IsEditing = false; 
             _ = LoadInstructorAsync();
             _= PopulateFields();
         }
@@ -389,130 +528,137 @@ namespace C_971.ViewModels
             }
         }
 
-        private async Task RequestNotificationPermissions()
+        private async Task HandleEndDateNotificationToggle()
         {
             try
             {
-                await LocalNotificationCenter.Current.RequestNotificationPermission();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to request notification permissions: {ex.Message}");
-            }
-        }
+                var daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+                    await Shell.Current.DisplayPromptAsync(
+                        "Due Date Notification",
+                        "How many days in advance would you like to be notified?",
+                        "OK",
+                        "Cancel",
+                        "Enter number of days",
+                        3,
+                        Keyboard.Numeric,
+                        "1"
+                    ));
 
-        partial void OnNewCourseStartDateNotificationsChanged(bool value)
-        {
-            if (Course?.Id > 0) // Only if we have a saved course
-            {
-                _ = Task.Run(async () => await HandleStartDateNotificationChange(value));
-            }
-        }
-        partial void OnNewCourseEndDateNotificationsChanged(bool value)
-        {
-            if (Course?.Id > 0) // Only if we have a saved course
-            {
-                _ = Task.Run(async () => await HandleEndDateNotificationChange(value));
-            }
-        }
-
-
-        private async Task HandleStartDateNotificationChange(bool enabled)
-        {
-            try
-            {
-                if (enabled)
+                if (string.IsNullOrWhiteSpace(daysInput))
                 {
-                    var reminderDate = NewCourseStartDate.AddDays(-1);
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
+                    return;
+                }
 
-                    if (reminderDate > DateTime.Now)
-                    {
-                        await Shell.Current.DisplayAlertAsync("Alert", $"{NewCourse}","OK");
-                        var success = await _notification.ScheduleCourseStartReminderAsync(NewCourse, reminderDate);
+                if (!int.TryParse(daysInput, out int days) || days < 1 || days > 30)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Invalid Input",
+                            "Please enter a number between 1 and 30 days.", "OK"));
 
-                        if (!success)
-                        {
-                            // Revert the switch if permission denied
-                            MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
+                    return;
+                }
 
-                            await MainThread.InvokeOnMainThreadAsync(async () =>
-                            {
-                                await Shell.Current.DisplayAlertAsync("Permission Required",
-                                    "Please enable notifications in your device settings.", "OK");
-                            });
-                        }
-                    }
-                    else
-                    {
-                        // Revert the switch if date is too soon
-                        MainThread.BeginInvokeOnMainThread(() => NewCourseStartDateNotifications = false);
+                EndDateNotificationDays = days;
 
-                        await MainThread.InvokeOnMainThreadAsync(async () =>
-                        {
-                            await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
-                                "This course starts too soon to set a reminder.", "OK");
-                        });
-                    }
+                var reminderDate = NewCourse.EndDate.AddDays(-days);
+
+                if (reminderDate <= DateTime.Now)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
+                            $"This assessment is due too soon for a {days}-day advance notice." +
+                            $"Please change the start date and save before setting notifications.", "OK"));
+
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
+                    return;
+                }
+
+                var success = await _notification.ScheduleCourseDueReminderAsync(NewCourse, reminderDate);
+
+                if (!success)
+                {
+                    MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Permission Required",
+                            "Please enable notifications in your device settings.", "OK"));
                 }
                 else
                 {
-                    // Cancel the notification
-                    await Shell.Current.DisplayAlertAsync("Canceling", $"{ NewCourseId }", "OK");
-                    await _notification.CancelNotificationAsync(1000 + NewCourseId);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error handling start date notification: {ex.Message}");
-            }
-        }
-
-        private async Task HandleEndDateNotificationChange(bool enabled)
-        {
-            try
-            {
-                if (enabled)
-                {
-                    var reminderDate = Course.EndDate.AddDays(-3); // 3 days before end
-
-                    if (reminderDate > DateTime.Now)
-                    {
-                        await Shell.Current.DisplayAlertAsync("Alert", $"{NewCourseId}", "OK");
-                        var success = await _notification.ScheduleCourseEndReminderAsync(NewCourse, reminderDate);
-
-                        if (!success)
-                        {
-                            MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
-
-                            await MainThread.InvokeOnMainThreadAsync(async () =>
-                            {
-                                await Shell.Current.DisplayAlertAsync("Permission Required",
-                                    "Please enable notifications in your device settings.", "OK");
-                            });
-                        }
-                    }
-                    else
-                    {
-                        MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
-
-                        await MainThread.InvokeOnMainThreadAsync(async () =>
-                        {
-                            await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
-                                "This course ends too soon to set a reminder.", "OK");
-                        });
-                    }
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlertAsync("Canceling", $"{NewCourseId}", "OK");
-                    await _notification.CancelNotificationAsync(2000 + NewCourseId);
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Reminder Set",
+                            $"You'll be reminded {days} day(s) before the assessment is due.", "OK"));
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error handling end date notification: {ex.Message}");
+                MainThread.BeginInvokeOnMainThread(() => NewCourseEndDateNotifications = false);
             }
         }
+
+        [RelayCommand]
+        public async Task TestNotificationAsync()
+        {
+            // Schedule notification for 30 seconds from now
+            DateTime testTime = DateTime.Now.AddSeconds(30);
+
+            bool success = false;
+            try
+            {
+                var request = new NotificationRequest
+                {
+                    NotificationId = 9999,
+                    Title = "Test Notification",
+                    Description = "This is a test notification scheduled 30 seconds from now.",
+                    Schedule = { NotifyTime = testTime }
+                };
+                await LocalNotificationCenter.Current.Show(request);
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to schedule test notification: {ex.Message}", "OK");
+
+            }
+            
+
+            if (success)
+            {
+                await Shell.Current.DisplayAlertAsync("Test Scheduled",
+                    "Notification will appear in 30 seconds. Close the app completely!", "OK");
+            }
+        }
+
+        public async Task<bool> ScheduleTestNotificationAsync(string title, string message, int secondsFromNow = 10)
+        {
+            if (!await EnsurePermissionAsync()) return false;
+
+            var testTime = DateTime.Now.AddSeconds(secondsFromNow);
+
+            System.Diagnostics.Debug.WriteLine($"Scheduling test notification for: {testTime:HH:mm:ss}");
+            System.Diagnostics.Debug.WriteLine($"Current time: {DateTime.Now:HH:mm:ss}");
+
+            var request = new NotificationRequest
+            {
+                NotificationId = 9999, // Test ID
+                Title = $"TEST: {title}",
+                Subtitle = "EduTrack Test",
+                Description = message,
+                Schedule = { NotifyTime = testTime }
+            };
+
+            await LocalNotificationCenter.Current.Show(request);
+            return true;
+        }
+
+        private async Task<bool> EnsurePermissionAsync()
+        {
+            return await _permission.HasNotificationPermissionAsync() ||
+                   await _permission.RequestNotificationPermissionAsync();
+        }
+
         private async Task LoadInstructorAsync()
         {
             if (NewCourse == null) return;
@@ -557,20 +703,32 @@ namespace C_971.ViewModels
 
         public async Task PopulateFields()
         {
-            if (NewCourse != null)
+            try
             {
-                NewCourseId = NewCourse.Id;
-                NewCourseName = NewCourse.Name;
-                NewCourseDescription = NewCourse.Description;
-                NewCourseStartDate = NewCourse.StartDate;
-                NewCourseEndDate = NewCourse.EndDate;
-                NewCourseStatus = NewCourse.Status;
-                NewCourseStartDateNotifications = NewCourse.StartDateNotifications;
-                NewCourseEndDateNotifications = NewCourse.EndDateNotifications;
-                NewCourseTermId = NewCourse.TermId;
-                NewCourseInstructorId = (int)NewCourse.InstructorId;
-                await LoadInstructorAsync();
+                _isLoadingData = true;
+
+                if (NewCourse != null)
+                {
+                    NewCourseId = NewCourse.Id;
+                    NewCourseName = NewCourse.Name;
+                    NewCourseDescription = NewCourse.Description;
+                    NewCourseStartDate = NewCourse.StartDate;
+                    NewCourseEndDate = NewCourse.EndDate;
+                    NewCourseStatus = NewCourse.Status;
+                    NewCourseStartDateNotifications = NewCourse.StartDateNotifications;
+                    NewCourseEndDateNotifications = NewCourse.EndDateNotifications;
+                    NewCourseTermId = NewCourse.TermId;
+                    NewCourseGrade = NewCourse.Grade;
+                    NewCourseInstructorId = (int)NewCourse.InstructorId;
+                    await LoadInstructorAsync();
+                }
             }
+            finally
+            {
+                _isLoadingData = false;
+            }
+
         }
     }
 }
+

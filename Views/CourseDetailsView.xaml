@@ -49,14 +49,14 @@
                     TextColor="White"
                     Margin="0,0,0,15"/>
             </Grid>
-            
+
             <!-- Course Details Section -->
             <Border Stroke="DarkBlue"
                 StrokeThickness="1"
                 Padding="10"
                 BackgroundColor="AliceBlue"
                 Margin="0,0,0,0">
-                
+
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="5"/>
                 </Border.StrokeShape>
@@ -115,7 +115,7 @@
                                Text="{Binding NewCourseGrade, Mode=TwoWay}" 
                                VerticalOptions="Center"
                                IsVisible="{Binding IsNotEditing}"/>
-                        <Picker Grid.Row="4" Grid.Column="1" 
+                        <Picker Grid.Row="5" Grid.Column="1" 
                         SelectedItem="{Binding NewCourseGrade, Mode=TwoWay}"
                         ItemsSource="{Binding GradeOptions}"
                         IsVisible="{Binding IsEditing}"        
@@ -123,9 +123,9 @@
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>
-            
+
             <Label Text="Course Notifications" FontAttributes="Bold" FontSize="18" Margin="0,10,0,0" HorizontalOptions="Center"/>
-            <!-- Notifications Section with Border --> 
+            <!-- Notifications Section with Border -->
             <Border Stroke="DarkBlue"
                 StrokeThickness="1"
                 Padding="10"
@@ -142,7 +142,7 @@
                         <Label Text="Start Date Notifications:" FontAttributes="Bold"/>
                         <Label Text="{Binding NewCourseStartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
                                IsVisible="{Binding IsNotEditing}"/>
-                        <Switch IsToggled="{Binding NewCourseStartDateNotifications, Mode=TwoWay}" 
+                        <Switch IsToggled="{Binding NewCourseStartDateNotifications, Mode=TwoWay}"
                                 IsVisible="{Binding IsEditing}"/>
                     </VerticalStackLayout>
 
@@ -157,7 +157,7 @@
                 </Grid>
             </Border>
             <!--End Notifications Section-->
-            
+
             <Label Text="Course Instructor" FontAttributes="Bold" FontSize="18" Margin="0,10,0,0" HorizontalOptions="Center"/>
 
             <!-- Course Instructor Section with Border -->
@@ -172,16 +172,16 @@
 
                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" Margin="0,0,0,0">
                     <!-- ID -->
-                        <Label Grid.Row="0" Grid.Column="0" Text="Instructor ID:" FontAttributes="Bold"/>
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding NewInstructor.Id}"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="Instructor ID:" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding NewInstructor.Id}"/>
                     <!-- Name -->
-                        <Label Grid.Row="1" Grid.Column="0" Text="Instructor Name:" FontAttributes="Bold"/>
+                    <Label Grid.Row="1" Grid.Column="0" Text="Instructor Name:" FontAttributes="Bold"/>
                     <Label Grid.Row="1" Grid.Column="1" Text="{Binding NewInstructor.Name}"/>
                     <!-- Phone -->
-                        <Label Grid.Row="2" Grid.Column="0" Text="Instructor Phone:" FontAttributes="Bold"/>
+                    <Label Grid.Row="2" Grid.Column="0" Text="Instructor Phone:" FontAttributes="Bold"/>
                     <Label Grid.Row="2" Grid.Column="1" Text="{Binding NewInstructor.Phone}"/>
                     <!-- Email -->
-                        <Label Grid.Row="3" Grid.Column="0" Text="Instructor Email:" FontAttributes="Bold"/>
+                    <Label Grid.Row="3" Grid.Column="0" Text="Instructor Email:" FontAttributes="Bold"/>
                     <Label Grid.Row="3" Grid.Column="1" Text="{Binding NewInstructor.Email}"/>
                 </Grid>
             </Border>
@@ -215,6 +215,10 @@
                         BackgroundColor="#4CAF50"
                         TextColor="White"
                         Grid.Column="2"/>
+            <Button Text="Test Notification (30 sec)" 
+                         Command="{Binding TestNotificationCommand}"
+                         BackgroundColor="Orange"
+                         Grid.Column="2"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
