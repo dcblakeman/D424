@@ -218,7 +218,8 @@
             <Button Text="Test Notification (30 sec)" 
                          Command="{Binding TestNotificationCommand}"
                          BackgroundColor="Orange"
-                         Grid.Column="2"/>
+                         Grid.Column="2"
+                         Margin="0,12,0,0"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
