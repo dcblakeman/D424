@@ -3,17 +3,40 @@ using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Net.Mail;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(Instructor), "instructor")]
+    [QueryProperty(nameof(User), "user")]
     public partial class CourseInstructorViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
         // Core Properties
+
+        [ObservableProperty]
+        public User user = new();
+
+        [ObservableProperty]
+        public User newUser;
+
+        [ObservableProperty]
+        private Course course = new();
+
         [ObservableProperty]
         private Course newCourse;
+
+        [ObservableProperty]
+        private AcademicTerm term;
+
+        [ObservableProperty]
+        private AcademicTerm newTerm;
+
+        [ObservableProperty]
+        private CourseInstructor instructor;
 
         [ObservableProperty]
         private CourseInstructor newInstructor;
@@ -64,14 +87,21 @@ namespace C_971.ViewModels
         }
 
         // Property Change Handlers
-        partial void OnNewCourseChanged(Course value)
+        partial void OnCourseChanged(Course value)
         {
-            if (value != null)
-            {
-                _ = LoadInstructorsAsync();
+            NewCourse = value;
+            _ = LoadInstructorsAsync();
+        }
 
-                NewCourse = value;
-            }
+        partial void OnInstructorChanged(CourseInstructor value)
+        {
+            NewInstructor = value;
+        }
+
+        partial void OnUserChanged(User value)
+        {
+            NewUser = value;
+            _ = Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnIsAddingInstructorChanged(bool value)
@@ -147,7 +177,10 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task AddCourseInstructor()
         {
-            if (!ValidateInstructor()) return;
+            if (!ValidateInstructor())
+            {
+                return;
+            }
 
             try
             {
@@ -155,7 +188,7 @@ namespace C_971.ViewModels
                 NewInstructor.Phone = NewInstructorPhone.Trim();
                 NewInstructor.Email = NewInstructorEmail.Trim().ToLowerInvariant();
 
-                await _database.SaveCourseInstructorAsync(NewInstructor);
+                _ = await _database.SaveCourseInstructorAsync(NewInstructor);
 
                 // Add to cache and refresh display
                 _allInstructors.Add(NewInstructor);
@@ -176,7 +209,10 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task DeleteInstructor(CourseInstructor instructor)
         {
-            if (instructor == null) return;
+            if (instructor == null)
+            {
+                return;
+            }
 
             try
             {
@@ -186,13 +222,16 @@ namespace C_971.ViewModels
                     "Delete",
                     "Cancel");
 
-                if (!confirmed) return;
+                if (!confirmed)
+                {
+                    return;
+                }
 
-                await _database.DeleteCourseInstructorAsync(instructor);
+                _ = await _database.DeleteCourseInstructorAsync(instructor);
 
                 // Remove from cache and refresh display
-                _allInstructors.Remove(instructor);
-                Instructors.Remove(instructor);
+                _ = _allInstructors.Remove(instructor);
+                _ = Instructors.Remove(instructor);
 
                 IsRemovingInstructor = false;
 
@@ -214,7 +253,9 @@ namespace C_971.ViewModels
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
-                    ["instructor"] = NewInstructor
+                    ["instructor"] = NewInstructor,
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)
@@ -267,10 +308,10 @@ namespace C_971.ViewModels
             }
 
             // Check for correct phone number format
-            if (!System.Text.RegularExpressions.Regex.IsMatch(NewInstructorPhone.Trim(), @"^\+?[1-9]\d{1,14}$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewInstructorPhone.Trim(), @"^(\+[1-9]\d{10,14}|[1-9]\d{2}-\d{3}-\d{4})$"))
             {
-            _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number", "OK");
-            return false;
+                _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number", "OK");
+                return false;
             }
 
             return true;
@@ -280,7 +321,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
+                MailAddress addr = new(email);
                 return addr.Address == email;
             }
             catch
@@ -294,20 +335,22 @@ namespace C_971.ViewModels
             NewInstructorName = string.Empty;
             NewInstructorPhone = string.Empty;
             NewInstructorEmail = string.Empty;
+
+            NewInstructor = new CourseInstructor();
         }
 
         private void ApplySearchFilter()
         {
             Instructors.Clear();
 
-            var filteredInstructors = string.IsNullOrWhiteSpace(SearchText)
+            IEnumerable<CourseInstructor> filteredInstructors = string.IsNullOrWhiteSpace(SearchText)
                 ? _allInstructors
                 : _allInstructors.Where(i =>
                     i.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                     i.Email.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                     i.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-            foreach (var instructor in filteredInstructors)
+            foreach (CourseInstructor? instructor in filteredInstructors)
             {
                 Instructors.Add(instructor);
             }
@@ -317,7 +360,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await _database.SaveCourseAsync(course);
+                _ = await _database.SaveCourseAsync(course);
                 return course;
             }
             catch (Exception ex)

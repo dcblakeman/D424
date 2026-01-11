@@ -1,62 +1,59 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static C_971.Models.CourseStatus;
+﻿using SQLite;
 
 namespace C_971.Models
 {
-    [Table("Course")]
+    [Table("course")]
     public partial class Course
     {
-        // Primary Key
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-
-        // Name
-        [MaxLength(100)]
+        [Column("name"), MaxLength(100)]
         [NotNull]
         public string Name { get; set; } = string.Empty;
 
-
-        // Description
-        [MaxLength(250)]
-        [NotNull]
+        [Column("description"), NotNull]
         public string Description { get; set; } = string.Empty;
 
+        [Column("start_date"), NotNull]
+        public DateTime StartDate { get; set; } = DateTime.Today;
 
-        // Start and End Dates
-        [NotNull]
-        public DateTime StartDate { get; set; } = DateTime.Now;
+        [Column("end_date"), NotNull]
+        public DateTime EndDate { get; set; } = DateTime.Today.AddMonths(6);
 
-        [NotNull]
-        public DateTime EndDate { get; set; } = DateTime.Now;
+        [Column("status"), NotNull]
+        public CourseStatus Status { get; set; }
 
-
-        // Course Status
-        [NotNull]
-        public CourseStatus Status { get; set; } = NotEnrolled;
-
-
-        // Notifications
-        [NotNull]
+        [Column("start_date_notifications"), NotNull]
         public bool StartDateNotifications { get; set; } = true;
 
-        [NotNull]
-        public bool EndDateNotifications { get; set; }  = true;
+        [Column("end_date_notifications"), NotNull]
+        public bool EndDateNotifications { get; set; } = true;
 
-        // Foreign Keys
-        [Indexed]
-        [NotNull]
+        [Column("credit_units"), NotNull]
+        public int CreditUnits { get; set; } = 3;
+
+        [Column("grade"), NotNull]
+        public FinalGrade Grade { get; set; }
+
+        // Foreign keys
+        [Column("term_id"), NotNull]
         public int TermId { get; set; }
 
-        [NotNull]
-        public int? InstructorId { get; set; }  
+        [Column("instructor_id"), NotNull]
+        public int InstructorId { get; set; }
+
+        // Navigation properties - ignored by SQLite
+        [Ignore]
+        public AcademicTerm? Term { get; set; }
+
+        [Ignore]
+        public CourseInstructor? Instructor { get; set; }
+
+        [Ignore]
+        public List<CourseAssessment> Assessments { get; set; } = [];
+
+        [Ignore]
+        public List<CourseNote> Notes { get; set; } = [];
     }
 }

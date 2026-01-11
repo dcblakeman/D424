@@ -4,10 +4,10 @@ namespace C_971.Views;
 
 public partial class ViewNotesView : ContentPage
 {
-	public ViewNotesView(ViewNotesViewModel viewModel)
-	{
-		InitializeComponent();
-		BindingContext = viewModel;
+    public ViewNotesView(ViewNotesViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
     }
 }
 

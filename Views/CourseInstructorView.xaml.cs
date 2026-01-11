@@ -1,15 +1,16 @@
-namespace C_971.Views;
 
 using C_971.Models;
 using C_971.ViewModels;
 
+namespace C_971.Views;
+
 public partial class CourseInstructorView : ContentPage
 {
-	public CourseInstructorView(CourseInstructorViewModel viewModel)
-	{
-		InitializeComponent();
-		BindingContext = viewModel;
-	}
+    public CourseInstructorView(CourseInstructorViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+    }
 
     protected override async void OnAppearing()
     {
@@ -20,11 +21,25 @@ public partial class CourseInstructorView : ContentPage
         }
     }
 
+    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+
+        if (BindingContext is CourseDetailsViewModel viewModel)
+        {
+            await Shell.Current.DisplayAlertAsync("Term", $"Term: {viewModel.Term}", "OK");
+            viewModel.NewCourse = viewModel.Course;
+            viewModel.NewUser = viewModel.User;
+            viewModel.NewTerm = viewModel.Term;
+            await Shell.Current.DisplayAlertAsync("Term", $"Term: {viewModel.NewTerm}", "OK");
+        }
+    }
+
     public async void OnInstructorTapped(object sender, EventArgs e)
     {
-        var border = (Border)sender;
-        var instructor = (CourseInstructor)border.BindingContext;
-        var viewModel = (CourseInstructorViewModel)BindingContext;
+        Border border = (Border)sender;
+        CourseInstructor instructor = (CourseInstructor)border.BindingContext;
+        CourseInstructorViewModel viewModel = (CourseInstructorViewModel)BindingContext;
 
         // Check if we're in remove mode
         if (viewModel.IsRemovingInstructor)
@@ -40,10 +55,19 @@ public partial class CourseInstructorView : ContentPage
             //Update the course in the databaes with the instructorid
             viewModel.NewCourse = await viewModel.UpdateCourseAsync(viewModel.NewCourse);
 
+            viewModel.NewTerm = viewModel.Term;
+            viewModel.NewCourse = viewModel.Course;
+            viewModel.NewUser = viewModel.User;
+
+            await Shell.Current.DisplayAlertAsync("Term", $"Term: {viewModel.NewTerm}", "OK");
+
             // Navigate to detail view - only pass course since that's what CourseDetailsView expects
             await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>
             {
-                ["course"] = viewModel.NewCourse
+                ["user"] = viewModel.NewUser,
+                ["course"] = viewModel.NewCourse,
+                ["instructor"] = instructor,
+                ["term"] = viewModel.NewTerm
             });
         }
     }

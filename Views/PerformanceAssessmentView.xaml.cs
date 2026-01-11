@@ -5,11 +5,11 @@ namespace C_971.Views;
 
 public partial class PerformanceAssessmentView : ContentPage
 {
-	public PerformanceAssessmentView(PerformanceAssessmentViewModel viewModel)
-	{
+    public PerformanceAssessmentView(PerformanceAssessmentViewModel viewModel)
+    {
         InitializeComponent();
-		BindingContext = viewModel;
-	}
+        BindingContext = viewModel;
+    }
 
     protected override async void OnAppearing()
     {
@@ -24,15 +24,15 @@ public partial class PerformanceAssessmentView : ContentPage
 
     private async void OnAssessmentTapped(object sender, EventArgs e)
     {
-        var border = (Border)sender;
-        var assessment = (CourseAssessment)border.BindingContext;
-        var viewModel = (PerformanceAssessmentViewModel)BindingContext;
+        Border border = (Border)sender;
+        CourseAssessment assessment = (CourseAssessment)border.BindingContext;
+        PerformanceAssessmentViewModel viewModel = (PerformanceAssessmentViewModel)BindingContext;
 
         // Visual feedback animation
-        await border.ScaleToAsync(0.95, 50);
+        _ = await border.ScaleToAsync(0.95, 50);
         border.BackgroundColor = Color.FromArgb("#E3F2FD");
         await Task.Delay(100);
-        await border.ScaleToAsync(1, 50);
+        _ = await border.ScaleToAsync(1, 50);
         border.BackgroundColor = Colors.White;
 
         // Check if we're in remove mode
@@ -48,7 +48,7 @@ public partial class PerformanceAssessmentView : ContentPage
             if (confirm)
             {
                 // Remove from collection
-                viewModel.Assessments.Remove(assessment);
+                _ = viewModel.Assessments.Remove(assessment);
 
                 // Exit remove mode
                 viewModel.IsDeletingAssessment = false;
@@ -74,6 +74,7 @@ public partial class PerformanceAssessmentView : ContentPage
             viewModel.AssessmentStartDate = assessment.StartDate;
             viewModel.AssessmentEndDate = assessment.EndDate;
             viewModel.AssessmentDescription = assessment.Description;
+            viewModel.NewCourse.Id = assessment.CourseId;
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
             viewModel.AssessmentIsActive = true;

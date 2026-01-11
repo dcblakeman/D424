@@ -1,9 +1,8 @@
-﻿using C_971.Models;
-using C_971.Services;
+﻿using C_971.Services;
 using C_971.ViewModels;
 using C_971.Views;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui;
 using Plugin.LocalNotification;
 using System.Runtime.Versioning;
 
@@ -16,18 +15,23 @@ namespace C_971
         [SupportedOSPlatform("ios13.0")]
         public static MauiApp CreateMauiApp()
         {
-            var builder = MauiApp.CreateBuilder();
-            builder
+            MauiAppBuilder builder = MauiApp.CreateBuilder();
+#pragma warning disable CA1416 // Validate platform compatibility
+            MauiAppBuilder mauiAppBuilder = builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .UseLocalNotification()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+#pragma warning restore CA1416 // Validate platform compatibility
 
             // Register database service and interface
             builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddSingleton<NotificationService>();
+            builder.Services.AddSingleton<PermissionService>();
 
             builder.Services.AddTransient<LoginView>();
             builder.Services.AddTransient<LoginViewModel>();
@@ -66,7 +70,7 @@ namespace C_971
             builder.Logging.AddDebug();
 #endif
 
-            var app = builder.Build();
+            MauiApp app = builder.Build();
 
             return app;
         }

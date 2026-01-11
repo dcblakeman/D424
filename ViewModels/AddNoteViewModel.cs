@@ -1,21 +1,42 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(NewCourse), "course")]
+    [QueryProperty(nameof(Term), "term")]
+    [QueryProperty(nameof(Course), "course")]
+    [QueryProperty(nameof(User), "user")]
     public partial class AddNoteViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
 
+        [ObservableProperty]
+        public User user = new();
+
+        [ObservableProperty]
+        public User newUser;
+
+        [ObservableProperty]
+        private int newUserId;
+
+        [ObservableProperty]
+        private AcademicTerm term;
+
+        [ObservableProperty]
+        private AcademicTerm newTerm;
+
         // Core Properties
+        [ObservableProperty]
+        private Course course;
+
         [ObservableProperty]
         private Course newCourse;
 
         [ObservableProperty]
-        private CourseNote newNote = new CourseNote();
+        private CourseNote newNote = new();
 
         [ObservableProperty]
         private string viewName = "Add Note";
@@ -32,27 +53,38 @@ namespace C_971.ViewModels
             _database = database;
         }
 
-        // Property Change Handlers
-        partial void OnNewCourseChanged(Course value)
+        partial void OnUserChanged(User value)
         {
-            if (value != null)
-            {
-            }
+            NewUser = value;
+        }
+
+        partial void OnCourseChanged(Course value)
+        {
+            NewCourse = value;
+        }
+
+        partial void OnTermChanged(AcademicTerm value)
+        {
+            NewTerm = value;
         }
 
         // Commands
         [RelayCommand]
         private async Task SaveNote()
         {
-            if (!ValidateNote()) return;
+            if (!ValidateNote())
+            {
+                return;
+            }
 
             try
             {
+                NewNote.Id = 0;
                 NewNote.CreatedDate = DateTime.Now;
                 NewNote.NoteContent = NewNoteContent.Trim();
                 NewNote.CourseId = NewCourse.Id;
 
-                await _database.SaveCourseNoteAsync(NewNote);
+                _ = await _database.SaveCourseNoteAsync(NewNote);
 
                 await Shell.Current.DisplayAlertAsync("Success", "Note saved successfully!", "OK");
                 await GoBack();
@@ -77,7 +109,10 @@ namespace C_971.ViewModels
                     "Discard",
                     "Continue Editing");
 
-                if (!confirmed) return;
+                if (!confirmed)
+                {
+                    return;
+                }
             }
 
             await GoBack();
@@ -91,7 +126,9 @@ namespace C_971.ViewModels
                 // Navigate back to previous page with course context
                 await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
-                    ["course"] = NewCourse
+                    ["course"] = NewCourse,
+                    ["term"] = NewTerm,
+                    ["user"] = NewUser
                 });
             }
             catch (Exception ex)

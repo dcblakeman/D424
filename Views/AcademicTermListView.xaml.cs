@@ -22,15 +22,15 @@ public partial class AcademicTermListView : ContentPage
     }
     private async void OnTermTapped(object sender, TappedEventArgs e)
     {
-        var border = (Border)sender;
-        var term = (AcademicTerm)border.BindingContext;
-        var viewModel = (AcademicTermListViewModel)BindingContext;
+        Border border = (Border)sender;
+        AcademicTerm term = (AcademicTerm)border.BindingContext;
+        AcademicTermListViewModel viewModel = (AcademicTermListViewModel)BindingContext;
 
         // Visual feedback animation
-        await border.ScaleToAsync(0.95, 50);
+        _ = await border.ScaleToAsync(0.95, 50);
         border.BackgroundColor = Color.FromArgb("#E3F2FD");
         await Task.Delay(100);
-        await border.ScaleToAsync(1, 50);
+        _ = await border.ScaleToAsync(1, 50);
         border.BackgroundColor = Colors.White;
 
         // Check if we're in remove mode
@@ -51,7 +51,7 @@ public partial class AcademicTermListView : ContentPage
                     await viewModel.DeleteTermCommand.ExecuteAsync(term);
 
                     // Remove from UI
-                    viewModel.AcademicTerms.Remove(term);
+                    _ = viewModel.AcademicTerms.Remove(term);
                     viewModel.IsRemovingTerm = false;
 
                     await Shell.Current.DisplayAlertAsync("Success", "Term removed successfully!", "OK");
@@ -67,7 +67,8 @@ public partial class AcademicTermListView : ContentPage
             // Normal navigation behavior
             await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
             {
-                { "term", term }
+                ["term"] = term,
+                ["user"] = viewModel.NewUser
             });
         }
     }

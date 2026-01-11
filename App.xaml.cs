@@ -1,7 +1,4 @@
-﻿using C_971.Views;
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Hosting;
+﻿using C_971.Services;
 
 
 namespace C_971
@@ -16,6 +13,17 @@ namespace C_971
         protected override Window CreateWindow(IActivationState? activationState)
         {
             return new Window(new AppShell());
+        }
+
+        protected override async void OnStart()
+        {
+            base.OnStart();
+
+            PermissionService? permissionService = Handler?.MauiContext?.Services.GetService<PermissionService>();
+            if (permissionService != null)
+            {
+                _ = await permissionService.RequestNotificationPermissionAsync();
+            }
         }
     }
 }

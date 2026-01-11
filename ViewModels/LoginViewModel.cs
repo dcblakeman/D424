@@ -2,25 +2,22 @@
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace C_971.ViewModels;
 
-[QueryProperty(nameof(NewUserId), "newuserid")]
+[QueryProperty(nameof(User), "user")]
 public partial class LoginViewModel : ObservableObject
 {
-    private DatabaseService _database;
+    private readonly DatabaseService _database;
 
     [ObservableProperty]
     private string viewName = "Login";
 
     [ObservableProperty]
-    private User newUser = new User();
+    public User user = new();
 
     [ObservableProperty]
-    private int newUserId;
+    public User newUser;
 
     [ObservableProperty]
     private string newRegisterUserEmail = string.Empty;
@@ -28,7 +25,7 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private string newRegisterUserPassword = string.Empty;
 
-    [ObservableProperty]    
+    [ObservableProperty]
     public string newLoginUserEmail = string.Empty;
 
     [ObservableProperty]
@@ -41,38 +38,56 @@ public partial class LoginViewModel : ObservableObject
 
     internal async Task<int> GetUserIdByEmailAsync(string email)
     {
-        int userId =  await _database.GetUserIdByEmailAsync(email);
+        int userId = await _database.GetUserIdByEmailAsync(email);
         return userId;
     }
 
     [RelayCommand]
     public async Task LoginUser()
     {
-        //Validate email format using regex
-        if (!System.Text.RegularExpressions.Regex.IsMatch(NewLoginUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        try
         {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+            // Verify that email is not empty
+            if (string.IsNullOrWhiteSpace(NewLoginUserEmail))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter your email.", "OK");
+                return;
+            }
+
+            //Validate email format using regex
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewLoginUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+                return;
+            }
+
+            //Verify that password is not empty
+            if (string.IsNullOrWhiteSpace(NewLoginUserPassword))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter your password.", "OK");
+                return;
+            }
+        }
+        catch
+        {
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter your email.", "OK");
             return;
         }
 
-        //Verify that password is not empty
-        if (string.IsNullOrWhiteSpace(NewLoginUserPassword))
-        {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter your password.", "OK");
-            return;
-        }
 
         bool isAuthenticated = await AuthenticateAsync(NewLoginUserEmail, NewLoginUserPassword);
 
         if (isAuthenticated)
         {
-            NewUserId = await GetUserIdByEmailAsync(NewLoginUserEmail);
+            //NewUser.Id = await GetUserIdByEmailAsync(NewLoginUserEmail);
+
+            NewUser = await _database.GetUserByEmailAsync(NewLoginUserEmail);
 
             // Pass the dictionary directly as an argument to GoToAsync
-            await Shell.Current.GoToAsync("AcademicTermListView", new Dictionary<string, object>
-                {
-                    { "newuserId", NewUserId }
-                });
+            await Shell.Current.GoToAsync("AcademicTermListView", true, new Dictionary<string, object>
+            {
+                ["user"] = NewUser
+            });
         }
         else
         {
@@ -83,19 +98,32 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     public async Task RegisterUser()
     {
-        // Validate email format using regex
-        if (!System.Text.RegularExpressions.Regex.IsMatch(NewRegisterUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        try
         {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
-            return;
+            // Verify that the email is not empty
+            if (string.IsNullOrWhiteSpace(NewRegisterUserEmail))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter an email address.", "OK");
+                return;
+            }
+
+            // Validate email format using regex
+            if (!System.Text.RegularExpressions.Regex.IsMatch(NewRegisterUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
+                return;
+            }
+
+            //Verify that password is not empty
+            if (string.IsNullOrWhiteSpace(NewRegisterUserPassword))
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Please enter a password.", "OK");
+                return;
+            }
         }
-
-
-        //Verify that password is not empty
-        if (string.IsNullOrWhiteSpace(NewRegisterUserPassword))
+        catch
         {
-            await Shell.Current.DisplayAlertAsync("Error", "Please enter a password.", "OK");
-            return;
+            await Shell.Current.DisplayAlertAsync("Error", "Please enter an email address.", "OK");
         }
 
         bool isRegistered = await IsEmailRegisteredAsync(NewRegisterUserEmail);
@@ -107,7 +135,7 @@ public partial class LoginViewModel : ObservableObject
         }
 
         //Register user in database
-        await _database.CreateUserAsync(NewRegisterUserEmail, NewRegisterUserPassword);
+        _ = await _database.CreateUserAsync(NewRegisterUserEmail, NewRegisterUserPassword);
 
         await Shell.Current.DisplayAlertAsync("Success", "Registration successful. You can now log in.", "OK");
     }
