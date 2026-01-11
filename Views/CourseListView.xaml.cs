@@ -1,6 +1,5 @@
 ﻿using C_971.Models;
 using C_971.ViewModels;
-using Microsoft.Maui.Controls;
 
 namespace C_971.Views
 {
@@ -27,15 +26,15 @@ namespace C_971.Views
 
         private async void OnCourseTapped(object sender, EventArgs e)
         {
-            var border = (Border)sender;
-            var newCourse = (Course)border.BindingContext;
-            var viewModel = (CourseListViewModel)BindingContext;
+            Border border = (Border)sender;
+            Course newCourse = (Course)border.BindingContext;
+            CourseListViewModel viewModel = (CourseListViewModel)BindingContext;
 
             // Visual feedback animation
-            await border.ScaleToAsync(0.95, 50);
+            _ = await border.ScaleToAsync(0.95, 50);
             border.BackgroundColor = Color.FromArgb("#E3F2FD");
             await Task.Delay(100);
-            await border.ScaleToAsync(1, 50);
+            _ = await border.ScaleToAsync(1, 50);
             border.BackgroundColor = Colors.White;
 
             // Check if we're in remove mode
@@ -51,7 +50,7 @@ namespace C_971.Views
                 if (confirm)
                 {
                     // Remove from collection
-                    viewModel.Courses.Remove(newCourse);
+                    _ = viewModel.Courses.Remove(newCourse);
                     viewModel.RemoveCourseCommand.Execute(newCourse);
 
                     // Exit remove mode

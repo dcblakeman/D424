@@ -68,17 +68,29 @@
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="FluentMermaid" Version="0.1.0" />
+		<PackageReference Include="MermaidClassDiagramGenerator" Version="1.2.1" />
+		<PackageReference Include="MermaidDotNet" Version="0.7.31" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.20" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.1" />
 		<PackageReference Include="Microsoft.Maui.Graphics" Version="10.0.20" />
 		<PackageReference Include="Microsoft.SourceLink.GitLab" Version="8.0.0">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Plugin.LocalNotification" Version="12.0.2" />
+		<PackageReference Include="PlantUML.Console" Version="1.0.0" />
+		<PackageReference Include="PlantUML.Logic" Version="1.0.1" />
+		<PackageReference Include="PlantUml.Net" Version="1.4.80" />
+		<PackageReference Include="PlantUmlClassDiagramGenerator.Attributes" Version="1.3.0.1" />
+		<PackageReference Include="PlantUmlClassDiagramGenerator.SourceGenerator" Version="1.1.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Plugin.LocalNotification" Version="13.0.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
 		<PackageReference Include="SQLitePCLRawEx.bundle_green" Version="2.1.0" />
+		<PackageReference Include="Waher.Content.Markdown.PlantUml" Version="5.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>

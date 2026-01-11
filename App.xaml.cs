@@ -1,8 +1,4 @@
 ﻿using C_971.Services;
-using C_971.Views;
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Hosting;
 
 
 namespace C_971
@@ -23,10 +19,10 @@ namespace C_971
         {
             base.OnStart();
 
-            var permissionService = Handler?.MauiContext?.Services.GetService<PermissionService>();
+            PermissionService? permissionService = Handler?.MauiContext?.Services.GetService<PermissionService>();
             if (permissionService != null)
             {
-                await permissionService.RequestNotificationPermissionAsync();
+                _ = await permissionService.RequestNotificationPermissionAsync();
             }
         }
     }

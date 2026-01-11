@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace C_971
+﻿namespace C_971
 {
     public static class Constants
     {

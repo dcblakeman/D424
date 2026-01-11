@@ -2,7 +2,6 @@
 
 using C_971.Models;
 using C_971.Services;
-using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -16,7 +15,7 @@ namespace C_971.ViewModels
         private readonly DatabaseService _database;
 
         [ObservableProperty]
-        private bool isPopulated = false; 
+        private bool isPopulated = false;
 
         [ObservableProperty]
         private string viewName = "Course List";
@@ -38,7 +37,7 @@ namespace C_971.ViewModels
         private Course course;
 
         [ObservableProperty]
-        private Course newCourse = new Course(); 
+        private Course newCourse = new();
 
         // New Course Form
         [ObservableProperty]
@@ -76,22 +75,22 @@ namespace C_971.ViewModels
         private string searchText = string.Empty;
 
         [ObservableProperty]
-        private ObservableCollection<Course> courses = new();
+        private ObservableCollection<Course> courses = [];
 
-        public List<Course> _allCourses = new List<Course>();
+        public List<Course> _allCourses = [];
 
         // Static Collections
-        public ObservableCollection<CourseStatus> StatusOptions { get; } = new ObservableCollection<CourseStatus>
-        {
+        public ObservableCollection<CourseStatus> StatusOptions { get; } =
+        [
             CourseStatus.NotEnrolled,
             CourseStatus.InProgress,
             CourseStatus.Completed,
             CourseStatus.Dropped,
             CourseStatus.Planned
-        };
+        ];
 
-        public ObservableCollection<FinalGrade> GradeOptions { get; set; } = new ObservableCollection<FinalGrade>
-        {
+        public ObservableCollection<FinalGrade> GradeOptions { get; set; } =
+        [
             FinalGrade.A,
             FinalGrade.AMinus,
             FinalGrade.BPlus,
@@ -105,7 +104,7 @@ namespace C_971.ViewModels
             FinalGrade.DMinus,
             FinalGrade.F,
             FinalGrade.NotGraded
-        };
+        ];
 
         public CourseListViewModel(DatabaseService database)
         {
@@ -150,11 +149,11 @@ namespace C_971.ViewModels
         {
             Courses.Clear();
 
-            var filteredCourses = string.IsNullOrWhiteSpace(SearchText)
+            IEnumerable<Course> filteredCourses = string.IsNullOrWhiteSpace(SearchText)
                 ? _allCourses
                 : _allCourses.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-            foreach (var course in filteredCourses)
+            foreach (Course? course in filteredCourses)
             {
                 Courses.Add(course);
             }
@@ -165,7 +164,11 @@ namespace C_971.ViewModels
         public async Task LoadCoursesAsync(AcademicTerm term)
         {
             //Courses.Clear();
-            if (term == null) return;
+            if (term == null)
+            {
+                return;
+            }
+
             if (term != null)
             {
                 _allCourses = await _database.GetCoursesByTermIdAsync(term.Id);
@@ -211,7 +214,11 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewCourse()
         {
-            if (!ValidateNewCourse()) return;
+            if (!ValidateNewCourse())
+            {
+                return;
+            }
+
             try
             {
                 NewCourse.Id = 0;
@@ -223,13 +230,13 @@ namespace C_971.ViewModels
                 NewCourse.Grade = NewCourseGrade;
                 NewCourse.TermId = NewTerm.Id;
 
-                await _database.SaveCourseAsync(NewCourse);
+                _ = await _database.SaveCourseAsync(NewCourse);
 
                 // Reload the term from database to get the assigned ID
                 Course savedCourse = await _database.GetCourseByNameAsync(NewCourse.Name);
 
                 // **ADD THIS: Auto-enroll the current user in the new course**
-                var userCourse = new UserCourse
+                UserCourse userCourse = new()
                 {
                     UserId = NewUser.Id,  // Use your User property
                     CourseId = savedCourse.Id
@@ -287,14 +294,14 @@ namespace C_971.ViewModels
         private async Task RemoveCourse(Course newCourse)
         {
             IsRemovingCourse = true;
-            await _database.DeleteCourseAsync(newCourse);
+            _ = await _database.DeleteCourseAsync(newCourse);
         }
 
         [RelayCommand]
         public async Task CancelRemoveCourse()
         {
             IsRemovingCourse = false;
-            await Task.CompletedTask;   
+            await Task.CompletedTask;
         }
     }
 }

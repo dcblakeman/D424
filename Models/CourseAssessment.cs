@@ -1,5 +1,4 @@
-﻿using C_971.Models;
-using SQLite;
+﻿using SQLite;
 
 namespace C_971.Models
 {
@@ -16,7 +15,7 @@ namespace C_971.Models
         [MaxLength(500)]
         [NotNull]
         [Column("description")]
-        public string Description { get; set; } = string.Empty;  
+        public string Description { get; set; } = string.Empty;
 
         [NotNull]
         [Column("start_date")]

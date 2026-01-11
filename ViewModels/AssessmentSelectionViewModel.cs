@@ -4,8 +4,6 @@ using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Plugin.LocalNotification;
-using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
@@ -15,7 +13,7 @@ namespace C_971.ViewModels
     public partial class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
-        public AssessmentSelectionViewModel(DatabaseService database) 
+        public AssessmentSelectionViewModel(DatabaseService database)
         {
             _database = database;
         }
@@ -54,7 +52,7 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewTerm}", "OK");
+            _ = Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewTerm}", "OK");
 
         }
 
@@ -115,7 +113,10 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task NavigateToReportView()
         {
-            if (NewCourse == null) return;
+            if (NewCourse == null)
+            {
+                return;
+            }
 
             try
             {

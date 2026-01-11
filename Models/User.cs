@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SQLite;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using SQLite;
 
 namespace C_971.Models
 {

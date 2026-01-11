@@ -2,16 +2,13 @@
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace C_971.ViewModels;
 
 [QueryProperty(nameof(User), "user")]
 public partial class LoginViewModel : ObservableObject
 {
-    private DatabaseService _database;
+    private readonly DatabaseService _database;
 
     [ObservableProperty]
     private string viewName = "Login";
@@ -28,7 +25,7 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private string newRegisterUserPassword = string.Empty;
 
-    [ObservableProperty]    
+    [ObservableProperty]
     public string newLoginUserEmail = string.Empty;
 
     [ObservableProperty]
@@ -41,7 +38,7 @@ public partial class LoginViewModel : ObservableObject
 
     internal async Task<int> GetUserIdByEmailAsync(string email)
     {
-        int userId =  await _database.GetUserIdByEmailAsync(email);
+        int userId = await _database.GetUserIdByEmailAsync(email);
         return userId;
     }
 
@@ -70,7 +67,8 @@ public partial class LoginViewModel : ObservableObject
                 await Shell.Current.DisplayAlertAsync("Error", "Please enter your password.", "OK");
                 return;
             }
-        } catch
+        }
+        catch
         {
             await Shell.Current.DisplayAlertAsync("Error", "Please enter your email.", "OK");
             return;
@@ -137,7 +135,7 @@ public partial class LoginViewModel : ObservableObject
         }
 
         //Register user in database
-        await _database.CreateUserAsync(NewRegisterUserEmail, NewRegisterUserPassword);
+        _ = await _database.CreateUserAsync(NewRegisterUserEmail, NewRegisterUserPassword);
 
         await Shell.Current.DisplayAlertAsync("Success", "Registration successful. You can now log in.", "OK");
     }

@@ -4,10 +4,10 @@ namespace C_971.Views;
 
 public partial class ReportView : ContentPage
 {
-	public ReportView(ReportViewModel viewModel)
-	{
-		InitializeComponent();
-		BindingContext = viewModel;
+    public ReportView(ReportViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
     }
 
     protected override async void OnNavigatedTo(NavigatedToEventArgs args)

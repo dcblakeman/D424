@@ -1,8 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using C_971.Models;
+using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using C_971.Models;
-using C_971.Services;
+using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
@@ -17,7 +17,7 @@ namespace C_971.ViewModels
         private string viewName = "Academic Terms";
 
         [ObservableProperty]
-        private AcademicTerm newTerm = new AcademicTerm();
+        private AcademicTerm newTerm = new();
 
         [ObservableProperty]
         public User user = new();
@@ -32,7 +32,7 @@ namespace C_971.ViewModels
         public int newUserId;
 
         [ObservableProperty]
-        private ObservableCollection<AcademicTerm> academicTerms = new();
+        private ObservableCollection<AcademicTerm> academicTerms = [];
 
         // UI State
         [ObservableProperty]
@@ -50,7 +50,7 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private string searchText = string.Empty;
 
-        private List<AcademicTerm> _allTerms = new();
+        private List<AcademicTerm> _allTerms = [];
 
         // New Term Form
         [ObservableProperty]
@@ -70,7 +70,7 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
+            _ = Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
         }
 
         // Initialization
@@ -109,11 +109,11 @@ namespace C_971.ViewModels
         {
             AcademicTerms.Clear();
 
-            var filteredTerms = string.IsNullOrWhiteSpace(SearchText)
+            IEnumerable<AcademicTerm> filteredTerms = string.IsNullOrWhiteSpace(SearchText)
                 ? _allTerms
                 : _allTerms.Where(t => t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-            foreach (var term in filteredTerms)
+            foreach (AcademicTerm? term in filteredTerms)
             {
                 AcademicTerms.Add(term);
             }
@@ -156,7 +156,11 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewTerm()
         {
-            if (!ValidateNewTerm()) return;
+            if (!ValidateNewTerm())
+            {
+                return;
+            }
+
             try
             {
                 NewTerm.Id = 0;
@@ -165,7 +169,7 @@ namespace C_971.ViewModels
                 NewTerm.EndDate = NewTermEndDate;
 
                 // Insert Term Into database
-                await _database.SaveTermAsync(NewTerm);
+                _ = await _database.SaveTermAsync(NewTerm);
 
                 // Reload the term from database to get the assigned ID
                 AcademicTerm savedTerm = await _database.GetTermByNameAsync(NewTerm.Name);
@@ -173,7 +177,7 @@ namespace C_971.ViewModels
 
                 AcademicTerms.Clear();
                 _allTerms.Add(savedTerm);  // Add the complete database term
-  
+
                 ApplySearchFilter();
                 await Shell.Current.DisplayAlertAsync("Success", "Term added successfully!", "OK");
 
@@ -201,15 +205,18 @@ namespace C_971.ViewModels
         [RelayCommand]
         public async Task DeleteTerm(AcademicTerm term)
         {
-            if (term == null) return;
+            if (term == null)
+            {
+                return;
+            }
 
             try
             {
-                await _database.DeleteTermAsync(term);
+                _ = await _database.DeleteTermAsync(term);
 
                 // Remove from cache and UI
-                _allTerms.Remove(term);
-                AcademicTerms.Remove(term);
+                _ = _allTerms.Remove(term);
+                _ = AcademicTerms.Remove(term);
 
                 // Exit remove mode
                 IsRemovingTerm = false;
@@ -258,7 +265,7 @@ namespace C_971.ViewModels
         public async Task Logout()
         {
             // Navigate back to login page
-            await Shell.Current.GoToAsync("///LoginView",true);
+            await Shell.Current.GoToAsync("///LoginView", true);
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace C_971.Services
+﻿namespace C_971.Services
 {
     public class PermissionService
     {

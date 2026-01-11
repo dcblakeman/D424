@@ -3,11 +3,7 @@ using C_971.Services;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Storage;
-using System;
-using System.Collections.Generic;
 using System.Text;
-using SQLite;
 
 namespace C_971.ViewModels
 {
@@ -17,7 +13,7 @@ namespace C_971.ViewModels
     public partial class ReportViewModel : ObservableObject
     {
 
-        private DatabaseService _database;
+        private readonly DatabaseService _database;
 
         [ObservableProperty]
         public User user = new();
@@ -56,19 +52,19 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
+            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
         {
             NewCourse = value;
-            Shell.Current.DisplayAlertAsync("Updated Values", $"New Course: {NewCourse}", "OK");
+            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New Course: {NewCourse}", "OK");
         }
 
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {NewTerm}", "OK");
+            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {NewTerm}", "OK");
         }
 
 
@@ -76,12 +72,12 @@ namespace C_971.ViewModels
         [RelayCommand]
         public async Task GenerateAssessmentReport()
         {
-            ReportTitle= "Assessment_Report";
+            ReportTitle = "Assessment_Report";
             ReportText = string.Empty;
 
             try
             {
-                var assessments = await _database.GetAssessmentsForUserAndTermAsync(NewUser.Id, NewTerm.Id);
+                List<CourseAssessment> assessments = await _database.GetAssessmentsForUserAndTermAsync(NewUser.Id, NewTerm.Id);
 
                 await Shell.Current.DisplayAlertAsync("Wait", $"Number of assessments: {assessments.Count}", "OK");
 
@@ -98,7 +94,7 @@ namespace C_971.ViewModels
                                     $"Type: {assessment.Type}\n" +
                                     $"Start Date: {assessment.StartDate:d}\n" +
                                     $"End Date: {assessment.EndDate:d}\n" +
-                                    $"Status: {assessment.Status}\n\n" + 
+                                    $"Status: {assessment.Status}\n\n" +
                                     $"Grade: {assessment.Grade}\n\n";
                 }
             }
@@ -117,7 +113,7 @@ namespace C_971.ViewModels
             ReportText = string.Empty;
             try
             {
-                var courses = await _database.GetCoursesWithDetailsAsync(NewUser.Id, NewTerm.Id);
+                List<Course> courses = await _database.GetCoursesWithDetailsAsync(NewUser.Id, NewTerm.Id);
 
                 // Generate Report
                 foreach (Course course in courses)
@@ -147,7 +143,7 @@ namespace C_971.ViewModels
 
             try
             {
-                var coursesWithAssessments = await _database.GetCoursesWithAssessmentsAsync(User.Id, Term.Id);
+                List<CourseWithAssessments> coursesWithAssessments = await _database.GetCoursesWithAssessmentsAsync(User.Id, Term.Id);
 
                 // Generate Report Header
                 ReportText += $"=== COURSES AND ASSESSMENTS REPORT ===\n";
@@ -156,10 +152,10 @@ namespace C_971.ViewModels
                 ReportText += $"Total Courses: {coursesWithAssessments.Count}\n\n";
 
                 // Generate Report Body
-                foreach (var courseWithAssessments in coursesWithAssessments)
+                foreach (CourseWithAssessments courseWithAssessments in coursesWithAssessments)
                 {
-                    var course = courseWithAssessments.Course;
-                    var assessments = courseWithAssessments.Assessments;
+                    Course course = courseWithAssessments.Course;
+                    List<CourseAssessment> assessments = courseWithAssessments.Assessments;
 
                     ReportText += $"COURSE: {course.Name}\n" +
                                  $"Description: {course.Description}\n" +
@@ -175,7 +171,7 @@ namespace C_971.ViewModels
                     else
                     {
                         ReportText += $"ASSESSMENTS ({assessments.Count}):\n";
-                        foreach (var assessment in assessments)
+                        foreach (CourseAssessment assessment in assessments)
                         {
                             ReportText += $"  • {assessment.Name}\n" +
                                          $"    Type: {assessment.Type}\n" +
@@ -210,10 +206,10 @@ namespace C_971.ViewModels
                     return;
                 }
 
-                var stream = new MemoryStream(Encoding.UTF8.GetBytes(reportContent));
+                MemoryStream stream = new(Encoding.UTF8.GetBytes(reportContent));
 
-                var fileName = $"{reportTitle}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
-                var result = await FileSaver.Default.SaveAsync(fileName, stream, CancellationToken.None);
+                string fileName = $"{reportTitle}_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                FileSaverResult result = await FileSaver.Default.SaveAsync(fileName, stream, CancellationToken.None);
 
                 if (result.IsSuccessful)
                 {
@@ -239,7 +235,7 @@ namespace C_971.ViewModels
             try
             {
                 string reportsPath = Preferences.Get(REPORTS_FOLDER_KEY, string.Empty);
-                var files = Directory.GetFiles(reportsPath);
+                string[] files = Directory.GetFiles(reportsPath);
 
                 if (files.Length == 0)
                 {
@@ -264,7 +260,7 @@ namespace C_971.ViewModels
             try
             {
                 string reportsPath = Preferences.Get(REPORTS_FOLDER_KEY, string.Empty);
-                var files = Directory.GetFiles(reportsPath).ToList();
+                List<string> files = Directory.GetFiles(reportsPath).ToList();
 
                 if (files.Count > 0)
                 {
@@ -312,7 +308,7 @@ namespace C_971.ViewModels
             try
             {
                 // Open file picker to let user select a report file
-                var customFileType = new FilePickerFileType(
+                FilePickerFileType customFileType = new(
                     new Dictionary<DevicePlatform, IEnumerable<string>>
                     {
                         { DevicePlatform.iOS, new[] { "public.text" } },
@@ -321,7 +317,7 @@ namespace C_971.ViewModels
                         { DevicePlatform.MacCatalyst, new[] { "txt" } }
                     });
 
-                var result = await FilePicker.PickAsync(new PickOptions
+                FileResult? result = await FilePicker.PickAsync(new PickOptions
                 {
                     FileTypes = customFileType,
                     PickerTitle = "Select Assessment Report"
@@ -329,7 +325,7 @@ namespace C_971.ViewModels
 
                 if (result != null)
                 {
-                    await Launcher.OpenAsync(new OpenFileRequest
+                    _ = await Launcher.OpenAsync(new OpenFileRequest
                     {
                         File = new ReadOnlyFile(result.FullPath)
                     });

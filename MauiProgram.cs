@@ -1,10 +1,10 @@
 ﻿using C_971.Services;
 using C_971.ViewModels;
 using C_971.Views;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Plugin.LocalNotification;
 using System.Runtime.Versioning;
-using CommunityToolkit.Maui;
 
 namespace C_971
 {
@@ -15,7 +15,7 @@ namespace C_971
         [SupportedOSPlatform("ios13.0")]
         public static MauiApp CreateMauiApp()
         {
-            var builder = MauiApp.CreateBuilder();
+            MauiAppBuilder builder = MauiApp.CreateBuilder();
 #pragma warning disable CA1416 // Validate platform compatibility
             MauiAppBuilder mauiAppBuilder = builder
                 .UseMauiApp<App>()
@@ -70,7 +70,7 @@ namespace C_971
             builder.Logging.AddDebug();
 #endif
 
-            var app = builder.Build();
+            MauiApp app = builder.Build();
 
             return app;
         }

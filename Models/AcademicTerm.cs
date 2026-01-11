@@ -1,11 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SQLite;
 
 namespace C_971.Models
 {
@@ -41,6 +34,6 @@ namespace C_971.Models
 
         // Navigation properties - ignored by SQLite
         [Ignore]
-        public List<Course> Courses { get; set; } = new();
+        public List<Course> Courses { get; set; } = [];
     }
 }

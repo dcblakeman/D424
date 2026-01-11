@@ -1,6 +1,4 @@
 ﻿using SQLite;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace C_971.Models
 {
@@ -24,7 +22,7 @@ namespace C_971.Models
         public DateTime EndDate { get; set; } = DateTime.Today.AddMonths(6);
 
         [Column("status"), NotNull]
-        public CourseStatus Status { get; set; } = CourseStatus.Planned;
+        public CourseStatus Status { get; set; }
 
         [Column("start_date_notifications"), NotNull]
         public bool StartDateNotifications { get; set; } = true;
@@ -36,7 +34,7 @@ namespace C_971.Models
         public int CreditUnits { get; set; } = 3;
 
         [Column("grade"), NotNull]
-        public FinalGrade Grade { get; set; } = FinalGrade.NotGraded;
+        public FinalGrade Grade { get; set; }
 
         // Foreign keys
         [Column("term_id"), NotNull]
@@ -53,9 +51,9 @@ namespace C_971.Models
         public CourseInstructor? Instructor { get; set; }
 
         [Ignore]
-        public List<CourseAssessment> Assessments { get; set; } = new();
+        public List<CourseAssessment> Assessments { get; set; } = [];
 
         [Ignore]
-        public List<CourseNote> Notes { get; set; } = new();
+        public List<CourseNote> Notes { get; set; } = [];
     }
 }

@@ -36,7 +36,7 @@ namespace C_971.ViewModels
         private Course newCourse;
 
         [ObservableProperty]
-        private CourseNote newNote = new CourseNote();
+        private CourseNote newNote = new();
 
         [ObservableProperty]
         private string viewName = "Add Note";
@@ -72,7 +72,10 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNote()
         {
-            if (!ValidateNote()) return;
+            if (!ValidateNote())
+            {
+                return;
+            }
 
             try
             {
@@ -81,7 +84,7 @@ namespace C_971.ViewModels
                 NewNote.NoteContent = NewNoteContent.Trim();
                 NewNote.CourseId = NewCourse.Id;
 
-                await _database.SaveCourseNoteAsync(NewNote);
+                _ = await _database.SaveCourseNoteAsync(NewNote);
 
                 await Shell.Current.DisplayAlertAsync("Success", "Note saved successfully!", "OK");
                 await GoBack();
@@ -106,7 +109,10 @@ namespace C_971.ViewModels
                     "Discard",
                     "Continue Editing");
 
-                if (!confirmed) return;
+                if (!confirmed)
+                {
+                    return;
+                }
             }
 
             await GoBack();

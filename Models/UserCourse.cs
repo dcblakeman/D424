@@ -1,13 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace C_971.Models
 {
     [Table("user_course")]
-    public partial class UserCourse : ObservableObject
+    public partial class UserCourse
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
@@ -22,12 +19,12 @@ namespace C_971.Models
         [Column("end_date")]
         public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(6);
         [Column("grade")]
-        public FinalGrade Grade { get; set; } = FinalGrade.NotGraded;
+        public FinalGrade Grade { get; set; }
         // Navigation properties
         [Ignore]
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [Ignore]
-        public Course Course { get; set; }
+        public Course? Course { get; set; }
     }
 }

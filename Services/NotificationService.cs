@@ -1,8 +1,5 @@
 ﻿using C_971.Models;
 using Plugin.LocalNotification;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace C_971.Services
 {
@@ -17,13 +14,16 @@ namespace C_971.Services
         public async Task<bool> ScheduleCourseStartReminderAsync(Course course, DateTime reminderDate)
         {
 
-            await Shell.Current.DisplayAlertAsync("Testing",$"Scheduling notification for {reminderDate:yyyy-MM-dd HH:mm:ss}","OK");
+            await Shell.Current.DisplayAlertAsync("Testing", $"Scheduling notification for {reminderDate:yyyy-MM-dd HH:mm:ss}", "OK");
 
-            await Shell.Current.DisplayAlertAsync("Testing",$"Current time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}","OK");
+            await Shell.Current.DisplayAlertAsync("Testing", $"Current time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}", "OK");
 
-            if (!await EnsurePermissionAsync()) return false;
+            if (!await EnsurePermissionAsync())
+            {
+                return false;
+            }
 
-            var request = new NotificationRequest
+            NotificationRequest request = new()
             {
                 NotificationId = 1000 + course.Id,
                 Title = "Course Starting Tomorrow",
@@ -32,15 +32,18 @@ namespace C_971.Services
                 Schedule = { NotifyTime = reminderDate }
             };
 
-            await LocalNotificationCenter.Current.Show(request);
+            _ = await LocalNotificationCenter.Current.Show(request);
             return true;
         }
 
         public async Task<bool> ScheduleCourseEndReminderAsync(Course course, DateTime reminderDate)
         {
-            if (!await EnsurePermissionAsync()) return false;
+            if (!await EnsurePermissionAsync())
+            {
+                return false;
+            }
 
-            var request = new NotificationRequest
+            NotificationRequest request = new()
             {
                 NotificationId = 2000 + course.Id,
                 Title = "Course Ending Soon",
@@ -49,13 +52,13 @@ namespace C_971.Services
                 Schedule = { NotifyTime = reminderDate }
             };
 
-            await LocalNotificationCenter.Current.Show(request);
+            _ = await LocalNotificationCenter.Current.Show(request);
             return true;
         }
 
         public async Task CancelNotificationAsync(int notificationId)
         {
-            LocalNotificationCenter.Current.Cancel(notificationId);
+            _ = LocalNotificationCenter.Current.Cancel(notificationId);
         }
 
         private async Task<bool> EnsurePermissionAsync()
@@ -66,9 +69,12 @@ namespace C_971.Services
 
         internal async Task<bool> ScheduleAssessmentReminderAsync(CourseAssessment assessment, DateTime reminderDate)
         {
-            if (!await EnsurePermissionAsync()) return false;
+            if (!await EnsurePermissionAsync())
+            {
+                return false;
+            }
 
-            var request = new NotificationRequest
+            NotificationRequest request = new()
             {
                 NotificationId = assessment.Id,
                 Title = "Assessment Due Soon",
@@ -86,15 +92,18 @@ namespace C_971.Services
                 }
             };
 
-            await LocalNotificationCenter.Current.Show(request);
+            _ = await LocalNotificationCenter.Current.Show(request);
             return true;
         }
 
         public async Task<bool> ScheduleAssessmentStartReminderAsync(CourseAssessment assessment, DateTime reminderDate)
         {
-            if (!await EnsurePermissionAsync()) return false;
+            if (!await EnsurePermissionAsync())
+            {
+                return false;
+            }
 
-            var request = new NotificationRequest
+            NotificationRequest request = new()
             {
                 NotificationId = assessment.Id,
                 Title = "Assessment Starting Soon",
@@ -103,15 +112,18 @@ namespace C_971.Services
                 Schedule = { NotifyTime = reminderDate }
             };
 
-            await LocalNotificationCenter.Current.Show(request);
+            _ = await LocalNotificationCenter.Current.Show(request);
             return true;
         }
 
         public async Task<bool> ScheduleAssessmentDueReminderAsync(CourseAssessment assessment, DateTime reminderDate)
         {
-            if (!await EnsurePermissionAsync()) return false;
+            if (!await EnsurePermissionAsync())
+            {
+                return false;
+            }
 
-            var request = new NotificationRequest
+            NotificationRequest request = new()
             {
                 NotificationId = 10000 + assessment.Id, // Different offset for due date reminders
                 Title = "Assessment Due Soon",
@@ -120,14 +132,18 @@ namespace C_971.Services
                 Schedule = { NotifyTime = reminderDate }
             };
 
-            await LocalNotificationCenter.Current.Show(request);
+            _ = await LocalNotificationCenter.Current.Show(request);
             return true;
         }
 
         public async Task<bool> ScheduleCourseDueReminderAsync(Course newCourse, DateTime reminderDate)
         {
-            if (!await EnsurePermissionAsync()) return false;
-            var request = new NotificationRequest
+            if (!await EnsurePermissionAsync())
+            {
+                return false;
+            }
+
+            NotificationRequest request = new()
             {
                 NotificationId = 3000 + newCourse.Id,
                 Title = "Course Due Soon",
@@ -135,7 +151,7 @@ namespace C_971.Services
                 Description = $"Course '{newCourse.Name}' is due on {newCourse.EndDate:MM/dd/yyyy}",
                 Schedule = { NotifyTime = reminderDate }
             };
-            await LocalNotificationCenter.Current.Show(request);
+            _ = await LocalNotificationCenter.Current.Show(request);
             return true;
         }
     }

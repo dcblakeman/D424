@@ -1,15 +1,16 @@
-namespace C_971.Views;
 
 using C_971.Models;
 using C_971.ViewModels;
 
+namespace C_971.Views;
+
 public partial class CourseInstructorView : ContentPage
 {
-	public CourseInstructorView(CourseInstructorViewModel viewModel)
-	{
-		InitializeComponent();
-		BindingContext = viewModel;
-	}
+    public CourseInstructorView(CourseInstructorViewModel viewModel)
+    {
+        InitializeComponent();
+        BindingContext = viewModel;
+    }
 
     protected override async void OnAppearing()
     {
@@ -36,9 +37,9 @@ public partial class CourseInstructorView : ContentPage
 
     public async void OnInstructorTapped(object sender, EventArgs e)
     {
-        var border = (Border)sender;
-        var instructor = (CourseInstructor)border.BindingContext;
-        var viewModel = (CourseInstructorViewModel)BindingContext;
+        Border border = (Border)sender;
+        CourseInstructor instructor = (CourseInstructor)border.BindingContext;
+        CourseInstructorViewModel viewModel = (CourseInstructorViewModel)BindingContext;
 
         // Check if we're in remove mode
         if (viewModel.IsRemovingInstructor)

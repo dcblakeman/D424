@@ -1,12 +1,5 @@
 ﻿using C_971.Models;
 using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.Maui.Controls;
-using BCrypt.Net;
 
 namespace C_971.Services
 {
@@ -16,7 +9,10 @@ namespace C_971.Services
 
         public async Task InitializeAsync()
         {
-            if (_database is not null) return;
+            if (_database is not null)
+            {
+                return;
+            }
 
             //For development -delete and recreate if schema changed
             //if (File.Exists(Constants.DatabasePath))
@@ -27,14 +23,13 @@ namespace C_971.Services
             try
             {
                 _database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
-                await _database.CreateTableAsync<AcademicTerm>();
-                await _database.CreateTableAsync<Course>();
-                await _database.CreateTableAsync<CourseNote>();
-                await _database.CreateTableAsync<CourseAssessment>();
-                await _database.CreateTableAsync<CourseInstructor>();
-                await _database.CreateTableAsync<User>();
-                await _database.CreateTableAsync<UserCourse>();
-                await _database.CreateTableAsync<UserAssessment>();
+                _ = await _database.CreateTableAsync<AcademicTerm>();
+                _ = await _database.CreateTableAsync<Course>();
+                _ = await _database.CreateTableAsync<CourseNote>();
+                _ = await _database.CreateTableAsync<CourseAssessment>();
+                _ = await _database.CreateTableAsync<CourseInstructor>();
+                _ = await _database.CreateTableAsync<User>();
+                _ = await _database.CreateTableAsync<UserCourse>();
 
             }
             catch (Exception ex)
@@ -155,7 +150,7 @@ namespace C_971.Services
         public async Task<int> GetNextCourseNoteIdAsync()
         {
             await InitializeAsync();
-            var notes = await _database.Table<CourseNote>()
+            List<CourseNote> notes = await _database.Table<CourseNote>()
                 .OrderByDescending(n => n.Id)
                 .ToListAsync();
             return notes.Count > 0 ? notes[0].Id + 1 : 1;
@@ -188,7 +183,7 @@ namespace C_971.Services
         public async Task<int> GetNextAssessmentIdAsync()
         {
             await InitializeAsync();
-            var assessments = await _database.Table<CourseAssessment>()
+            List<CourseAssessment> assessments = await _database.Table<CourseAssessment>()
                 .OrderByDescending(a => a.Id)
                 .ToListAsync();
             return assessments.Count > 0 ? assessments[0].Id + 1 : 1;
@@ -235,20 +230,10 @@ namespace C_971.Services
         public async Task<int> GetNextCourseInstructorIdAsync()
         {
             await InitializeAsync();
-            var instructors = await _database.Table<CourseInstructor>()
+            List<CourseInstructor> instructors = await _database.Table<CourseInstructor>()
                 .OrderByDescending(i => i.Id)
                 .ToListAsync();
             return instructors.Count > 0 ? instructors[0].Id + 1 : 1;
-        }
-
-        internal async Task<int> GetMaxAssessmentIdAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal async Task AddCourseInstructorAsync(CourseInstructor newInstructor)
-        {
-            throw new NotImplementedException();
         }
 
         internal async Task<IEnumerable<object>> GetCourseNotesByCourseIdAsync(int id)
@@ -271,7 +256,7 @@ namespace C_971.Services
 
         public async Task<bool> CanAddAssessment(int courseId, AssessmentType assessmentType)
         {
-            var existingAssessment = await _database.Table<CourseAssessment>()
+            CourseAssessment existingAssessment = await _database.Table<CourseAssessment>()
                 .FirstOrDefaultAsync(a => a.CourseId == courseId && a.Type == assessmentType);
 
             return existingAssessment == null;
@@ -279,12 +264,12 @@ namespace C_971.Services
 
         public async Task<bool> ValidateCourseAssessments(int courseId)
         {
-            var assessments = await _database.Table<CourseAssessment>()
+            List<CourseAssessment> assessments = await _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId)
                 .ToListAsync();
 
-            var hasPerformance = assessments.Any(a => a.Type == AssessmentType.Performance);
-            var hasObjective = assessments.Any(a => a.Type == AssessmentType.Objective);
+            bool hasPerformance = assessments.Any(a => a.Type == AssessmentType.Performance);
+            bool hasObjective = assessments.Any(a => a.Type == AssessmentType.Objective);
 
             return hasPerformance && hasObjective && assessments.Count == 2;
         }
@@ -292,10 +277,10 @@ namespace C_971.Services
         public async Task DeleteAssessmentAsync(int id)
         {
             await InitializeAsync();
-            var assessment = await _database.FindAsync<CourseAssessment>(id);
+            CourseAssessment assessment = await _database.FindAsync<CourseAssessment>(id);
             if (assessment != null)
             {
-                await _database.DeleteAsync(assessment);
+                _ = await _database.DeleteAsync(assessment);
             }
         }
 
@@ -332,7 +317,7 @@ namespace C_971.Services
         public async Task<CourseAssessment> GetAssessmentbyCourseId(int courseId)
         {
             await InitializeAsync();
-            var assessment = _database.Table<CourseAssessment>()
+            AsyncTableQuery<CourseAssessment> assessment = _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId);
 
             return await assessment.FirstOrDefaultAsync();
@@ -341,7 +326,7 @@ namespace C_971.Services
         public async Task<CourseAssessment> GetAssessmentbyCourseIdAndType(int courseId, AssessmentType type)
         {
             await InitializeAsync();
-            var assessment = _database.Table<CourseAssessment>()
+            AsyncTableQuery<CourseAssessment> assessment = _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId && a.Type == type);
             return await assessment.FirstOrDefaultAsync();
 
@@ -350,7 +335,7 @@ namespace C_971.Services
         internal async Task<CourseAssessment> GetAssessmentbyCourseIdAndTypeAndIsActive(int courseId, AssessmentType assessmentType, bool assessmentIsActive)
         {
             await InitializeAsync();
-            var assessment = _database.Table<CourseAssessment>()
+            AsyncTableQuery<CourseAssessment> assessment = _database.Table<CourseAssessment>()
                 .Where(a => a.CourseId == courseId && a.Type == assessmentType && a.IsActive == assessmentIsActive);
             return await assessment.FirstOrDefaultAsync();
         }
@@ -358,16 +343,17 @@ namespace C_971.Services
         public async Task<bool> CreateUserAsync(string email, string password)
         {
             await InitializeAsync();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
-            User newUser = new User();
-
-            newUser.Email = email;
-            newUser.HashedPassword = hashedPassword;
+            User newUser = new()
+            {
+                Email = email,
+                HashedPassword = hashedPassword
+            };
 
             try
             {
-                await _database.InsertAsync(newUser);
+                _ = await _database.InsertAsync(newUser);
                 return true;
             }
             catch
@@ -380,7 +366,7 @@ namespace C_971.Services
         internal async Task<int> GetUserIdByEmailAsync(string email)
         {
             await InitializeAsync();
-            var user = await _database.Table<User>()
+            User user = await _database.Table<User>()
                 .Where(u => u.Email == email)
                 .FirstOrDefaultAsync();
             if (user != null)
@@ -415,17 +401,17 @@ namespace C_971.Services
         internal async Task<bool> IsEmailRegisteredAsync(string email)
         {
             await InitializeAsync();
-            var user = await _database.Table<User>()
+            User user = await _database.Table<User>()
                 .Where(u => u.Email == email)
                 .FirstOrDefaultAsync();
             return user != null;
         }
 
-        internal async Task<AcademicTerm> GetTermByNameAsync(string name)
+        internal async Task<AcademicTerm?> GetTermByNameAsync(string name)
         {
 
             await InitializeAsync();
-            var term = await _database.Table<AcademicTerm>()
+            AcademicTerm term = await _database.Table<AcademicTerm>()
                 .Where(t => t.Name == name)
                 .FirstOrDefaultAsync();
             if (term != null)
@@ -439,10 +425,10 @@ namespace C_971.Services
             }
         }
 
-        internal async Task<Course> GetCourseByNameAsync(string name)
+        internal async Task<Course?> GetCourseByNameAsync(string name)
         {
             await InitializeAsync();
-            var course = await _database.Table<Course>()
+            Course course = await _database.Table<Course>()
                 .Where(c => c.Name == name)
                 .FirstOrDefaultAsync();
             if (course != null)
@@ -465,12 +451,12 @@ namespace C_971.Services
 
         public async Task<List<UserCourse>> GetUserCoursesWithDetailsAsync(int userId)
         {
-            var userCourses = await _database.Table<UserCourse>()
+            List<UserCourse> userCourses = await _database.Table<UserCourse>()
                 .Where(uc => uc.UserId == userId)
                 .ToListAsync();
 
             // Load the actual course data for each enrollment
-            foreach (var userCourse in userCourses)
+            foreach (UserCourse userCourse in userCourses)
             {
                 userCourse.Course = await _database.Table<Course>()
                     .FirstOrDefaultAsync(c => c.Id == userCourse.CourseId);
@@ -480,57 +466,11 @@ namespace C_971.Services
         }
 
         // Add this to your DatabaseService
-        public async Task<bool> AddAssessmentToUserCourseAsync(int userCourseId, int assessmentId)
-        {
-            try
-            {
-                // Check if assessment already exists for this enrollment
-                var existing = await _database.Table<UserAssessment>()
-                    .FirstOrDefaultAsync(ua => ua.UserCourseId == userCourseId && ua.AssessmentId == assessmentId);
-
-                if (existing != null)
-                    return false; // Already exists
-
-                var userAssessment = new UserAssessment
-                {
-                    UserCourseId = userCourseId,
-                    AssessmentId = assessmentId,
-                };
-
-                await _database.InsertAsync(userAssessment);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> UpdateAssessmentGradeAsync(int userAssessmentId, FinalGrade grade)
-        {
-            try
-            {
-                var userAssessment = await _database.Table<UserAssessment>()
-                    .FirstOrDefaultAsync(ua => ua.Id == userAssessmentId);
-
-                if (userAssessment == null)
-                    return false;
-
-                userAssessment.Grade = grade;
-
-                await _database.UpdateAsync(userAssessment);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
         public async Task<List<Course>> GetCoursesWithDetailsAsync(int userId, int termId)
         {
-            var query = @"
-                        SELECT *
+            string query = @"
+                        SELECT DISTINCT *
                         FROM course c
                         INNER JOIN user_course uc ON c.id = uc.course_id
                         INNER JOIN academic_term t ON c.term_id = t.id
@@ -542,7 +482,7 @@ namespace C_971.Services
 
         public async Task<List<CourseAssessment>> GetAssessmentsForUserAndTermAsync(int userId, int termId)
         {
-            var query = @"
+            string query = @"
                         SELECT *
                         FROM course_assessment a
                         INNER JOIN course c ON a.course_id = c.id
@@ -556,7 +496,7 @@ namespace C_971.Services
         public async Task<List<CourseWithAssessments>> GetCoursesWithAssessmentsAsync(int userId, int termId)
         {
             // First get all courses for the user and term
-            var coursesQuery = @"
+            string coursesQuery = @"
                 SELECT DISTINCT c.*
                 FROM course c
                 INNER JOIN user_course uc ON c.id = uc.course_id
@@ -564,20 +504,20 @@ namespace C_971.Services
                 WHERE uc.user_id = ? AND c.term_id = ?
                 ORDER BY c.start_date ASC";
 
-            var courses = await _database.QueryAsync<Course>(coursesQuery, userId, termId);
+            List<Course> courses = await _database.QueryAsync<Course>(coursesQuery, userId, termId);
 
-            var result = new List<CourseWithAssessments>();
+            List<CourseWithAssessments> result = [];
 
-            foreach (var course in courses)
+            foreach (Course course in courses)
             {
                 await Shell.Current.DisplayAlertAsync("Course Id", $"{course.Id}", "OK");
                 // Get assessments for each course
-                var assessmentsQuery = @"
+                string assessmentsQuery = @"
                     SELECT * FROM course_assessment
                     WHERE course_id = ?
                     ORDER BY end_date ASC";
 
-                var assessments = await _database.QueryAsync<CourseAssessment>(assessmentsQuery, course.Id);
+                List<CourseAssessment> assessments = await _database.QueryAsync<CourseAssessment>(assessmentsQuery, course.Id);
 
                 result.Add(new CourseWithAssessments
                 {
@@ -589,10 +529,10 @@ namespace C_971.Services
             return result;
         }
 
-        internal async Task<User> GetUserByEmailAsync(string newLoginUserEmail)
+        internal async Task<User?> GetUserByEmailAsync(string newLoginUserEmail)
         {
             await InitializeAsync();
-            var user = await _database.Table<User>()
+            User user = await _database.Table<User>()
                 .Where(u => u.Email == newLoginUserEmail)
                 .FirstOrDefaultAsync();
             if (user != null)
@@ -609,14 +549,7 @@ namespace C_971.Services
         internal async Task SaveUserCourseAsync(UserCourse userCourse)
         {
             await InitializeAsync();
-            if (userCourse.Id != 0)
-            {
-                await _database.UpdateAsync(userCourse);
-            }
-            else
-            {
-                await _database.InsertAsync(userCourse);
-            }
+            _ = userCourse.Id != 0 ? await _database.UpdateAsync(userCourse) : await _database.InsertAsync(userCourse);
         }
     }
 }
