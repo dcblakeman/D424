@@ -89,7 +89,7 @@
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="5"/>
                         </Border.StrokeShape>
-                        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
+                        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5">
                             <Label Grid.Row="0" Grid.Column="0" Text="ID:" FontAttributes="Bold" VerticalOptions="Center"/>
                             <Label Grid.Row="0" Grid.Column="1" Text="{Binding AssessmentId}" VerticalOptions="Center"/>
 
@@ -99,7 +99,6 @@
 
                             <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
                             <Label Grid.Row="2" Grid.Column="1" Text="{Binding AssessmentType}" VerticalOptions="Center"/>
-                            <!-- <Picker Grid.Row="2" Grid.Column="1" ItemsSource="{Binding AssessmentTypeOptions}" SelectedItem="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/> -->
 
                             <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
                             <Label Grid.Row="3" Grid.Column="1" Text="{Binding AssessmentDescription}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
@@ -117,11 +116,15 @@
                             <Label Grid.Row="6" Grid.Column="1" Text="{Binding AssessmentStatus}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
                             <Picker Grid.Row="6" Grid.Column="1" ItemsSource="{Binding AssessmentStatusOptions}" SelectedItem="{Binding AssessmentStatus}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
-                            <Label Grid.Row="7" Grid.Column="0" Text="Course ID:" FontAttributes="Bold" VerticalOptions="Center"/>
-                            <Label Grid.Row="7" Grid.Column="1" Text="{Binding AssessmentCourseId}" VerticalOptions="Center"/>
+                            <Label Grid.Row="7" Grid.Column="0" Text="Grade:" FontAttributes="Bold" VerticalOptions="Center"/>
+                            <Label Grid.Row="7" Grid.Column="1" Text="{Binding AssessmentGrade}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>
+                            <Picker Grid.Row="7" Grid.Column="1" ItemsSource="{Binding GradeOptions}" SelectedItem="{Binding AssessmentGrade}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/>
 
-                            <Label Grid.Row="8" Grid.Column="1" Text="IsActive:" VerticalOptions="Center" TextColor="Gray" FontAttributes="Italic"/>
-                            <Label Grid.Row="8" Grid.Column="2" Text="{Binding AssessmentIsActive, Converter={StaticResource BoolToYesNoConverter}}" VerticalOptions="Center" TextColor="DarkBlue" FontAttributes="Italic"/>
+                            <Label Grid.Row="8" Grid.Column="0" Text="Course ID:" FontAttributes="Bold" VerticalOptions="Center"/>
+                            <Label Grid.Row="8" Grid.Column="1" Text="{Binding AssessmentCourseId}" VerticalOptions="Center"/>
+
+                            <Label Grid.Row="9" Grid.Column="1" Text="IsActive:" VerticalOptions="Center" TextColor="Gray" FontAttributes="Italic"/>
+                        <Label Grid.Row="9" Grid.Column="2" Text="{Binding AssessmentIsActive, Converter={StaticResource BoolToYesNoConverter}}" VerticalOptions="Center" TextColor="DarkBlue" FontAttributes="Italic"/>
                     </Grid>
                     </Border>
 

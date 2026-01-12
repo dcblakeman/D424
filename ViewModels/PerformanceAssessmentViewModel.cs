@@ -83,6 +83,9 @@ namespace C_971.ViewModels
         public int assessmentCourseId = 0;
 
         [ObservableProperty]
+        public FinalGrade assessmentGrade = FinalGrade.NotGraded;
+
+        [ObservableProperty]
         public ObservableCollection<CourseAssessment> assessments = [];
 
         public List<CourseAssessment> _allPerformanceAssessments = [];
@@ -122,6 +125,23 @@ namespace C_971.ViewModels
         public string AddButtonText => IsAddingAssessment ? "Save Assessment" : "Add Assessment";
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
 
+        public ObservableCollection<FinalGrade> GradeOptions { get; set; } =
+        [
+            FinalGrade.A,
+            FinalGrade.AMinus,
+            FinalGrade.BPlus,
+            FinalGrade.B,
+            FinalGrade.BMinus,
+            FinalGrade.CPlus,
+            FinalGrade.C,
+            FinalGrade.CMinus,
+            FinalGrade.DPlus,
+            FinalGrade.D,
+            FinalGrade.DMinus,
+            FinalGrade.F,
+            FinalGrade.NotGraded
+        ];
+
         //Assessment StatusOptions
         [ObservableProperty]
         private List<AssessmentStatus> assessmentStatusOptions =
@@ -144,6 +164,7 @@ namespace C_971.ViewModels
             _database = database;
             _notification = notification;
             IsSearching = false;
+            IsEditing = false;
         }
 
         partial void OnUserChanged(User value)
@@ -421,6 +442,7 @@ namespace C_971.ViewModels
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
+                    Assessment.Grade = AssessmentGrade;
 
                 }
                 else
@@ -436,7 +458,8 @@ namespace C_971.ViewModels
                         EndDate = AssessmentEndDate,
                         Description = AssessmentDescription,
                         StartDateNotifications = AssessmentStartDateNotifications,
-                        EndDateNotifications = AssessmentEndDateNotifications
+                        EndDateNotifications = AssessmentEndDateNotifications,
+                        Grade = AssessmentGrade
                     };
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
@@ -555,6 +578,7 @@ namespace C_971.ViewModels
                     AssessmentEndDate = DateTime.Now.AddMonths(6);
                     AssessmentStatus = AssessmentStatus.Pending;
                     AssessmentCourseId = NewCourse.Id;
+                    AssessmentGrade = FinalGrade.NotGraded;
 
                 }
                 catch (Exception ex)
@@ -622,9 +646,7 @@ namespace C_971.ViewModels
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                     AssessmentIsActive = Assessment.IsActive;
                     AssessmentCourseId = NewCourse.Id;
-
-                    //await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
-
+                    AssessmentGrade = Assessment.Grade;
                 }
                 catch (Exception ex)
                 {
@@ -679,6 +701,7 @@ namespace C_971.ViewModels
             AssessmentStatus = AssessmentStatus.Pending;
             AssessmentIsActive = true;
             AssessmentCourseId = NewCourse.Id;
+            AssessmentGrade = FinalGrade.NotGraded;
         }
     }
 }

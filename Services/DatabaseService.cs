@@ -470,12 +470,23 @@ namespace C_971.Services
         public async Task<List<Course>> GetCoursesWithDetailsAsync(int userId, int termId)
         {
             string query = @"
-                        SELECT DISTINCT *
-                        FROM course c
-                        INNER JOIN user_course uc ON c.id = uc.course_id
-                        INNER JOIN academic_term t ON c.term_id = t.id
-                        WHERE uc.user_id = ? AND c.term_id = ?
-                        ORDER BY c.start_date ASC";
+                SELECT DISTINCT 
+                    c.id,
+                    c.name,
+                    c.description,
+                    c.start_date,
+                    c.end_date,
+                    c.status,
+                    c.start_date_notifications,
+                    c.end_date_notifications,
+                    c.credit_units,
+                    c.grade,
+                    c.term_id,
+                    c.instructor_id
+                FROM course c
+                INNER JOIN user_course uc ON c.id = uc.course_id
+                WHERE uc.user_id = ? AND c.term_id = ?
+                ORDER BY c.start_date ASC";
 
             return await _database.QueryAsync<Course>(query, userId, termId);
         }
@@ -483,12 +494,12 @@ namespace C_971.Services
         public async Task<List<CourseAssessment>> GetAssessmentsForUserAndTermAsync(int userId, int termId)
         {
             string query = @"
-                        SELECT *
-                        FROM course_assessment a
-                        INNER JOIN course c ON a.course_id = c.id
-                        INNER JOIN user_course uc ON c.id = uc.course_id
-                        WHERE uc.user_id = ? AND c.term_id = ?
-                        ORDER BY a.end_date ASC";
+                            SELECT DISTINCT a.*
+                            FROM course_assessment a
+                            INNER JOIN course c ON a.course_id = c.id
+                            INNER JOIN user_course uc ON c.id = uc.course_id
+                            WHERE uc.user_id = ? AND c.term_id = ?
+                            ORDER BY a.end_date ASC";
 
             return await _database.QueryAsync<CourseAssessment>(query, userId, termId);
         }

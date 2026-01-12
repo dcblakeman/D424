@@ -177,6 +177,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task AddCourseInstructor()
         {
+            NewInstructor = new CourseInstructor();
             if (!ValidateInstructor())
             {
                 return;

@@ -115,6 +115,7 @@ namespace C_971.ViewModels
             {
                 List<Course> courses = await _database.GetCoursesWithDetailsAsync(NewUser.Id, NewTerm.Id);
 
+                await Shell.Current.DisplayAlertAsync("Test", $"Number of courses: {courses.Count}", "OK");
                 // Generate Report
                 foreach (Course course in courses)
                 {
@@ -177,7 +178,8 @@ namespace C_971.ViewModels
                                          $"    Type: {assessment.Type}\n" +
                                          $"    Start: {assessment.StartDate:d}\n" +
                                          $"    Due: {assessment.EndDate:d}\n" +
-                                         $"    Score: {assessment.Grade}\n\n";
+                                         $"    Status: {course.Status}\n" +
+                                         $"    Grade: {assessment.Grade}\n\n";
                         }
                     }
 
@@ -362,31 +364,6 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Navigation Error", $"Navigation back failed: {ex.Message}", "OK");
             }
-        }
-
-        internal async Task OnAppearingAsync()
-        {
-            // Get all of the courses in a list
-            //for each course, generate a report
-            var courses = _database.GetCoursesByUserId(NewUserId);
-
-            if (NewCourse == null) return;
-            StringBuilder reportBuilder = new StringBuilder();
-            
-            //Add date and time first
-            reportBuilder.AppendLine($"Report Generated on: {DateTime.Now}");
-            reportBuilder.AppendLine($"Report for Course: {NewCourse.Name}");
-            reportBuilder.AppendLine($"Course ID: {NewCourse.Id}");
-            reportBuilder.AppendLine($"User ID: {NewUserId}");
-            reportBuilder.AppendLine("--------------------------------------------------");
-            reportBuilder.AppendLine("This is a placeholder for the detailed report content.");
-            reportBuilder.AppendLine("You can expand this method to include actual data analysis and reporting logic.");
-            reportBuilder.AppendLine("--------------------------------------------------");
-            reportBuilder.AppendLine($"Report generated on: {DateTime.Now}");
-            ReportText = reportBuilder.ToString();
-
-            //Output report to a text file
-            File.AppendAllBytes(Path.Combine(filePath, $"CourseReport_{NewCourse.Id}_{DateTime.Now:yyyyMMdd_HHmmss}.txt"), Encoding.UTF8.GetBytes(ReportText));
         }
     }
 }

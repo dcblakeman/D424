@@ -84,6 +84,9 @@ namespace C_971.ViewModels
         private int assessmentCourseId = 0;
 
         [ObservableProperty]
+        public FinalGrade assessmentGrade;
+
+        [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = [];
 
         private List<CourseAssessment> _allObjectiveAssessments = [];
@@ -111,9 +114,14 @@ namespace C_971.ViewModels
         private bool isLoadingAssessments;
 
         [ObservableProperty]
+        private bool isNavigating = true;
+
+        [ObservableProperty]
         private bool isSearching;
 
         private bool _isLoadingData;
+
+        public bool IsNotNavigating => !IsNavigating;
 
         public bool IsNotSearching => !IsSearching;
 
@@ -123,6 +131,22 @@ namespace C_971.ViewModels
         public string AddButtonText => IsAddingAssessment ? "Save Assessment" : "Add Assessment";
         public string BackButtonText => IsEditing || IsSearching ? "Cancel" : "Back";
 
+        public ObservableCollection<FinalGrade> GradeOptions { get; set; } =
+        [
+            FinalGrade.A,
+            FinalGrade.AMinus,
+            FinalGrade.BPlus,
+            FinalGrade.B,
+            FinalGrade.BMinus,
+            FinalGrade.CPlus,
+            FinalGrade.C,
+            FinalGrade.CMinus,
+            FinalGrade.DPlus,
+            FinalGrade.D,
+            FinalGrade.DMinus,
+            FinalGrade.F,
+            FinalGrade.NotGraded
+        ];
 
         //Assessment StatusOptions
         [ObservableProperty]
@@ -145,13 +169,13 @@ namespace C_971.ViewModels
         {
             _database = database;
             _notification = notification;
-            IsSearching = false; IsSearching = false;
+            IsSearching = false;
+            IsEditing = false;
         }
 
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
         }
 
         partial void OnTermChanged(AcademicTerm value)
@@ -465,6 +489,7 @@ namespace C_971.ViewModels
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
+                    Assessment.Grade = AssessmentGrade;
                 }
                 else
                 {
@@ -479,7 +504,8 @@ namespace C_971.ViewModels
                         EndDate = AssessmentEndDate,
                         Description = AssessmentDescription,
                         StartDateNotifications = AssessmentStartDateNotifications,
-                        EndDateNotifications = AssessmentEndDateNotifications
+                        EndDateNotifications = AssessmentEndDateNotifications,
+                        Grade = AssessmentGrade
                     };
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
@@ -665,6 +691,7 @@ namespace C_971.ViewModels
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                     AssessmentIsActive = Assessment.IsActive;
                     AssessmentCourseId = Assessment.CourseId;
+                    AssessmentGrade = Assessment.Grade;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
                     return;

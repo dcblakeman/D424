@@ -5,6 +5,7 @@ using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using Waher.Script.Functions.Strings;
 
 namespace C_971.ViewModels
 {
@@ -221,7 +222,7 @@ namespace C_971.ViewModels
 
             try
             {
-                NewCourse.Id = 0;
+                NewCourse = new Course();
                 NewCourse.Name = NewCourseName;
                 NewCourse.Description = NewCourseDescription;
                 NewCourse.StartDate = NewCourseStartDate;

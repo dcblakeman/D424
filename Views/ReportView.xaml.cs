@@ -21,14 +21,4 @@ public partial class ReportView : ContentPage
             viewModel.NewTerm = viewModel.Term;
         }
     }
-
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-        if (BindingContext is ReportViewModel viewModel)
-        {
-            await viewModel.OnAppearingAsync();
-        }
-    }
-
 }
