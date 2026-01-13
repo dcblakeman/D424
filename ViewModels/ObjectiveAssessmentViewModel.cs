@@ -232,12 +232,11 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentStartDateNotificationsChanged(bool value)
         {
-            if (IsLoading) return;
             if (value)
             {
                 _ = Task.Run(async () => await HandleStartDateNotificationToggle());
             }
-            else if (!value) // Toggled OFF
+            else if (value)// Toggled OFF
             {
                 _ = Task.Run(async () => await _notification.CancelNotificationAsync(Assessment.Id));
             }
@@ -258,13 +257,13 @@ namespace C_971.ViewModels
 
         private async Task HandleStartDateNotificationToggle()
         {
-            if(IsLoading) return;
+            if(!IsEditing) return;
             try
             {
                 // Ask user for number of days
                 string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
                     await Shell.Current.DisplayPromptAsync(
-                        "Start Date Notification",
+                        "Start Date Notification Test",
                         "How many days in advance would you like to be notified?",
                         "OK",
                         "Cancel",
@@ -333,7 +332,7 @@ namespace C_971.ViewModels
 
         private async Task HandleEndDateNotificationToggle()
         {
-            if(IsLoading) return; 
+            if (!IsEditing) return; 
             try
             {
                 string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -401,27 +400,6 @@ namespace C_971.ViewModels
             }
         }
 
-        [RelayCommand]
-        public async Task SetReminderAsync()
-        {
-            DateTime reminderDate = Assessment.EndDate.AddDays(-1);
-
-            if (reminderDate <= DateTime.Now)
-            {
-                await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
-                    "This assessment is due too soon.", "OK");
-                return;
-            }
-
-            bool success = await _notification.ScheduleAssessmentReminderAsync(Assessment, reminderDate);
-
-            string message = success
-                ? $"Reminder set for {reminderDate:MM/dd/yyyy}"
-                : "Permission required. Check device settings.";
-
-            await Shell.Current.DisplayAlertAsync("Reminder", message, "OK");
-        }
-
         partial void OnIsEditingChanged(bool value)
         {
             OnPropertyChanged(nameof(IsNotEditing));
@@ -449,16 +427,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveAssessment()
         {
-            IsLoading = false;
             try
             {
-                if (Assessment != null)
+                if (Assessment != null && !IsLoading)
                 {
                     Assessment.IsActive = false;
                     Assessment.StartDateNotifications = false;
                     Assessment.EndDateNotifications = false;
-                    AssessmentStartDateNotifications = false;
-                    AssessmentEndDateNotifications = false;
                     _ = await _database.SaveCourseAssessmentAsync(Assessment);
 
                     Assessment.Id = AssessmentId;
@@ -472,7 +447,6 @@ namespace C_971.ViewModels
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
                     Assessment.Grade = AssessmentGrade;
-
                     Assessment.StartDateNotifications = AssessmentStartDateNotifications;
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                 }
@@ -488,14 +462,16 @@ namespace C_971.ViewModels
                         StartDate = AssessmentStartDate,
                         EndDate = AssessmentEndDate,
                         Description = AssessmentDescription,
+                        StartDateNotifications = AssessmentStartDateNotifications,
+                        EndDateNotifications = AssessmentEndDateNotifications,
                         Grade = AssessmentGrade
                     };
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
-
-                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
-                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                 }
+
+
+                await Task.Delay(100);
 
                 Assessment.IsActive = true;
                 _ = await _database.SaveCourseAssessmentAsync(Assessment);
@@ -661,7 +637,6 @@ namespace C_971.ViewModels
         }
         private async Task PopulateAssessmentProperties()
         {
-            IsLoading = true;
             Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(AssessmentCourseId, AssessmentType.Objective, Assessment.IsActive = true);
 
             if (Assessment != null)
@@ -738,10 +713,8 @@ namespace C_971.ViewModels
             AssessmentEndDate = DateTime.Now.AddMonths(6);
             AssessmentStatus = AssessmentStatus.Pending;
             AssessmentIsActive = true;
-
-            await Task.Delay(100); // Small delay to ensure UI updates
-            AssessmentStartDateNotifications = false;
-            AssessmentEndDateNotifications = false;
+            AssessmentCourseId = NewCourse.Id;
+            AssessmentGrade = FinalGrade.NotGraded;
         }
     }
 }

@@ -68,8 +68,8 @@ public partial class ObjectiveAssessmentView : ContentPage
             viewModel.NewCourse.Id = assessment.CourseId;
 
             await Task.Delay(100);
-            viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
-            viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
+            viewModel.AssessmentStartDateNotifications = false;
+            viewModel.AssessmentEndDateNotifications = false;
             viewModel.AssessmentIsActive = assessment.IsActive;
 
             //Save Assessment to database

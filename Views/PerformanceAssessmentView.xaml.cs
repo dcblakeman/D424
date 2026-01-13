@@ -22,6 +22,20 @@ public partial class PerformanceAssessmentView : ContentPage
         }
     }
 
+    //protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    //{
+    //    base.OnNavigatedTo(args);
+
+    //    // Check if the source contains AssessmentSelectionView
+    //    if (args.PreviousPage is AssessmentSelectionView)
+    //    {
+    //        if (BindingContext is PerformanceAssessmentViewModel viewModel)
+    //        {
+    //            await viewModel.GoBackCommand.ExecuteAsync(null);
+    //        }
+    //    }
+    //}
+
     private async void OnAssessmentTapped(object sender, EventArgs e)
     {
         Border border = (Border)sender;
@@ -77,6 +91,7 @@ public partial class PerformanceAssessmentView : ContentPage
             viewModel.AssessmentEndDate = assessment.EndDate;
             viewModel.AssessmentDescription = assessment.Description;
             viewModel.NewCourse.Id = assessment.CourseId;
+
             await Task.Delay(100); // Small delay for UI responsiveness
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;

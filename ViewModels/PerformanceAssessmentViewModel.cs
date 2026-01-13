@@ -169,6 +169,7 @@ namespace C_971.ViewModels
             _notification = notification;
             IsSearching = false;
             IsEditing = false;
+            IsLoading = false;
         }
 
         partial void OnUserChanged(User value)
@@ -253,7 +254,7 @@ namespace C_971.ViewModels
 
         private async Task HandleStartDateNotificationToggle()
         {
-            if (IsLoading) return;
+            if (!IsEditing) return;
             try
             {
                 // Ask user for number of days
@@ -329,7 +330,7 @@ namespace C_971.ViewModels
 
         private async Task HandleEndDateNotificationToggle()
         {
-            if (IsLoading) return;
+            if (!IsEditing) return;
             try
             {
                 string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -426,16 +427,13 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveAssessment()
         {
-            IsLoading = false;
             try
             {
-                if (Assessment != null)
+                if (Assessment != null && !IsLoading)
                 {
                     Assessment.IsActive = false;
                     Assessment.StartDateNotifications = false;
                     Assessment.EndDateNotifications = false;
-                    AssessmentStartDateNotifications = false;
-                    AssessmentEndDateNotifications = false;
                     _ = await _database.SaveCourseAssessmentAsync(Assessment);
 
                     Assessment.Id = AssessmentId;
@@ -449,8 +447,6 @@ namespace C_971.ViewModels
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
                     Assessment.Grade = AssessmentGrade;
-
-                    await Task.Delay(100);
                     Assessment.StartDateNotifications = AssessmentStartDateNotifications;
                     Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                 }
@@ -643,7 +639,6 @@ namespace C_971.ViewModels
 
         private async Task PopulateAssessmentProperties()
         {
-            IsLoading = true;
             Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(NewCourse.Id, AssessmentType.Performance, Assessment.IsActive = true);
 
             if (Assessment != null)
@@ -719,11 +714,6 @@ namespace C_971.ViewModels
             AssessmentIsActive = true;
             AssessmentCourseId = NewCourse.Id;
             AssessmentGrade = FinalGrade.NotGraded;
-
-            AssessmentStartDateNotifications = false;
-            AssessmentEndDateNotifications = false;
-
-            await Task.Delay(100);
         }
     }
 }
