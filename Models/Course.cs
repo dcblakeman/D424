@@ -25,10 +25,10 @@ namespace C_971.Models
         public CourseStatus Status { get; set; }
 
         [Column("start_date_notifications"), NotNull]
-        public bool StartDateNotifications { get; set; } = true;
+        public bool StartDateNotifications { get; set; } = false;
 
         [Column("end_date_notifications"), NotNull]
-        public bool EndDateNotifications { get; set; } = true;
+        public bool EndDateNotifications { get; set; } = false;
 
         [Column("credit_units"), NotNull]
         public int CreditUnits { get; set; } = 3;

@@ -51,6 +51,8 @@ public partial class ObjectiveAssessmentView : ContentPage
             {
                 //Deactivate Current Assessment
                 viewModel.Assessment.IsActive = false;
+                viewModel.Assessment.StartDateNotifications = false;
+                viewModel.Assessment.EndDateNotifications = false;
                 viewModel.SaveAssessmentCommand.Execute(null);
             }
 
@@ -64,6 +66,8 @@ public partial class ObjectiveAssessmentView : ContentPage
             viewModel.AssessmentEndDate = assessment.EndDate;
             viewModel.AssessmentDescription = assessment.Description;
             viewModel.NewCourse.Id = assessment.CourseId;
+
+            await Task.Delay(100);
             viewModel.AssessmentStartDateNotifications = assessment.StartDateNotifications;
             viewModel.AssessmentEndDateNotifications = assessment.EndDateNotifications;
             viewModel.AssessmentIsActive = assessment.IsActive;

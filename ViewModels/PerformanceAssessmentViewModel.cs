@@ -1,4 +1,5 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -115,7 +116,10 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isSearching;
 
-        private bool _isLoadingData;
+        [ObservableProperty]
+        private bool isLoading;
+
+        public bool IsNotLoading => !isLoading;
 
         public bool IsNotSearching => !IsSearching;
 
@@ -170,7 +174,6 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            _ = Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnTermChanged(AcademicTerm value)
@@ -226,12 +229,11 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentStartDateNotificationsChanged(bool value)
         {
-            if (_isLoadingData) return;
-            if (value && Assessment?.Id > 0) // Only if toggled ON and we have a saved assessment
+            if (value) // Only if toggled ON and we have a saved assessment
             {
                 _ = Task.Run(async () => await HandleStartDateNotificationToggle());
             }
-            else if (!value && Assessment?.Id > 0) // Toggled OFF
+            else if (!value) // Toggled OFF
             {
                 _ = Task.Run(async () => await _notification.CancelNotificationAsync(Assessment.Id));
             }
@@ -239,12 +241,11 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentEndDateNotificationsChanged(bool value)
         {
-            if (_isLoadingData) return;
-            if (value && Assessment?.Id > 0) // Only if toggled ON and we have a saved assessment
+            if (value) // Only if toggled ON and we have a saved assessment
             {
                 _ = Task.Run(async () => await HandleEndDateNotificationToggle());
             }
-            else if (!value && Assessment?.Id > 0) // Toggled OFF
+            else if (!value) // Toggled OFF
             {
                 _ = Task.Run(async () => await _notification.CancelNotificationAsync(10000 + Assessment.Id));
             }
@@ -252,6 +253,7 @@ namespace C_971.ViewModels
 
         private async Task HandleStartDateNotificationToggle()
         {
+            if (IsLoading) return;
             try
             {
                 // Ask user for number of days
@@ -327,6 +329,7 @@ namespace C_971.ViewModels
 
         private async Task HandleEndDateNotificationToggle()
         {
+            if (IsLoading) return;
             try
             {
                 string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -423,11 +426,16 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveAssessment()
         {
+            IsLoading = false;
             try
             {
                 if (Assessment != null)
                 {
                     Assessment.IsActive = false;
+                    Assessment.StartDateNotifications = false;
+                    Assessment.EndDateNotifications = false;
+                    AssessmentStartDateNotifications = false;
+                    AssessmentEndDateNotifications = false;
                     _ = await _database.SaveCourseAssessmentAsync(Assessment);
 
                     Assessment.Id = AssessmentId;
@@ -438,12 +446,13 @@ namespace C_971.ViewModels
                     Assessment.StartDate = AssessmentStartDate;
                     Assessment.EndDate = AssessmentEndDate;
                     Assessment.Description = AssessmentDescription;
-                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
-                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
                     Assessment.Grade = AssessmentGrade;
 
+                    await Task.Delay(100);
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                 }
                 else
                 {
@@ -464,6 +473,8 @@ namespace C_971.ViewModels
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
                 }
+
+                await Task.Delay(100);
 
                 _ = await _database.SaveCourseAssessmentAsync(Assessment);
 
@@ -580,6 +591,10 @@ namespace C_971.ViewModels
                     AssessmentCourseId = NewCourse.Id;
                     AssessmentGrade = FinalGrade.NotGraded;
 
+                    await Task.Delay(100);
+                    AssessmentStartDateNotifications = false;
+                    AssessmentEndDateNotifications = false;
+
                 }
                 catch (Exception ex)
                 {
@@ -628,7 +643,7 @@ namespace C_971.ViewModels
 
         private async Task PopulateAssessmentProperties()
         {
-            _isLoadingData = true;
+            IsLoading = true;
             Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(NewCourse.Id, AssessmentType.Performance, Assessment.IsActive = true);
 
             if (Assessment != null)
@@ -642,11 +657,13 @@ namespace C_971.ViewModels
                     AssessmentStatus = Assessment.Status;
                     AssessmentStartDate = Assessment.StartDate;
                     AssessmentEndDate = Assessment.EndDate;
-                    AssessmentStartDateNotifications = Assessment.StartDateNotifications;
-                    AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                     AssessmentIsActive = Assessment.IsActive;
                     AssessmentCourseId = NewCourse.Id;
                     AssessmentGrade = Assessment.Grade;
+
+                    await Task.Delay(100);
+                    AssessmentStartDateNotifications = Assessment.StartDateNotifications;
+                    AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                 }
                 catch (Exception ex)
                 {
@@ -655,7 +672,7 @@ namespace C_971.ViewModels
                 }
                 finally
                 {
-                    _isLoadingData = false;
+                    IsLoading = false;
                 }
 
             }
@@ -702,6 +719,11 @@ namespace C_971.ViewModels
             AssessmentIsActive = true;
             AssessmentCourseId = NewCourse.Id;
             AssessmentGrade = FinalGrade.NotGraded;
+
+            AssessmentStartDateNotifications = false;
+            AssessmentEndDateNotifications = false;
+
+            await Task.Delay(100);
         }
     }
 }

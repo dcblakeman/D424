@@ -645,7 +645,6 @@ namespace C_971.ViewModels
 
             }
 
-
             if (success)
             {
                 await Shell.Current.DisplayAlertAsync("Test Scheduled",

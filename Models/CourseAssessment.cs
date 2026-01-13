@@ -40,13 +40,11 @@ namespace C_971.Models
         [Column("grade")]
         public FinalGrade Grade { get; set; } = FinalGrade.NotGraded;
 
-        [NotNull]
         [Column("start_date_notifications")]
-        public bool StartDateNotifications { get; set; } = true;
+        public bool StartDateNotifications { get; set; } = false;
 
-        [NotNull]
         [Column("end_date_notifications")]
-        public bool EndDateNotifications { get; set; } = true;
+        public bool EndDateNotifications { get; set; } = false;
 
         [NotNull]
         [Column("is_active")]

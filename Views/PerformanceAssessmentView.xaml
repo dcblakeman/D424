@@ -99,7 +99,6 @@
 
                         <Label Grid.Row="2" Grid.Column="0" Text="Type:" FontAttributes="Bold" VerticalOptions="Center"/>
                         <Label Grid.Row="2" Grid.Column="1" Text="{Binding AssessmentType}" VerticalOptions="Center"/>
-                        <!-- <Picker Grid.Row="2" Grid.Column="1" ItemsSource="{Binding AssessmentTypeOptions}" SelectedItem="{Binding AssessmentType}" VerticalOptions="Center" IsVisible="{Binding IsEditing}"/> -->
 
                         <Label Grid.Row="3" Grid.Column="0" Text="Description:" FontAttributes="Bold" VerticalOptions="Center"/>
                         <Label Grid.Row="3" Grid.Column="1" Text="{Binding AssessmentDescription}" VerticalOptions="Center" IsVisible="{Binding IsNotEditing}"/>

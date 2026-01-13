@@ -1,9 +1,11 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.LocalNotification;
 using System.Collections.ObjectModel;
+
 
 namespace C_971.ViewModels
 {
@@ -119,7 +121,8 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isSearching;
 
-        private bool _isLoadingData;
+        [ObservableProperty]
+        private bool isLoading;
 
         public bool IsNotNavigating => !IsNavigating;
 
@@ -229,12 +232,12 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentStartDateNotificationsChanged(bool value)
         {
-            if (_isLoadingData) return;
-            if (value && Assessment?.Id > 0)
+            if (IsLoading) return;
+            if (value)
             {
                 _ = Task.Run(async () => await HandleStartDateNotificationToggle());
             }
-            else if (!value && Assessment?.Id > 0) // Toggled OFF
+            else if (!value) // Toggled OFF
             {
                 _ = Task.Run(async () => await _notification.CancelNotificationAsync(Assessment.Id));
             }
@@ -242,45 +245,20 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentEndDateNotificationsChanged(bool value)
         {
-            if (_isLoadingData) return;
-            if (value && Assessment?.Id > 0) //
+            if (value) 
             {
                 _ = Task.Run(async () => await HandleEndDateNotificationToggle());
             }
-            else if (!value && Assessment?.Id > 0) // Toggled OFF
+            else if (!value) // Toggled OFF
             {
                 _ = Task.Run(async () => await _notification.CancelNotificationAsync(10000 + Assessment.Id));
             }
         }
 
-        [RelayCommand]
-        public async Task ToggleStartNotificationsAsync()
-        {
-            if (AssessmentStartDateNotifications && Assessment?.Id > 0)
-            {
-                await HandleStartDateNotificationToggle();
-            }
-            else if (!AssessmentStartDateNotifications && Assessment?.Id > 0)
-            {
-                await _notification.CancelNotificationAsync(Assessment.Id);
-            }
-        }
-
-        [RelayCommand]
-        public async Task ToggleEndNotificationsAsync()
-        {
-            if (AssessmentEndDateNotifications && Course?.Id > 0)
-            {
-                await HandleEndDateNotificationToggle();
-            }
-            else if (!AssessmentEndDateNotifications && Course?.Id > 0)
-            {
-                await _notification.CancelNotificationAsync(10000 + Course.Id);
-            }
-        }
 
         private async Task HandleStartDateNotificationToggle()
         {
+            if(IsLoading) return;
             try
             {
                 // Ask user for number of days
@@ -355,6 +333,7 @@ namespace C_971.ViewModels
 
         private async Task HandleEndDateNotificationToggle()
         {
+            if(IsLoading) return; 
             try
             {
                 string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -470,11 +449,16 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveAssessment()
         {
+            IsLoading = false;
             try
             {
                 if (Assessment != null)
                 {
                     Assessment.IsActive = false;
+                    Assessment.StartDateNotifications = false;
+                    Assessment.EndDateNotifications = false;
+                    AssessmentStartDateNotifications = false;
+                    AssessmentEndDateNotifications = false;
                     _ = await _database.SaveCourseAssessmentAsync(Assessment);
 
                     Assessment.Id = AssessmentId;
@@ -485,11 +469,12 @@ namespace C_971.ViewModels
                     Assessment.StartDate = AssessmentStartDate;
                     Assessment.EndDate = AssessmentEndDate;
                     Assessment.Description = AssessmentDescription;
-                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
-                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
                     Assessment.Grade = AssessmentGrade;
+
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                 }
                 else
                 {
@@ -503,12 +488,13 @@ namespace C_971.ViewModels
                         StartDate = AssessmentStartDate,
                         EndDate = AssessmentEndDate,
                         Description = AssessmentDescription,
-                        StartDateNotifications = AssessmentStartDateNotifications,
-                        EndDateNotifications = AssessmentEndDateNotifications,
                         Grade = AssessmentGrade
                     };
                     AssessmentIsActive = true;
                     Assessment.IsActive = AssessmentIsActive;
+
+                    Assessment.StartDateNotifications = AssessmentStartDateNotifications;
+                    Assessment.EndDateNotifications = AssessmentEndDateNotifications;
                 }
 
                 Assessment.IsActive = true;
@@ -622,6 +608,8 @@ namespace C_971.ViewModels
                     AssessmentType = AssessmentType.Objective;
                     AssessmentDescription = string.Empty;
                     AssessmentStartDate = DateTime.Now;
+                    AssessmentStartDateNotifications = false;
+                    AssessmentEndDateNotifications = false;
                     AssessmentEndDate = DateTime.Now.AddMonths(6);
                     AssessmentStatus = AssessmentStatus.Pending;
                     AssessmentCourseId = NewCourse.Id;
@@ -643,7 +631,7 @@ namespace C_971.ViewModels
 
             _ = LoadAllObjectiveAssessments();
 
-            SearchText = string.Empty; // Clear any existing search textq
+            SearchText = string.Empty; // Clear any existing search text
         }
 
         partial void OnSearchTextChanged(string value)
@@ -673,7 +661,7 @@ namespace C_971.ViewModels
         }
         private async Task PopulateAssessmentProperties()
         {
-            _isLoadingData = true;
+            IsLoading = true;
             Assessment = await _database.GetAssessmentbyCourseIdAndTypeAndIsActive(AssessmentCourseId, AssessmentType.Objective, Assessment.IsActive = true);
 
             if (Assessment != null)
@@ -687,11 +675,13 @@ namespace C_971.ViewModels
                     AssessmentStatus = Assessment.Status;
                     AssessmentStartDate = Assessment.StartDate;
                     AssessmentEndDate = Assessment.EndDate;
-                    AssessmentStartDateNotifications = Assessment.StartDateNotifications;
-                    AssessmentEndDateNotifications = Assessment.EndDateNotifications;
                     AssessmentIsActive = Assessment.IsActive;
                     AssessmentCourseId = Assessment.CourseId;
                     AssessmentGrade = Assessment.Grade;
+
+                    await Task.Delay(100); // Small delay for UI responsiveness
+                    AssessmentStartDateNotifications = Assessment.StartDateNotifications;
+                    AssessmentEndDateNotifications = Assessment.EndDateNotifications;
 
                     await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
                     return;
@@ -702,7 +692,7 @@ namespace C_971.ViewModels
                 }
                 finally
                 {
-                    _isLoadingData = false;
+                    IsLoading = false;
                 }
             }
 
@@ -748,6 +738,10 @@ namespace C_971.ViewModels
             AssessmentEndDate = DateTime.Now.AddMonths(6);
             AssessmentStatus = AssessmentStatus.Pending;
             AssessmentIsActive = true;
+
+            await Task.Delay(100); // Small delay to ensure UI updates
+            AssessmentStartDateNotifications = false;
+            AssessmentEndDateNotifications = false;
         }
     }
 }
