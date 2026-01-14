@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.LocalNotification;
 using System.Collections.ObjectModel;
+using Waher.Script.Constants;
 
 namespace C_971.ViewModels
 {
@@ -70,6 +71,12 @@ namespace C_971.ViewModels
 
         [ObservableProperty]
         public bool assessmentEndDateNotifications = false;
+
+        [ObservableProperty]
+        public DateTime assessmentStartDateReminderTime = DateTime.Now;
+
+        [ObservableProperty]
+        public DateTime assessmentEndDateReminderTime = DateTime.Now;
 
         [ObservableProperty]
         public int startDateNotificationDays = 1; // Default to 1 day
@@ -254,55 +261,67 @@ namespace C_971.ViewModels
 
         private async Task HandleStartDateNotificationToggle()
         {
-            if (!IsEditing) return;
+            if (IsLoading) return;
             try
             {
-                // Ask user for number of days
-                string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+                // Calculate suggested reminder date (1 day before start)
+                DateTime suggestedDate = Assessment.StartDate.AddDays(-1);
+                string defaultDateTime = suggestedDate.ToString("MM/dd/yyyy hh:mm tt");
+
+                // Ask user for specific date and time
+                string dateTimeInput = await MainThread.InvokeOnMainThreadAsync(async () =>
                     await Shell.Current.DisplayPromptAsync(
                         "Start Date Notification",
-                        "How many days in advance would you like to be notified?",
+                        $"When would you like to be reminded?\nAssessment starts: {Assessment.StartDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
                         "OK",
                         "Cancel",
-                        "Enter number of days",
-                        3, // Max length
-                        Keyboard.Numeric,
-                        "1" // Default value
+                        "MM/dd/yyyy hh:mm AM/PM",
+                        25, // Max length for datetime string
+                        Keyboard.Default,
+                        defaultDateTime // Default to 1 day before at same time
                     ));
 
-                if (string.IsNullOrWhiteSpace(daysInput))
+                if (string.IsNullOrWhiteSpace(dateTimeInput))
                 {
                     // User canceled - turn switch back off
                     MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
                     return;
                 }
 
-                if (!int.TryParse(daysInput, out int days) || days < 1 || days > 30)
+                // Try to parse the user input
+                if (!DateTime.TryParse(dateTimeInput, out DateTime reminderDate))
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Input",
-                            "Please enter a number between 1 and 30 days.", "OK"));
+                            "Please enter a valid date and time in the format: MM/dd/yyyy hh:mm AM/PM\n\nExample: 01/15/2024 2:30 PM", "OK"));
 
                     MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
                     return;
                 }
 
-                // Store the preference
-                StartDateNotificationDays = days;
+                // Validate that reminder date is before start date and in the future
+                if (reminderDate >= Assessment.StartDate)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Invalid Date",
+                            "Reminder date must be before the assessment start date.", "OK"));
 
-                // Calculate reminder date
-                DateTime reminderDate = Assessment.StartDate.AddDays(-days);
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
+                    return;
+                }
 
                 if (reminderDate <= DateTime.Now)
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
-                            $"This assessment starts too soon for a {days}-day advance notice." +
-                            $"Please change the start date and save before setting notifications.", "OK"));
+                            "Reminder date must be in the future.", "OK"));
 
                     MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
                     return;
                 }
+
+                // Store the chosen reminder date
+                AssessmentStartDateReminderTime = reminderDate;
 
                 // Schedule notification
                 bool success = await _notification.ScheduleAssessmentStartReminderAsync(Assessment, reminderDate);
@@ -318,7 +337,7 @@ namespace C_971.ViewModels
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Reminder Set",
-                            $"You'll be reminded {days} day(s) before the assessment starts.", "OK"));
+                            $"You'll be reminded on {reminderDate:MM/dd/yyyy} at {reminderDate:h:mm tt} before the assessment starts.", "OK"));
                 }
             }
             catch (Exception ex)
@@ -330,51 +349,64 @@ namespace C_971.ViewModels
 
         private async Task HandleEndDateNotificationToggle()
         {
-            if (!IsEditing) return;
+            if (IsLoading) return;
             try
             {
-                string daysInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+                // Calculate suggested reminder date (1 day before due date)
+                DateTime suggestedDate = Assessment.EndDate.AddDays(-1);
+                string defaultDateTime = suggestedDate.ToString("MM/dd/yyyy hh:mm tt");
+
+                string dateTimeInput = await MainThread.InvokeOnMainThreadAsync(async () =>
                     await Shell.Current.DisplayPromptAsync(
                         "Due Date Notification",
-                        "How many days in advance would you like to be notified?",
+                        $"When would you like to be reminded?\nAssessment due: {Assessment.EndDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
                         "OK",
                         "Cancel",
-                        "Enter number of days",
-                        3,
-                        Keyboard.Numeric,
-                        "1"
+                        "MM/dd/yyyy hh:mm AM/PM",
+                        25, // Max length for datetime string
+                        Keyboard.Default,
+                        defaultDateTime // Default to 1 day before at same time
                     ));
 
-                if (string.IsNullOrWhiteSpace(daysInput))
+                if (string.IsNullOrWhiteSpace(dateTimeInput))
                 {
                     MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
                     return;
                 }
 
-                if (!int.TryParse(daysInput, out int days) || days < 1 || days > 30)
+                if (!DateTime.TryParse(dateTimeInput, out DateTime reminderDate))
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Input",
-                            "Please enter a number between 1 and 30 days.", "OK"));
+                            "Please enter a valid date and time in the format: MM/dd/yyyy hh:mm AM/PM\n\nExample: 01/15/2024 2:30 PM", "OK"));
 
                     MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
                     return;
                 }
 
-                EndDateNotificationDays = days;
+                // Validate that reminder date is before due date and in the future
+                if (reminderDate >= Assessment.EndDate)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("Invalid Date",
+                            "Reminder date must be before the assessment due date.", "OK"));
 
-                DateTime reminderDate = Assessment.EndDate.AddDays(-days);
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+                    return;
+                }
 
                 if (reminderDate <= DateTime.Now)
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Cannot Set Reminder",
-                            $"This assessment is due too soon for a {days}-day advance notice." +
-                            $"Please change the start date and save before setting notifications.", "OK"));
+                            "Reminder date must be in the future.", "OK"));
 
                     MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
                     return;
                 }
+
+                // Store the chosen reminder date
+                AssessmentEndDateReminderTime = reminderDate;
 
                 bool success = await _notification.ScheduleAssessmentDueReminderAsync(Assessment, reminderDate);
 
@@ -389,7 +421,7 @@ namespace C_971.ViewModels
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Reminder Set",
-                            $"You'll be reminded {days} day(s) before the assessment is due.", "OK"));
+                            $"You'll be reminded on {reminderDate:MM/dd/yyyy} at {reminderDate:h:mm tt} before the assessment is due.", "OK"));
                 }
             }
             catch (Exception ex)
