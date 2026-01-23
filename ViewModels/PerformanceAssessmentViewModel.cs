@@ -265,14 +265,14 @@ namespace C_971.ViewModels
             try
             {
                 // Calculate suggested reminder date (1 day before start)
-                DateTime suggestedDate = Assessment.StartDate.AddDays(-1);
+                DateTime suggestedDate = AssessmentStartDate.AddDays(-1);
                 string defaultDateTime = suggestedDate.ToString("MM/dd/yyyy hh:mm tt");
 
                 // Ask user for specific date and time
                 string dateTimeInput = await MainThread.InvokeOnMainThreadAsync(async () =>
                     await Shell.Current.DisplayPromptAsync(
                         "Start Date Notification",
-                        $"When would you like to be reminded?\nAssessment starts: {Assessment.StartDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
+                        $"When would you like to be reminded?\nAssessment starts: {AssessmentStartDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
                         "OK",
                         "Cancel",
                         "MM/dd/yyyy hh:mm AM/PM",

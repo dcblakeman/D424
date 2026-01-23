@@ -9,6 +9,7 @@ namespace C_971.Services
 
         public async Task InitializeAsync()
         {
+            await Shell.Current.DisplayAlertAsync("Database", "Initializing database...", "OK");
             if (_database is not null)
             {
                 return;
@@ -156,6 +157,8 @@ namespace C_971.Services
             return notes.Count > 0 ? notes[0].Id + 1 : 1;
         }
         #endregion
+
+
 
         #region Course Assessments
         public async Task<IEnumerable<CourseAssessment>> GetCourseAssessmentsAsync(int courseId)

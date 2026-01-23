@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
 {
-    [QueryProperty(nameof(UserId), "userid")]
+    [QueryProperty(nameof(UserId), "userId")]
     [QueryProperty(nameof(User), "user")]
     public partial class AcademicTermListViewModel : ObservableObject
     {
@@ -44,7 +44,7 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private bool isRefreshing;
 
-        public bool IsNotAddingTerm => !IsAddingTerm && !IsRemovingTerm;
+        public bool IsNotAddingTerm => !IsAddingTerm;
 
         // Search
         [ObservableProperty]
@@ -156,6 +156,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewTerm()
         {
+            await Shell.Current.DisplayAlertAsync("Debug", $"{NewTerm}", "OK");
             if (!ValidateNewTerm())
             {
                 return;

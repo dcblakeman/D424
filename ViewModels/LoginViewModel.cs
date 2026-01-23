@@ -74,6 +74,7 @@ public partial class LoginViewModel : ObservableObject
             return;
         }
 
+        
 
         bool isAuthenticated = await AuthenticateAsync(NewLoginUserEmail, NewLoginUserPassword);
 
@@ -148,6 +149,7 @@ public partial class LoginViewModel : ObservableObject
 
     internal async Task<bool> AuthenticateAsync(string email, string password)
     {
+        await Shell.Current.DisplayAlertAsync("OK", $"{NewLoginUserEmail} {NewLoginUserPassword}", "OK");
         bool isAuthenticated = await _database.AuthenticateUserAsync(email, password);
         return isAuthenticated;
     }

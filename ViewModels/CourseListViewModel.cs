@@ -1,5 +1,6 @@
 ﻿
 
+
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -110,6 +111,7 @@ namespace C_971.ViewModels
         public CourseListViewModel(DatabaseService database)
         {
             _database = database;
+            _ = LoadCoursesAsync(Term);
         }
 
         // Property Change Handlers
@@ -137,6 +139,15 @@ namespace C_971.ViewModels
         partial void OnIsAddingCourseChanged(bool value)
         {
             OnPropertyChanged(nameof(IsNotAddingCourse));
+        }
+
+        // Initialization
+        public async Task OnAppearingAsync()
+        {
+            if (Courses.Count == 0)
+            {
+                await LoadCoursesAsync(NewTerm);
+            }
         }
 
         // Search and Filter
@@ -215,6 +226,8 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewCourse()
         {
+            NewCourse = new Course();
+            await Shell.Current.DisplayAlertAsync("Debug", $"{NewCourse}", "OK");
             if (!ValidateNewCourse())
             {
                 return;
@@ -222,7 +235,8 @@ namespace C_971.ViewModels
 
             try
             {
-                NewCourse = new Course();
+                
+                NewCourse.Id = 0; // Ensure ID is zero for new record
                 NewCourse.Name = NewCourseName;
                 NewCourse.Description = NewCourseDescription;
                 NewCourse.StartDate = NewCourseStartDate;
@@ -231,10 +245,12 @@ namespace C_971.ViewModels
                 NewCourse.Grade = NewCourseGrade;
                 NewCourse.TermId = NewTerm.Id;
 
+                // Insert Course Into Database
                 _ = await _database.SaveCourseAsync(NewCourse);
 
                 // Reload the term from database to get the assigned ID
                 Course savedCourse = await _database.GetCourseByNameAsync(NewCourse.Name);
+                NewCourse.Id = savedCourse.Id;
 
                 // **ADD THIS: Auto-enroll the current user in the new course**
                 UserCourse userCourse = new()
@@ -243,8 +259,6 @@ namespace C_971.ViewModels
                     CourseId = savedCourse.Id
                 };
                 await _database.SaveUserCourseAsync(userCourse);
-
-                NewCourse.Id = savedCourse.Id;
 
                 Courses.Clear();
                 _allCourses.Add(savedCourse);
@@ -292,10 +306,9 @@ namespace C_971.ViewModels
         }
 
         [RelayCommand]
-        private async Task RemoveCourse(Course newCourse)
+        public async Task RemoveCourse()
         {
             IsRemovingCourse = true;
-            _ = await _database.DeleteCourseAsync(newCourse);
         }
 
         [RelayCommand]

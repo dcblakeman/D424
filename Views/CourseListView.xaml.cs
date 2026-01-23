@@ -24,11 +24,22 @@ namespace C_971.Views
             }
         }
 
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+
+            if (BindingContext is CourseListViewModel viewModel)
+            {
+                await viewModel.LoadCoursesCommand.ExecuteAsync(null);
+            }
+        }
+
         private async void OnCourseTapped(object sender, EventArgs e)
         {
+            CourseListViewModel viewModel = (CourseListViewModel)BindingContext;
             Border border = (Border)sender;
             Course newCourse = (Course)border.BindingContext;
-            CourseListViewModel viewModel = (CourseListViewModel)BindingContext;
+            //CourseListViewModel viewModel = (CourseListViewModel)BindingContext;
 
             // Visual feedback animation
             _ = await border.ScaleToAsync(0.95, 50);
