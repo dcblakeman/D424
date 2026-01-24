@@ -237,6 +237,11 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentStartDateNotificationsChanged(bool value)
         {
+            if (Assessment == null)
+            {
+                AssessmentStartDateNotifications = false;
+                return;
+            }
             if (value) // Only if toggled ON and we have a saved assessment
             {
                 _ = Task.Run(async () => await HandleStartDateNotificationToggle());
@@ -249,6 +254,11 @@ namespace C_971.ViewModels
 
         partial void OnAssessmentEndDateNotificationsChanged(bool value)
         {
+            if (Assessment == null)
+            {
+                AssessmentEndDateNotifications = false;
+                return;
+            }
             if (value) // Only if toggled ON and we have a saved assessment
             {
                 _ = Task.Run(async () => await HandleEndDateNotificationToggle());
@@ -300,7 +310,7 @@ namespace C_971.ViewModels
                 }
 
                 // Validate that reminder date is before start date and in the future
-                if (reminderDate >= Assessment.StartDate)
+                if (reminderDate >= AssessmentStartDate)
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Date",
@@ -353,7 +363,7 @@ namespace C_971.ViewModels
             try
             {
                 // Calculate suggested reminder date (1 day before due date)
-                DateTime suggestedDate = Assessment.EndDate.AddDays(-1);
+                DateTime suggestedDate = AssessmentEndDate.AddDays(-1);
                 string defaultDateTime = suggestedDate.ToString("MM/dd/yyyy hh:mm tt");
 
                 string dateTimeInput = await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -407,6 +417,12 @@ namespace C_971.ViewModels
 
                 // Store the chosen reminder date
                 AssessmentEndDateReminderTime = reminderDate;
+
+                if (Assessment == null)
+                {
+                    MainThread.BeginInvokeOnMainThread(() => AssessmentEndDateNotifications = false);
+                    return;
+                }
 
                 bool success = await _notification.ScheduleAssessmentDueReminderAsync(Assessment, reminderDate);
 

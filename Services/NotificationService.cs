@@ -67,35 +67,6 @@ namespace C_971.Services
                    await _permission.RequestNotificationPermissionAsync();
         }
 
-        internal async Task<bool> ScheduleAssessmentReminderAsync(CourseAssessment assessment, DateTime reminderDate)
-        {
-            if (!await EnsurePermissionAsync())
-            {
-                return false;
-            }
-
-            NotificationRequest request = new()
-            {
-                NotificationId = assessment.Id,
-                Title = "Assessment Due Soon",
-                Subtitle = assessment.Name,
-                Description = $"Your {assessment.Type} assessment '{assessment.Name}' is due on {assessment.EndDate:MM/dd/yyyy}",
-                Schedule =
-                {
-                    NotifyTime = reminderDate
-                },
-                Android =
-                {
-                    ChannelId = "assessment_reminders",
-                    Priority = Plugin.LocalNotification.AndroidOption.AndroidPriority.High,
-                    AutoCancel = true
-                }
-            };
-
-            _ = await LocalNotificationCenter.Current.Show(request);
-            return true;
-        }
-
         public async Task<bool> ScheduleAssessmentStartReminderAsync(CourseAssessment assessment, DateTime reminderDate)
         {
             if (!await EnsurePermissionAsync())
