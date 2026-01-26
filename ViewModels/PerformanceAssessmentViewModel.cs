@@ -272,6 +272,7 @@ namespace C_971.ViewModels
         private async Task HandleStartDateNotificationToggle()
         {
             if (IsLoading) return;
+            OnPropertyChanged(nameof(AssessmentStartDate));
             try
             {
                 // Calculate suggested reminder date (1 day before start)
@@ -315,6 +316,7 @@ namespace C_971.ViewModels
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Date",
                             "Reminder date must be before the assessment start date.", "OK"));
+                    await Shell.Current.DisplayAlertAsync("Test", $"{AssessmentStartDate}","OK");
 
                     MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
                     return;

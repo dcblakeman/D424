@@ -1,4 +1,5 @@
-﻿using C_971.Models;
+﻿
+using C_971.Models;
 using C_971.Services;
 using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -200,17 +201,17 @@ namespace C_971.ViewModels
         }
         private async Task HandleStartDateNotificationToggle()
         {
+            DateTime reminderDate;
             if (!IsEditing) return;
             try
             {
                 // Calculate suggested reminder date (1 day before due date)
-                DateTime suggestedDate = NewCourse.StartDate.AddDays(-1);
+                DateTime suggestedDate = NewCourseStartDate.AddDays(-1);
                 string defaultDateTime = suggestedDate.ToString("MM/dd/yyyy hh:mm tt");
-
                 string dateTimeInput = await MainThread.InvokeOnMainThreadAsync(async () =>
                     await Shell.Current.DisplayPromptAsync(
                         "Start Date Notification",
-                        $"When would you like to be reminded?\nAssessment due: {NewCourse.StartDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
+                        $"When would you like to be reminded?\nAssessment due: {NewCourseStartDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
                         "OK",
                         "Cancel",
                         "MM/dd/yyyy hh:mm AM/PM",
@@ -225,7 +226,7 @@ namespace C_971.ViewModels
                     return;
                 }
 
-                if (!DateTime.TryParse(dateTimeInput, out DateTime reminderDate))
+                if (!DateTime.TryParse(dateTimeInput, out reminderDate))
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Input",
@@ -236,7 +237,7 @@ namespace C_971.ViewModels
                 }
 
                 // Validate that reminder date is before due date and in the future
-                if (reminderDate >= NewCourse.StartDate)
+                if (reminderDate >= NewCourseStartDate)
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Date",
@@ -288,13 +289,13 @@ namespace C_971.ViewModels
             try
             {
                 // Calculate suggested reminder date (1 day before due date)
-                DateTime suggestedDate = NewCourse.EndDate.AddDays(-1);
+                DateTime suggestedDate = NewCourseEndDate.AddDays(-1);
                 string defaultDateTime = suggestedDate.ToString("MM/dd/yyyy hh:mm tt");
-
                 string dateTimeInput = await MainThread.InvokeOnMainThreadAsync(async () =>
+
                     await Shell.Current.DisplayPromptAsync(
                         "End Date Notification",
-                        $"When would you like to be reminded?\nAssessment due: {NewCourse.EndDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
+                        $"When would you like to be reminded?\nAssessment due: {NewCourseEndDate:MM/dd/yyyy}\n\nEnter date and time (MM/dd/yyyy hh:mm AM/PM):",
                         "OK",
                         "Cancel",
                         "MM/dd/yyyy hh:mm AM/PM",
@@ -320,7 +321,7 @@ namespace C_971.ViewModels
                 }
 
                 // Validate that reminder date is before due date and in the future
-                if (reminderDate >= NewCourse.EndDate)
+                if (reminderDate >= NewCourseEndDate)
                 {
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Date",

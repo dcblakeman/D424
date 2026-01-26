@@ -9,7 +9,6 @@ namespace C_971.Services
 
         public async Task InitializeAsync()
         {
-            await Shell.Current.DisplayAlertAsync("Database", "Initializing database...", "OK");
             if (_database is not null)
             {
                 return;
