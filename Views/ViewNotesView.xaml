@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.ViewNotesView"
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:ViewNotesViewModel">
+
+    <Shell.TitleView>
+        <Label Text="{Binding ViewName}" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+    </Shell.TitleView>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+        <!--Back Button-->
+        <Button Text="Back" Command="{Binding GoBackCommand}"/>
+
+        <CollectionView ItemsSource="{Binding CourseNotesList}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:CourseNote">
+                    <Border Stroke="LightGray" 
+                            StrokeThickness="1" 
+                            Padding="15"
+                            BackgroundColor="White"
+                            Margin="0,0,0,10">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="5"/>
+                        </Border.StrokeShape>
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding CreatedDate, StringFormat='{0:MM/dd/yyyy hh:mm tt}'}" 
+                                   FontSize="12" 
+                                   FontAttributes="Bold"
+                                   TextColor="Gray"/>
+                            <Label Text="{Binding NoteContent}"
+                                   FontSize="14"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <StackLayout Padding="20" VerticalOptions="Center">
+                    <Label Text="No notes available" 
+                           HorizontalOptions="Center"
+                           FontSize="18"
+                           TextColor="Gray"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.LoginView"
+             xmlns:model="clr-namespace:C_971.Models"  
+             xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
+             x:DataType="viewmodel:LoginViewModel">
+    
+    <Shell.TitleView>
+        <Label Text="College Course Tracker" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+               
+    </Shell.TitleView>
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20,60,20,20">
+
+            <!-- Login Frame -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+               HasShadow="True" 
+               CornerRadius="10" 
+               Padding="20"
+               VerticalOptions="Start">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Login" 
+                       FontSize="Header" 
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       HorizontalOptions="Center" />
+                    <Entry Placeholder="Email" Text="{Binding NewLoginUserEmail}" />
+                    <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewLoginUserPassword}" />
+                    <Button Text="Log In" 
+                        Command="{Binding LoginUserCommand}" 
+                        Pressed="OnButtonPressed"
+                        Released="OnButtonReleased"
+                        BackgroundColor="#1976D2"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Register Frame -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
+               HasShadow="True" 
+               CornerRadius="10" 
+               Padding="20"
+               VerticalOptions="Start">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Register User" 
+                       FontSize="Header" 
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       HorizontalOptions="Center" />
+                    <Entry Placeholder="Email" Text="{Binding NewRegisterUserEmail}" />
+                    <Entry Placeholder="Password" IsPassword="True" Text="{Binding NewRegisterUserPassword}" />
+                    <Button BackgroundColor="#1976D2"
+                        Text="Register User" 
+                        Command="{Binding RegisterUserCommand}" 
+                        Pressed="OnButtonPressed"
+                        Released="OnButtonReleased"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Exit Frame -->
+            <Frame BackgroundColor="{AppThemeBinding Light=#E9ECEF, Dark=#4A5568}" 
+               HasShadow="True" 
+               CornerRadius="10" 
+               Padding="15"
+               VerticalOptions="Start">
+                <Button BackgroundColor="MediumVioletRed" 
+                    Text="Exit" 
+                    Command="{Binding ExitCommand}" />
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+
+</ContentPage>

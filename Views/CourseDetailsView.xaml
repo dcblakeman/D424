@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="C_971.Views.CourseDetailsView"
+             xmlns:vm="clr-namespace:C_971.ViewModels"
+             xmlns:models="clr-namespace:C_971.Models"
+             x:DataType="vm:CourseDetailsViewModel">
+    
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+    
+        <Shell.TitleView>
+        <Label Text="Course Details" 
+               FontSize="24" 
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+        </Shell.TitleView>
+    
+    <ScrollView>
+        <VerticalStackLayout Padding="15,0,15,15" Spacing="3">
+
+            <!-- Buttons Section -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="0,5,0,0">
+
+                <Button Text="{Binding EditButtonText}"
+                    Command="{Binding ToggleEditCommand}"
+                    BackgroundColor="{Binding EditButtonColor}"
+                    FontAttributes="Bold"  
+                    TextColor="White"
+                    Margin="0,0,0,15"/>
+
+                <Button Grid.Column="1"
+                    Text="Edit Instructor"
+                    FontAttributes="Bold"
+                    Command="{Binding GetInstructorCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    Margin="0,0,0,15"/>
+
+                <!--Back Button-->
+                <Button Grid.Column="2"
+                    Text="Back"
+                    FontAttributes="Bold"
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Grey"
+                    TextColor="White"
+                    Margin="0,0,0,15"/>
+            </Grid>
+
+            <!-- Course Details Section -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,0,0,0">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="8">
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Id" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding NewCourseId}"/>
+                    </VerticalStackLayout>
+                    <!-- Course Name -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Name" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding NewCourseName}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding NewCourseName, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Course Description -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Description" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding NewCourseDescription}" IsVisible="{Binding IsNotEditing}"/>
+                        <Entry Text="{Binding NewCourseDescription, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Course Start Date -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Start Date" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding NewCourseStartDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Date="{Binding NewCourseStartDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- Course End Date -->
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="End Date:" FontAttributes="Bold" TextDecorations="Underline"/>
+                        <Label Text="{Binding NewCourseEndDate, StringFormat='{0:MM/dd/yyyy}'}" IsVisible="{Binding IsNotEditing}"/>
+                        <DatePicker Date="{Binding NewCourseEndDate, Mode=TwoWay}" IsVisible="{Binding IsEditing}" />
+                    </VerticalStackLayout>
+
+                    <!-- Course Status -->
+                    <VerticalStackLayout Spacing="3">
+                        <!-- Status -->
+                        <Label Grid.Row="4" Grid.Column="0" Text="Status" FontAttributes="Bold" VerticalOptions="Center" TextDecorations="Underline"/>
+                        <Label Grid.Row="4" Grid.Column="1" 
+                               Text="{Binding NewCourseStatus, Mode=TwoWay}" 
+                               VerticalOptions="Center"
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Picker Grid.Row="4" Grid.Column="1" 
+                        SelectedItem="{Binding NewCourseStatus, Mode=TwoWay}"
+                        ItemsSource="{Binding StatusOptions}"
+                        IsVisible="{Binding IsEditing}"        
+                        VerticalOptions="Center"/>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="3">
+                        <!-- Course Grade -->
+                        <Label Grid.Row="5" Grid.Column="0" Text="Grade" FontAttributes="Bold" VerticalOptions="Center" TextDecorations="Underline"/>
+                        <Label Grid.Row="5" Grid.Column="1" 
+                               Text="{Binding NewCourseGrade, Mode=TwoWay}" 
+                               VerticalOptions="Center"
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Picker Grid.Row="5" Grid.Column="1" 
+                        SelectedItem="{Binding NewCourseGrade, Mode=TwoWay}"
+                        ItemsSource="{Binding GradeOptions}"
+                        IsVisible="{Binding IsEditing}"        
+                        VerticalOptions="Center"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Label Text="Course Notifications" FontAttributes="Bold" FontSize="18" Margin="0,10,0,0" HorizontalOptions="Center"/>
+            <!-- Notifications Section with Border -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10" Margin="0,5,0,0">
+
+                    <!-- Start Date Notifications -->
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="3">
+                        <Label Text="Start Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding NewCourseStartDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding NewCourseStartDateNotifications, Mode=TwoWay}"
+                                IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+
+                    <!-- End Date Notifications -->
+                    <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="3">
+                        <Label Text="End Date Notifications:" FontAttributes="Bold"/>
+                        <Label Text="{Binding NewCourseEndDateNotifications, Converter={StaticResource BoolToOnOffConverter}}" 
+                               IsVisible="{Binding IsNotEditing}"/>
+                        <Switch IsToggled="{Binding NewCourseEndDateNotifications, Mode=TwoWay}" 
+                                IsVisible="{Binding IsEditing}"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+            <!--End Notifications Section-->
+
+            <Label Text="Course Instructor" FontAttributes="Bold" FontSize="18" Margin="0,10,0,0" HorizontalOptions="Center"/>
+
+            <!-- Course Instructor Section with Border -->
+            <Border Stroke="DarkBlue"
+                StrokeThickness="1"
+                Padding="10"
+                BackgroundColor="AliceBlue"
+                Margin="0,5,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="5"/>
+                </Border.StrokeShape>
+
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="5" Margin="0,0,0,0">
+                    <!-- ID -->
+                    <Label Grid.Row="0" Grid.Column="0" Text="Instructor ID:" FontAttributes="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="1" Text="{Binding NewInstructor.Id}"/>
+                    <!-- Name -->
+                    <Label Grid.Row="1" Grid.Column="0" Text="Instructor Name:" FontAttributes="Bold"/>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding NewInstructor.Name}"/>
+                    <!-- Phone -->
+                    <Label Grid.Row="2" Grid.Column="0" Text="Instructor Phone:" FontAttributes="Bold"/>
+                    <Label Grid.Row="2" Grid.Column="1" Text="{Binding NewInstructor.Phone}"/>
+                    <!-- Email -->
+                    <Label Grid.Row="3" Grid.Column="0" Text="Instructor Email:" FontAttributes="Bold"/>
+                    <Label Grid.Row="3" Grid.Column="1" Text="{Binding NewInstructor.Email}"/>
+                </Grid>
+            </Border>
+            <!--End Notifications Section-->
+
+            <!-- Notes Section -->
+            <Label Text="Notes / Assessments" FontAttributes="Bold" FontSize="18" Margin="0,10,0,0" HorizontalOptions="Center"/>
+
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" Margin="0,5,0,15">
+                <Button Text="Add Note"
+                        FontAttributes="Bold"
+                        
+                        Command="{Binding AddNoteCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"/>
+
+                <Button Text="View Notes"
+                        FontAttributes="Bold"
+                        Command="{Binding ViewNotesCommand}"
+                        BackgroundColor="#F44336"
+                        TextColor="White"
+                        Grid.Column="2"
+                        Grid.ColumnSpan="2"/>
+
+            </Grid>
+            <Button Text="Assessments | Reports"
+                        FontAttributes="Bold"
+                        Command="{Binding ViewAssessmentsCommand}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        Grid.Column="2"/>
+            <Button Text="Test Notification (30 sec)" 
+                         Command="{Binding TestNotificationCommand}"
+                         BackgroundColor="Orange"
+                         Grid.Column="2"
+                         Margin="0,12,0,0"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

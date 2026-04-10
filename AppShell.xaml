@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="C_971.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:C_971"
+    xmlns:views="clr-namespace:C_971.Views"
+    Title="C_971"
+    FlyoutBehavior="Disabled">
+    
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <ShellContent
+        ContentTemplate="{DataTemplate views:LoginView}"
+        Route="LoginView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:AcademicTermListView}"
+        Route="AcademicTermListView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:CourseListView}"
+        Route="CourseListView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:CourseDetailsView}"
+        Route="CourseDetailsView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:AddNoteView}"
+        Route="AddNoteView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:ViewNotesView}"
+        Route="ViewNotesView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:CourseInstructorView}"
+        Route="CourseInstructorView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:AssessmentSelectionView}"
+        Route="AssessmentSelectionView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:PerformanceAssessmentView}"
+        Route="AssessmentSelectionView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:ObjectiveAssessmentView}"
+        Route="AssessmentSelectionView"/>
+    <ShellContent
+        ContentTemplate="{DataTemplate views:ReportView}"
+        Route="ReportView"/>
+</Shell>
