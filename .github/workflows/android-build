@@ -1,4 +1,4 @@
-name: .NET MAUI Android Build
+name: D424 Android Build & Test
 
 on:
   push:
@@ -9,59 +9,71 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest # Windows is often more reliable for initial MAUI builds
+    runs-on: windows-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x # Ensure this matches your project version
+          dotnet-version: '10.0.x'
+          include-prerelease: true # Required for .NET 10 during the preview cycle
 
-      - name: Install MAUI Workload
+      - name: Install MAUI Android Workload
         run: dotnet workload install android
 
       - name: Restore Dependencies
-        run: dotnet restore
+        run: dotnet restore C_971.csproj
 
-      - name: Build and Publish Android APK
-        run: dotnet publish -f net8.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk
+      - name: Build & Package APK
+        # We target net10.0-android specifically based on your csproj
+        run: dotnet publish C_971.csproj -f net10.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk
 
-      - name: Upload APK
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: maui-android-apk
-          path: "**/bin/Release/**-Signed.apk"
+          name: CollegeCourseTracker-APK
+          path: "**/bin/Release/net10.0-android/*-Signed.apk"
 
-  test:
-    runs-on: macos-latest # Required for hardware acceleration to run the emulator
+  emulator-test:
+    runs-on: macos-latest
     needs: build
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
-          name: maui-android-apk
+          name: CollegeCourseTracker-APK
 
-      - name: Run Emulator and Install App
+      - name: Run Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
+          api-level: 34 # Android 14
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          # Replace 'com.companyname.yourapp' with your actual package name from AndroidManifest.xml
           script: |
-            adb install $(find . -name "*-Signed.apk" | head -n 1)
-            adb shell monkey -p com.companyname.yourapp -c android.intent.category.LAUNCHER 1
+            # Find the generated APK
+            APK_PATH=$(find . -name "*-Signed.apk" | head -n 1)
+            echo "Installing $APK_PATH..."
+            adb install "$APK_PATH"
+            
+            # Launch the app using your specific ApplicationId
+            echo "Launching com.companyname.c_971..."
+            adb shell monkey -p com.companyname.c_971 -c android.intent.category.LAUNCHER 1
+            
+            # Optional: Wait a few seconds to ensure it doesn't immediate crash
+            sleep 5
+            adb shell screencap -p /sdcard/screen.png
+            adb pull /sdcard/screen.png .
+
+      - name: Upload Launch Screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: launch-screenshot
+          path: screen.png
