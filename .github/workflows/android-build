@@ -1,0 +1,67 @@
+name: .NET MAUI Android Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest # Windows is often more reliable for initial MAUI builds
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x # Ensure this matches your project version
+
+      - name: Install MAUI Workload
+        run: dotnet workload install android
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build and Publish Android APK
+        run: dotnet publish -f net8.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: maui-android-apk
+          path: "**/bin/Release/**-Signed.apk"
+
+  test:
+    runs-on: macos-latest # Required for hardware acceleration to run the emulator
+    needs: build
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: maui-android-apk
+
+      - name: Run Emulator and Install App
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          # Replace 'com.companyname.yourapp' with your actual package name from AndroidManifest.xml
+          script: |
+            adb install $(find . -name "*-Signed.apk" | head -n 1)
+            adb shell monkey -p com.companyname.yourapp -c android.intent.category.LAUNCHER 1
