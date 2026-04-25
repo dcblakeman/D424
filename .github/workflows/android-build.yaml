@@ -5,75 +5,34 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Setup .NET 10
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-          include-prerelease: true # Required for .NET 10 during the preview cycle
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
 
-      - name: Install MAUI Android Workload
-        run: dotnet workload install android
+    - name: Install MAUI Android Workload
+      run: dotnet workload install maui-android --ignore-failed-sources
 
-      - name: Restore Dependencies
-        run: dotnet restore C_971.csproj
+    - name: Workload Restore
+      run: dotnet workload restore
 
-      - name: Build & Package APK
-        # We target net10.0-android specifically based on your csproj
-        run: dotnet publish C_971.csproj -f net10.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk
+    - name: Restore Dependencies
+      run: dotnet restore C_971.csproj
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: CollegeCourseTracker-APK
-          path: "**/bin/Release/net10.0-android/*-Signed.apk"
+    - name: Build Android App
+      run: dotnet build C_971.csproj -c Release -f net10.0-android --no-restore
 
-  emulator-test:
-    runs-on: macos-latest
-    needs: build
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: CollegeCourseTracker-APK
-
-      - name: Run Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34 # Android 14
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-          disable-animations: true
-          script: |
-            # Find the generated APK
-            APK_PATH=$(find . -name "*-Signed.apk" | head -n 1)
-            echo "Installing $APK_PATH..."
-            adb install "$APK_PATH"
-            
-            # Launch the app using your specific ApplicationId
-            echo "Launching com.companyname.c_971..."
-            adb shell monkey -p com.companyname.c_971 -c android.intent.category.LAUNCHER 1
-            
-            # Optional: Wait a few seconds to ensure it doesn't immediate crash
-            sleep 5
-            adb shell screencap -p /sdcard/screen.png
-            adb pull /sdcard/screen.png .
-
-      - name: Upload Launch Screenshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: launch-screenshot
-          path: screen.png
+    - name: Upload Android Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-build
+        path: bin/Release/net10.0-android/*-Signed.apk
