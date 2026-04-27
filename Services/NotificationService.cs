@@ -58,6 +58,10 @@ namespace C_971.Services
 
         public async Task CancelNotificationAsync(int notificationId)
         {
+            if(notificationId == 0)
+            {
+                return;
+            }
             _ = LocalNotificationCenter.Current.Cancel(notificationId);
         }
 
