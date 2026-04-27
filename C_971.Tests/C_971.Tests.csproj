@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>C_971.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.2" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <!-- Include model source files from the main project -->
+  <ItemGroup>
+    <Compile Include="..\Models\Enums.cs" />
+    <Compile Include="..\Models\AcademicTerm.cs" />
+    <Compile Include="..\Models\Course.cs" />
+    <Compile Include="..\Models\CourseAssessment.cs" />
+    <Compile Include="..\Models\CourseInstructor.cs" />
+    <Compile Include="..\Models\CourseNote.cs" />
+    <Compile Include="..\Models\User.cs" />
+    <Compile Include="..\Models\UserCourse.cs" />
+    <Compile Include="..\Models\CourseWithAssessments.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
