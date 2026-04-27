@@ -107,16 +107,10 @@ namespace C_971.ViewModels
 
         private void ApplySearchFilter()
         {
-            AcademicTerms.Clear();
-
             IEnumerable<AcademicTerm> filteredTerms = string.IsNullOrWhiteSpace(SearchText)
                 ? _allTerms
                 : _allTerms.Where(t => t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
-
-            foreach (AcademicTerm? term in filteredTerms)
-            {
-                AcademicTerms.Add(term);
-            }
+            AcademicTerms = new ObservableCollection<AcademicTerm>(filteredTerms);
         }
 
         // Data Loading
@@ -156,7 +150,6 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewTerm()
         {
-            await Shell.Current.DisplayAlertAsync("Debug", $"{NewTerm}", "OK");
             if (!ValidateNewTerm())
             {
                 return;
@@ -164,22 +157,18 @@ namespace C_971.ViewModels
 
             try
             {
-                NewTerm.Id = 0;
-                NewTerm.Name = NewTermName;
-                NewTerm.StartDate = NewTermStartDate;
-                NewTerm.EndDate = NewTermEndDate;
+                AcademicTerm termToSave = new()
+                {
+                    Name = NewTermName.Trim(),
+                    StartDate = NewTermStartDate,
+                    EndDate = NewTermEndDate,
+                    CreatedDate = DateTime.Now
+                };
 
-                // Insert Term Into database
-                _ = await _database.SaveTermAsync(NewTerm);
-
-                // Reload the term from database to get the assigned ID
-                AcademicTerm savedTerm = await _database.GetTermByNameAsync(NewTerm.Name);
-                NewTerm.Id = savedTerm.Id;
-
-                AcademicTerms.Clear();
-                _allTerms.Add(savedTerm);  // Add the complete database term
-
-                ApplySearchFilter();
+                _ = await _database.SaveTermAsync(termToSave);
+                NewTerm = termToSave;
+                SearchText = string.Empty;
+                await LoadTermsAsync();
                 await Shell.Current.DisplayAlertAsync("Success", "Term added successfully!", "OK");
 
                 ClearForm();
@@ -257,6 +246,7 @@ namespace C_971.ViewModels
 
         private void ClearForm()
         {
+            NewTerm = new AcademicTerm();
             NewTermName = string.Empty;
             NewTermStartDate = DateTime.Now;
             NewTermEndDate = DateTime.Now.AddMonths(6);

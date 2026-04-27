@@ -19,19 +19,22 @@ namespace C_971
 #pragma warning disable CA1416 // Validate platform compatibility
             MauiAppBuilder mauiAppBuilder = builder
                 .UseMauiApp<App>()
-                .UseMauiCommunityToolkit()
-                .UseLocalNotification()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+                .UseMauiCommunityToolkit();
+#if ANDROID || IOS
+            mauiAppBuilder = mauiAppBuilder.UseLocalNotification();
+#endif
+            mauiAppBuilder.ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 #pragma warning restore CA1416 // Validate platform compatibility
 
             // Register database service and interface
             builder.Services.AddSingleton<DatabaseService>();
             builder.Services.AddSingleton<NotificationService>();
             builder.Services.AddSingleton<PermissionService>();
+            builder.Services.AddSingleton<AppShell>();
 
             builder.Services.AddTransient<LoginView>();
             builder.Services.AddTransient<LoginViewModel>();

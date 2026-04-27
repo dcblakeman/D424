@@ -5,25 +5,25 @@ namespace C_971
 {
     public partial class App : Application
     {
-        public App()
+        private readonly AppShell _appShell;
+        private readonly PermissionService _permissionService;
+
+        public App(AppShell appShell, PermissionService permissionService)
         {
             InitializeComponent();
+            _appShell = appShell;
+            _permissionService = permissionService;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            return new Window(_appShell);
         }
 
         protected override async void OnStart()
         {
             base.OnStart();
-
-            PermissionService? permissionService = Handler?.MauiContext?.Services.GetService<PermissionService>();
-            if (permissionService != null)
-            {
-                _ = await permissionService.RequestNotificationPermissionAsync();
-            }
+            _ = await _permissionService.RequestNotificationPermissionAsync();
         }
     }
 }

@@ -65,6 +65,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Platforms\Android\AndroidManifest.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AndroidAsset Include="Platforms\Android\AndroidManifest.xml" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
