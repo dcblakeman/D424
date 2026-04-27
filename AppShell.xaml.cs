@@ -1,15 +1,16 @@
-﻿using C_971.Views;
+using C_971.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace C_971
 {
     public partial class AppShell : Shell
     {
-        public AppShell()
+        public AppShell(IServiceProvider services)
         {
             InitializeComponent();
+            LoginShellContent.ContentTemplate = new DataTemplate(() => services.GetRequiredService<LoginView>());
 
-            // Register your routes
-            Routing.RegisterRoute("LoginView", typeof(LoginView));
+            // Register navigation routes for all non-root pages.
             Routing.RegisterRoute("AcademicTermListView", typeof(AcademicTermListView));
             Routing.RegisterRoute("CourseListView", typeof(CourseListView));
             Routing.RegisterRoute("CourseDetailsView", typeof(CourseDetailsView));
@@ -19,17 +20,7 @@ namespace C_971
             Routing.RegisterRoute("AssessmentSelectionView", typeof(AssessmentSelectionView));
             Routing.RegisterRoute("PerformanceAssessmentView", typeof(PerformanceAssessmentView));
             Routing.RegisterRoute("ObjectiveAssessmentView", typeof(ObjectiveAssessmentView));
+            Routing.RegisterRoute("ReportView", typeof(ReportView));
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-

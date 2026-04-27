@@ -30,7 +30,7 @@ namespace C_971.Views
 
             if (BindingContext is CourseListViewModel viewModel)
             {
-                await viewModel.LoadCoursesCommand.ExecuteAsync(null);
+                await viewModel.OnAppearingAsync();
             }
         }
 

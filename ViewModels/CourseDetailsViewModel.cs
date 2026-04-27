@@ -84,10 +84,10 @@ namespace C_971.ViewModels
         public int newCourseInstructorId = 0;
 
         [ObservableProperty]
-        private CourseInstructor instructor;
+        private CourseInstructor instructor = new();
 
         [ObservableProperty]
-        private CourseInstructor newInstructor;
+        private CourseInstructor newInstructor = new();
 
         [ObservableProperty]
         private string viewName = "Course Details";
@@ -716,16 +716,24 @@ namespace C_971.ViewModels
         {
             if (NewCourse == null)
             {
+                NewInstructor = new CourseInstructor();
+                return;
+            }
+
+            if (NewCourse.InstructorId <= 0)
+            {
+                NewInstructor = new CourseInstructor();
                 return;
             }
 
             try
             {
-                CourseInstructor instructor = await _database.GetInstructorByIdAsync(NewCourse.InstructorId);
-                NewInstructor = instructor;
+                CourseInstructor? instructor = await _database.GetInstructorByIdAsync(NewCourse.InstructorId);
+                NewInstructor = instructor ?? new CourseInstructor();
             }
             catch (Exception ex)
             {
+                NewInstructor = new CourseInstructor();
                 System.Diagnostics.Debug.WriteLine($"Failed to load instructor: {ex.Message}");
             }
         }
@@ -738,7 +746,11 @@ namespace C_971.ViewModels
                 try
                 {
                     // Reload course from database to get latest InstructorId
-                    NewCourse = await _database.GetCourseByIdAsync(NewCourse.Id);
+                    Course? refreshedCourse = await _database.GetCourseByIdAsync(NewCourse.Id);
+                    if (refreshedCourse != null)
+                    {
+                        NewCourse = refreshedCourse;
+                    }
 
                     // Load the instructor data
                     await LoadInstructorAsync();

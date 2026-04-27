@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="C_971.Views.AcademicTermListView"
+             x:Name="AcademicTermListPage"
              xmlns:model="clr-namespace:C_971.Models"  
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
              x:DataType="viewmodel:AcademicTermListViewModel">
@@ -151,7 +152,7 @@
                             <Border StrokeThickness="1"   
                                     Stroke="LightGray"
                                     Padding="10"
-                                    BackgroundColor="{Binding Source={x:Reference AcademicTermListPage}, Path=BindingContext.IsRemovingTerm, Converter={StaticResource BoolToRemoveBgColorConverter}}">
+                                    BackgroundColor="White">
                                 
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="8"/>

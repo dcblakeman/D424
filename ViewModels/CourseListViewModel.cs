@@ -159,16 +159,11 @@ namespace C_971.ViewModels
 
         private void ApplySearchFilter()
         {
-            Courses.Clear();
-
             IEnumerable<Course> filteredCourses = string.IsNullOrWhiteSpace(SearchText)
                 ? _allCourses
                 : _allCourses.Where(c => c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
 
-            foreach (Course? course in filteredCourses)
-            {
-                Courses.Add(course);
-            }
+            Courses = new ObservableCollection<Course>(filteredCourses);
         }
 
         // Data Loading
@@ -226,8 +221,6 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task SaveNewCourse()
         {
-            NewCourse = new Course();
-            await Shell.Current.DisplayAlertAsync("Debug", $"{NewCourse}", "OK");
             if (!ValidateNewCourse())
             {
                 return;
@@ -235,35 +228,44 @@ namespace C_971.ViewModels
 
             try
             {
-                
-                NewCourse.Id = 0; // Ensure ID is zero for new record
-                NewCourse.Name = NewCourseName;
-                NewCourse.Description = NewCourseDescription;
-                NewCourse.StartDate = NewCourseStartDate;
-                NewCourse.EndDate = NewCourseEndDate;
-                NewCourse.Status = NewCourseStatus;
-                NewCourse.Grade = NewCourseGrade;
-                NewCourse.TermId = NewTerm.Id;
+                if (NewTerm == null)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", "No academic term is selected for this course.", "OK");
+                    return;
+                }
+
+                if (NewUser == null)
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", "No user is available for this course.", "OK");
+                    return;
+                }
+
+                Course courseToSave = new()
+                {
+                    Id = 0,
+                    Name = NewCourseName.Trim(),
+                    Description = NewCourseDescription?.Trim() ?? string.Empty,
+                    StartDate = NewCourseStartDate,
+                    EndDate = NewCourseEndDate,
+                    Status = NewCourseStatus,
+                    Grade = NewCourseGrade,
+                    TermId = NewTerm.Id
+                };
 
                 // Insert Course Into Database
-                _ = await _database.SaveCourseAsync(NewCourse);
-
-                // Reload the term from database to get the assigned ID
-                Course savedCourse = await _database.GetCourseByNameAsync(NewCourse.Name);
-                NewCourse.Id = savedCourse.Id;
+                _ = await _database.SaveCourseAsync(courseToSave);
+                NewCourse = courseToSave;
 
                 // **ADD THIS: Auto-enroll the current user in the new course**
                 UserCourse userCourse = new()
                 {
-                    UserId = NewUser.Id,  // Use your User property
-                    CourseId = savedCourse.Id
+                    UserId = NewUser.Id,
+                    CourseId = courseToSave.Id
                 };
                 await _database.SaveUserCourseAsync(userCourse);
 
-                Courses.Clear();
-                _allCourses.Add(savedCourse);
-
-                ApplySearchFilter();
+                SearchText = string.Empty;
+                await LoadCoursesAsync(NewTerm);
                 await Shell.Current.DisplayAlertAsync("Success", "Course added successfully!", "OK");
 
                 ClearForm();
