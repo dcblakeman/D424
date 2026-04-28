@@ -2,6 +2,11 @@
 
 College Course Tracker is a .NET MAUI mobile app for organizing academic terms, courses, assessments, notes, instructors, and reminders in one place.
 
+## Download
+
+- Android APK: [com.dcblakeman.collegecoursetracker-Signed.apk](https://github.com/dcblakeman/D424/releases/download/v1.0.2/com.dcblakeman.collegecoursetracker-Signed.apk)
+- GitHub release page: [v1.0.2](https://github.com/dcblakeman/D424/releases/tag/v1.0.2)
+
 ## What it does
 
 - Create and manage academic terms

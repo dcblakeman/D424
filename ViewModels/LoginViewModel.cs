@@ -1,5 +1,6 @@
 using C_971.Models;
 using C_971.Services;
+using C_971.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -55,7 +56,7 @@ public partial class LoginViewModel : ObservableObject
             }
 
             //Validate email format using regex
-            if (!System.Text.RegularExpressions.Regex.IsMatch(NewLoginUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            if (!ValidationRules.IsValidEmail(NewLoginUserEmail))
             {
                 await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
                 return;
@@ -114,7 +115,7 @@ public partial class LoginViewModel : ObservableObject
             }
 
             // Validate email format using regex
-            if (!System.Text.RegularExpressions.Regex.IsMatch(NewRegisterUserEmail, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            if (!ValidationRules.IsValidEmail(NewRegisterUserEmail))
             {
                 await Shell.Current.DisplayAlertAsync("Error", "Please enter a valid email address.", "OK");
                 return;
