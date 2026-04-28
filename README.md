@@ -1,6 +1,6 @@
 **DO NOT DISTRIBUTE OR PUBLICLY POST SOLUTIONS TO THESE LABS. MAKE ALL FORKS OF THIS REPOSITORY WITH SOLUTION CODE PRIVATE. PLEASE REFER TO THE STUDENT CODE OF CONDUCT AND ETHICAL EXPECTATIONS FOR COLLEGE OF INFORMATION TECHNOLOGY STUDENTS FOR SPECIFICS.**
     
-[## WESTERN GOVERNORS UNIVERSITY](https://github.com/dcblakeman/D424/releases/download/v1.0.1/android-build.zip)
+[## D424 - SOFTWARE ENGINEERING CAPSTONE ](https://github.com/dcblakeman/D424/releases/download/v1.0.1/android-build.zip)
 
 Welcome to Software Engineering Capstone! This is an opportunity for students to develop full stack software engineering documentation and applications. 
 
