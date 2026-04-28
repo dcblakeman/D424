@@ -1,4 +1,4 @@
-﻿using C_971.Models;
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,10 +14,10 @@ public partial class LoginViewModel : ObservableObject
     private string viewName = "Login";
 
     [ObservableProperty]
-    public User user = new();
+    private User user = new();
 
     [ObservableProperty]
-    public User newUser;
+    private User newUser = null!;
 
     [ObservableProperty]
     private string newRegisterUserEmail = string.Empty;
@@ -26,10 +26,10 @@ public partial class LoginViewModel : ObservableObject
     private string newRegisterUserPassword = string.Empty;
 
     [ObservableProperty]
-    public string newLoginUserEmail = string.Empty;
+    private string newLoginUserEmail = string.Empty;
 
     [ObservableProperty]
-    public string newLoginUserPassword = string.Empty;
+    private string newLoginUserPassword = string.Empty;
 
     public LoginViewModel(DatabaseService database)
     {
@@ -80,14 +80,19 @@ public partial class LoginViewModel : ObservableObject
 
         if (isAuthenticated)
         {
-            //NewUser.Id = await GetUserIdByEmailAsync(NewLoginUserEmail);
+            User? authenticatedUser = await _database.GetUserByEmailAsync(NewLoginUserEmail);
+            if (authenticatedUser is null)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", "Your account could not be loaded.", "OK");
+                return;
+            }
 
-            NewUser = await _database.GetUserByEmailAsync(NewLoginUserEmail);
+            NewUser = authenticatedUser;
 
             // Pass the dictionary directly as an argument to GoToAsync
             await Shell.Current.GoToAsync("AcademicTermListView", true, new Dictionary<string, object>
             {
-                ["user"] = NewUser
+                ["user"] = authenticatedUser
             });
         }
         else
@@ -149,7 +154,6 @@ public partial class LoginViewModel : ObservableObject
 
     internal async Task<bool> AuthenticateAsync(string email, string password)
     {
-        await Shell.Current.DisplayAlertAsync("OK", $"{NewLoginUserEmail} {NewLoginUserPassword}", "OK");
         bool isAuthenticated = await _database.AuthenticateUserAsync(email, password);
         return isAuthenticated;
     }

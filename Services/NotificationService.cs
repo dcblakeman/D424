@@ -13,11 +13,6 @@ namespace C_971.Services
         }
         public async Task<bool> ScheduleCourseStartReminderAsync(Course course, DateTime reminderDate)
         {
-
-            await Shell.Current.DisplayAlertAsync("Testing", $"Scheduling notification for {reminderDate:yyyy-MM-dd HH:mm:ss}", "OK");
-
-            await Shell.Current.DisplayAlertAsync("Testing", $"Current time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}", "OK");
-
             if (!await EnsurePermissionAsync())
             {
                 return false;

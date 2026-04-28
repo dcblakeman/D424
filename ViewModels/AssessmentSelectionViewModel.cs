@@ -1,4 +1,4 @@
-﻿
+
 using C_971.Models;
 using C_971.Services;
 using C_971.Views;
@@ -19,22 +19,22 @@ namespace C_971.ViewModels
         }
 
         [ObservableProperty]
-        public User user;
+        private User user = null!;
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private Course course;
+        private Course course = null!;
 
         [ObservableProperty]
-        private Course newCourse;
+        private Course newCourse = null!;
 
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
         private string viewName = "Assessments | Reports";
@@ -52,8 +52,6 @@ namespace C_971.ViewModels
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            _ = Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewTerm}", "OK");
-
         }
 
         [RelayCommand]

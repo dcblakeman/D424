@@ -1,4 +1,4 @@
-﻿
+
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,26 +14,24 @@ namespace C_971.ViewModels
         private readonly DatabaseService _database;
 
         [ObservableProperty]
-        public User user = new();
+        private User user = new();
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private int newUserId;
+        private int newUserId;[ObservableProperty]
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm term;
-
-        [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         // Core Properties
         [ObservableProperty]
-        private Course course;
+        private Course course = null!;
 
         [ObservableProperty]
-        private Course newCourse;
+        private Course newCourse = null!;
 
         [ObservableProperty]
         private CourseNote newNote = new();

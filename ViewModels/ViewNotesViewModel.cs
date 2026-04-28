@@ -1,4 +1,4 @@
-﻿using C_971.Models;
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,28 +12,25 @@ namespace C_971.ViewModels
     public partial class ViewNotesViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
-        private readonly bool _isLoading;
 
         [ObservableProperty]
-        private bool isRefreshing;
+        private bool isRefreshing;[ObservableProperty]
+        private User user = null!;
 
         [ObservableProperty]
-        public User user;
+        private User newUser = null!;
 
         [ObservableProperty]
-        public User newUser;
+        private Course course = null!;
 
         [ObservableProperty]
-        public Course course;
+        private Course newCourse = null!;
 
         [ObservableProperty]
-        public Course newCourse;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        public AcademicTerm term;
-
-        [ObservableProperty]
-        public AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         public ObservableCollection<CourseNote> CourseNotesList { get; private set; } = [];
 
@@ -45,7 +42,7 @@ namespace C_971.ViewModels
         private string viewName = "View Notes";
 
         [ObservableProperty]
-        private CourseNote newNote;
+        private CourseNote newNote = null!;
 
         public ViewNotesViewModel(DatabaseService databaseService)
         {

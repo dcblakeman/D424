@@ -19,7 +19,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>C_971</ApplicationTitle>
+		<ApplicationTitle>College Course Tracker</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.c_971</ApplicationId>
@@ -42,9 +42,17 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<NoWarn>$(NoWarn);XA0141</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\appicon.png" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -62,6 +70,10 @@
 
 	<ItemGroup>
 	  <Compile Remove="Services\CourseService.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="C:\Users\Dan\.nuget\packages\fluentmermaid\0.1.0\contentFiles\any\netstandard2.0\README.md" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -97,7 +109,6 @@
 		</PackageReference>
 		<PackageReference Include="Plugin.LocalNotification" Version="13.0.0" />
 		<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-		<PackageReference Include="SQLitePCLRawEx.bundle_green" Version="2.1.0" />
 		<PackageReference Include="Waher.Content.Markdown.PlantUml" Version="5.1.2" />
 	</ItemGroup>
 
@@ -139,6 +150,10 @@
 
 	<ItemGroup>
 	  <Folder Include="Reports\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="C:\Users\Dan\.nuget\packages\fluentmermaid\0.1.0\contentFiles\any\netstandard2.0\README.md" />
 	</ItemGroup>
 
 </Project>

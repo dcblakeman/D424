@@ -1,4 +1,4 @@
-﻿using C_971.Models;
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -20,31 +20,25 @@ namespace C_971.ViewModels
         private AcademicTerm newTerm = new();
 
         [ObservableProperty]
-        public User user = new();
+        private User user = new();
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private int userId;
-
-        [ObservableProperty]
-        public int newUserId;
+        private int userId;[ObservableProperty]
+        private int newUserId;
 
         [ObservableProperty]
         private ObservableCollection<AcademicTerm> academicTerms = [];
 
         // UI State
         [ObservableProperty]
-        private bool isAddingTerm;
-
-        [ObservableProperty]
+        private bool isAddingTerm;[ObservableProperty]
         private bool isRemovingTerm;
 
         [ObservableProperty]
-        private bool isRefreshing;
-
-        public bool IsNotAddingTerm => !IsAddingTerm;
+        private bool isRefreshing;public bool IsNotAddingTerm => !IsAddingTerm;
 
         // Search
         [ObservableProperty]
@@ -70,7 +64,6 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            _ = Shell.Current.DisplayAlertAsync("User Selected", $"You have selected the User: {NewUser}", "OK");
         }
 
         // Initialization

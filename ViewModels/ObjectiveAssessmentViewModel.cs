@@ -1,4 +1,4 @@
-﻿
+
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -20,22 +20,22 @@ namespace C_971.ViewModels
         // Core Properties
 
         [ObservableProperty]
-        public User user;
+        private User user = null!;
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private Course course;
+        private Course course = null!;
 
         [ObservableProperty]
-        private Course newCourse;
+        private Course newCourse = null!;
 
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
         private string viewName = "Objective Assessment";
@@ -47,7 +47,7 @@ namespace C_971.ViewModels
         private CourseAssessment assessment = new();
 
         [ObservableProperty]
-        public int assessmentId = 0;
+        private int assessmentId = 0;
 
         [ObservableProperty]
         private string assessmentName = string.Empty;
@@ -68,66 +68,52 @@ namespace C_971.ViewModels
         private DateTime assessmentEndDate = DateTime.Now.AddMonths(6);
 
         [ObservableProperty]
-        public bool assessmentStartDateNotifications = false;
+        private bool assessmentStartDateNotifications = false;
 
         [ObservableProperty]
-        public bool assessmentEndDateNotifications = false;
+        private bool assessmentEndDateNotifications = false;
 
         [ObservableProperty]
-        public int startDateNotificationDays = 1; // Default to 1 day
+        private int startDateNotificationDays = 1; // Default to 1 day
 
         [ObservableProperty]
-        public int endDateNotificationDays = 1;   // Default to 1 day
+        private int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
-        public DateTime assessmentStartDateReminderTime;
+        private DateTime assessmentStartDateReminderTime;[ObservableProperty]
+        private DateTime assessmentEndDateReminderTime;
 
         [ObservableProperty]
-        public DateTime assessmentEndDateReminderTime;
-
-        [ObservableProperty]
-        public bool assessmentIsActive = false;
+        private bool assessmentIsActive = false;
 
         [ObservableProperty]
         private int assessmentCourseId = 0;
 
         [ObservableProperty]
-        public FinalGrade assessmentGrade;
-
-        [ObservableProperty]
+        private FinalGrade assessmentGrade;[ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = [];
 
         private List<CourseAssessment> _allObjectiveAssessments = [];
 
         // UI State
         [ObservableProperty]
-        private bool isEditing;
-
-        [ObservableProperty]
+        private bool isEditing;[ObservableProperty]
         private bool isRefreshing;
 
         [ObservableProperty]
-        private bool isAddingAssessment;
-
-        [ObservableProperty]
+        private bool isAddingAssessment;[ObservableProperty]
         private bool isRemovingAssessment;
 
         [ObservableProperty]
-        private bool isSavingAssessment;
-
-        [ObservableProperty]
+        private bool isSavingAssessment;[ObservableProperty]
         private bool isDeletingAssessment;
 
         [ObservableProperty]
-        private bool isLoadingAssessments;
-
-        [ObservableProperty]
+        private bool isLoadingAssessments;[ObservableProperty]
         private bool isNavigating = true;
 
         [ObservableProperty]
-        private bool isSearching;
-
-        [ObservableProperty]
+        private bool isSearching;[ObservableProperty]
         private bool isLoading;
 
         public bool IsNotNavigating => !IsNavigating;
@@ -708,7 +694,6 @@ namespace C_971.ViewModels
                     AssessmentStartDateNotifications = Assessment.StartDateNotifications;
                     AssessmentEndDateNotifications = Assessment.EndDateNotifications;
 
-                    await Shell.Current.DisplayAlertAsync("Alert", $"Populated UI properties for assessment: {AssessmentName}", "OK");
                     return;
                 }
                 catch (Exception)
@@ -736,7 +721,7 @@ namespace C_971.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Debug Error", ex.Message, "OK");
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load assessments: {ex.Message}", "OK");
             }
             finally
             {

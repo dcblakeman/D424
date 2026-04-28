@@ -1,4 +1,4 @@
-﻿
+
 
 
 using C_971.Models;
@@ -24,19 +24,19 @@ namespace C_971.ViewModels
 
         // Core Properties
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
-        public User user = new();
+        private User user = new();
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private Course course;
+        private Course course = null!;
 
         [ObservableProperty]
         private Course newCourse = new();
@@ -58,19 +58,15 @@ namespace C_971.ViewModels
         private CourseStatus newCourseStatus = CourseStatus.Planned;
 
         [ObservableProperty]
-        public FinalGrade newCourseGrade = FinalGrade.NotGraded;
+        private FinalGrade newCourseGrade = FinalGrade.NotGraded;
 
         // UI State
         [ObservableProperty]
-        private bool isAddingCourse;
-
-        [ObservableProperty]
+        private bool isAddingCourse;[ObservableProperty]
         private bool isRemovingCourse;
 
         [ObservableProperty]
-        private bool isRefreshing;
-
-        public bool IsNotAddingCourse => !IsAddingCourse;
+        private bool isRefreshing;public bool IsNotAddingCourse => !IsAddingCourse;
 
         // Search
         [ObservableProperty]

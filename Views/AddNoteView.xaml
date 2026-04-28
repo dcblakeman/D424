@@ -31,7 +31,7 @@
                 HeightRequest="200"
                 AutoSize="TextChanges"/>
 
-        <Label Text="{Binding CreatedDate, StringFormat='Date: {0:MM/dd/yyyy hh:mm tt}'}" 
+        <Label Text="{Binding NewCreatedDate, StringFormat='Date: {0:MM/dd/yyyy hh:mm tt}'}" 
                FontSize="12" 
                TextColor="Gray"/>
 

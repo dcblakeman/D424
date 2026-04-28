@@ -1,4 +1,4 @@
-﻿using C_971.Models;
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,28 +18,28 @@ namespace C_971.ViewModels
         // Core Properties
 
         [ObservableProperty]
-        public User user = new();
+        private User user = new();
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
         private Course course = new();
 
         [ObservableProperty]
-        private Course newCourse;
+        private Course newCourse = null!;
 
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
-        private CourseInstructor instructor;
+        private CourseInstructor instructor = null!;
 
         [ObservableProperty]
-        private CourseInstructor newInstructor;
+        private CourseInstructor newInstructor = null!;
 
         // New Instructor Form
         [ObservableProperty]
@@ -59,15 +59,11 @@ namespace C_971.ViewModels
 
         // UI State
         [ObservableProperty]
-        private bool isAddingInstructor;
-
-        [ObservableProperty]
+        private bool isAddingInstructor;[ObservableProperty]
         private bool isRemovingInstructor;
 
         [ObservableProperty]
-        private bool isRefreshing;
-
-        public bool IsNotAddingInstructor => !IsAddingInstructor && !IsRemovingInstructor;
+        private bool isRefreshing;public bool IsNotAddingInstructor => !IsAddingInstructor && !IsRemovingInstructor;
 
         public bool IsNotRemovingInstructor => !IsRemovingInstructor;
 
@@ -101,7 +97,6 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            _ = Shell.Current.DisplayAlertAsync("User Info", $"Logged in as: {NewUser}", "OK");
         }
 
         partial void OnIsAddingInstructorChanged(bool value)

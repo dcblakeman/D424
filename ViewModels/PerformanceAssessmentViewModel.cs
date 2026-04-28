@@ -1,4 +1,4 @@
-﻿
+
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,114 +19,104 @@ namespace C_971.ViewModels
 
         // Core Properties
         [ObservableProperty]
-        public User user;
+        private User user = null!;
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        public Course course;
+        private Course course = null!;
 
         [ObservableProperty]
-        public Course newCourse;
+        private Course newCourse = null!;
 
         [ObservableProperty]
-        public AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        public AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
-        public string viewName = "Performance Assessment";
+        private string viewName = "Performance Assessment";
 
         [ObservableProperty]
-        public string searchText = string.Empty;
+        private string searchText = string.Empty;
 
         [ObservableProperty]
-        public CourseAssessment assessment = new();
+        private CourseAssessment assessment = new();
 
         [ObservableProperty]
-        public int assessmentId = 0;
+        private int assessmentId = 0;
 
         [ObservableProperty]
-        public string assessmentName = string.Empty;
+        private string assessmentName = string.Empty;
 
         [ObservableProperty]
-        public AssessmentType assessmentType = AssessmentType.Performance;
+        private AssessmentType assessmentType = AssessmentType.Performance;
 
         [ObservableProperty]
-        public AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
+        private AssessmentStatus assessmentStatus = AssessmentStatus.Pending;
 
         [ObservableProperty]
-        public string assessmentDescription = string.Empty;
+        private string assessmentDescription = string.Empty;
 
         [ObservableProperty]
-        public DateTime assessmentStartDate = DateTime.Today;
+        private DateTime assessmentStartDate = DateTime.Today;
 
         [ObservableProperty]
-        public DateTime assessmentEndDate = DateTime.Today.AddMonths(6);
+        private DateTime assessmentEndDate = DateTime.Today.AddMonths(6);
 
         [ObservableProperty]
-        public bool assessmentStartDateNotifications = false;
+        private bool assessmentStartDateNotifications = false;
 
         [ObservableProperty]
-        public bool assessmentEndDateNotifications = false;
+        private bool assessmentEndDateNotifications = false;
 
         [ObservableProperty]
-        public DateTime assessmentStartDateReminderTime = DateTime.Now;
+        private DateTime assessmentStartDateReminderTime = DateTime.Now;
 
         [ObservableProperty]
-        public DateTime assessmentEndDateReminderTime = DateTime.Now;
+        private DateTime assessmentEndDateReminderTime = DateTime.Now;
 
         [ObservableProperty]
-        public int startDateNotificationDays = 1; // Default to 1 day
+        private int startDateNotificationDays = 1; // Default to 1 day
 
         [ObservableProperty]
-        public int endDateNotificationDays = 1;   // Default to 1 day
+        private int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
-        public bool assessmentIsActive = false;
+        private bool assessmentIsActive = false;
 
         [ObservableProperty]
-        public int assessmentCourseId = 0;
+        private int assessmentCourseId = 0;
 
         [ObservableProperty]
-        public FinalGrade assessmentGrade = FinalGrade.NotGraded;
+        private FinalGrade assessmentGrade = FinalGrade.NotGraded;
 
         [ObservableProperty]
-        public ObservableCollection<CourseAssessment> assessments = [];
+        private ObservableCollection<CourseAssessment> assessments = [];
 
         public List<CourseAssessment> _allPerformanceAssessments = [];
 
         // UI State
         [ObservableProperty]
-        private bool isEditing;
-
-        [ObservableProperty]
+        private bool isEditing;[ObservableProperty]
         private bool isRefreshing;
 
         [ObservableProperty]
-        private bool isAddingAssessment;
-
-        [ObservableProperty]
+        private bool isAddingAssessment;[ObservableProperty]
         private bool isRemovingAssessment;
 
         [ObservableProperty]
-        private bool isSavingAssessment;
-
-        [ObservableProperty]
+        private bool isSavingAssessment;[ObservableProperty]
         private bool isDeletingAssessment;
 
         [ObservableProperty]
-        private bool isLoadingAssessments;
-
-        [ObservableProperty]
+        private bool isLoadingAssessments;[ObservableProperty]
         private bool isSearching;
 
         [ObservableProperty]
-        private bool isLoading;
-
-        public bool IsNotLoading => !isLoading;
+        private bool isLoading;public bool IsNotLoading => !IsLoading;
 
         public bool IsNotSearching => !IsSearching;
 
@@ -316,7 +306,6 @@ namespace C_971.ViewModels
                     await MainThread.InvokeOnMainThreadAsync(async () =>
                         await Shell.Current.DisplayAlertAsync("Invalid Date",
                             "Reminder date must be before the assessment start date.", "OK"));
-                    await Shell.Current.DisplayAlertAsync("Test", $"{AssessmentStartDate}","OK");
 
                     MainThread.BeginInvokeOnMainThread(() => AssessmentStartDateNotifications = false);
                     return;
@@ -735,7 +724,7 @@ namespace C_971.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlertAsync("Debug Error", ex.Message, "OK");
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to load assessments: {ex.Message}", "OK");
             }
             finally
             {

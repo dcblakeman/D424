@@ -21,20 +21,6 @@ public partial class CourseInstructorView : ContentPage
         }
     }
 
-    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
-    {
-        base.OnNavigatedTo(args);
-
-        if (BindingContext is CourseDetailsViewModel viewModel)
-        {
-            await Shell.Current.DisplayAlertAsync("Term", $"Term: {viewModel.Term}", "OK");
-            viewModel.NewCourse = viewModel.Course;
-            viewModel.NewUser = viewModel.User;
-            viewModel.NewTerm = viewModel.Term;
-            await Shell.Current.DisplayAlertAsync("Term", $"Term: {viewModel.NewTerm}", "OK");
-        }
-    }
-
     public async void OnInstructorTapped(object sender, EventArgs e)
     {
         Border border = (Border)sender;
@@ -58,8 +44,6 @@ public partial class CourseInstructorView : ContentPage
             viewModel.NewTerm = viewModel.Term;
             viewModel.NewCourse = viewModel.Course;
             viewModel.NewUser = viewModel.User;
-
-            await Shell.Current.DisplayAlertAsync("Term", $"Term: {viewModel.NewTerm}", "OK");
 
             // Navigate to detail view - only pass course since that's what CourseDetailsView expects
             await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>

@@ -47,55 +47,27 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Folder Configuration -->
             <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
                    HasShadow="True" 
                    CornerRadius="10" 
                    Padding="20">
-                
+                 
                 <VerticalStackLayout Spacing="15">
-                    <!-- View Reports Button -->
-                    <Label Text="Folder Configuration" 
+                    <Label Text="Report Tools" 
                            FontSize="18" 
                            FontAttributes="Bold"/>
                     <Button Text="Open Report" 
                             Command="{Binding OpenReportCommand}"
                             BackgroundColor="{StaticResource SecondaryDarkText}" />
-
-                    <!-- Share Reports Button -->
-                    <Button Text="Share Reports" 
-                            Command="{Binding ShareReportsCommand}"
-                            BackgroundColor="{StaticResource MidnightBlue}" />
-
-                    <!-- Change Reports Folder -->
-                    <Button Text="Show Current Reports Folder" 
-                            Command="{Binding ShowCurrentReportsFolderCommand}"
-                            BackgroundColor="{StaticResource Tertiary}" />
-
-                    <!-- Change Reports Folder -->
-                    <Button Text="Change Reports Folder" 
-                            Command="{Binding ChangeReportsFolderCommand}"
-                            BackgroundColor="{StaticResource PrimaryDark}" />
-
-                    <!-- Reset Reports Folder -->
-                    <Button Text="Reset Reports Folder" 
-                            Command="{Binding ResetReportsFolderCommand}"
-                            BackgroundColor="{StaticResource Gray300}" />
                 </VerticalStackLayout>
             </Frame>
-            <!-- End Report Configuration Settings Frame -->
-            
-           
-            <!-- Save and Go Back Buttons Frame -->
-            <!-- Go Back Button -->
+
             <Frame BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
                    HasShadow="True" 
                    CornerRadius="10" 
-                   Padding="20"
-                   IsVisible="{Binding HasRecentReports}">
+                   Padding="20">
 
                 <VerticalStackLayout Spacing="10">
-                    <!-- Back Button -->
                     <Button Text="Back"
                             Command="{Binding GoBackCommand}"
                             BackgroundColor="{AppThemeBinding Light=DarkRed, Dark=Red}"
@@ -106,7 +78,6 @@
                     
                 </VerticalStackLayout>
             </Frame>
-            <!-- End Save and Go Back Buttons Frame -->
         </VerticalStackLayout>
     </ScrollView>
 

@@ -1,4 +1,4 @@
-﻿
+
 using C_971.Models;
 using C_971.Services;
 using C_971.Views;
@@ -17,26 +17,25 @@ namespace C_971.ViewModels
     {
         private readonly DatabaseService _database;
         private readonly NotificationService _notification;
-        private readonly PermissionService _permission;
 
         [ObservableProperty]
-        public User user = new();
+        private User user = new();
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private Course course;
+        private Course course = null!;
 
         // Core Properties
         [ObservableProperty]
         private Course newCourse = new();
 
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
         private int newCourseId = 0;
@@ -45,25 +44,25 @@ namespace C_971.ViewModels
         private string newCourseName = string.Empty;
 
         [ObservableProperty]
-        public string newCourseDescription = string.Empty;
+        private string newCourseDescription = string.Empty;
 
         [ObservableProperty]
-        public DateTime newCourseStartDate = DateTime.Today;
+        private DateTime newCourseStartDate = DateTime.Today;
 
         [ObservableProperty]
-        public DateTime newCourseEndDate = DateTime.Today.AddMonths(6);
+        private DateTime newCourseEndDate = DateTime.Today.AddMonths(6);
 
         [ObservableProperty]
-        public CourseStatus newCourseStatus = CourseStatus.Planned;
+        private CourseStatus newCourseStatus = CourseStatus.Planned;
 
         [ObservableProperty]
-        public FinalGrade newCourseGrade = FinalGrade.NotGraded;
+        private FinalGrade newCourseGrade = FinalGrade.NotGraded;
 
         [ObservableProperty]
-        public bool newCourseStartDateNotifications = false;
+        private bool newCourseStartDateNotifications = false;
 
         [ObservableProperty]
-        public bool newCourseEndDateNotifications = false;
+        private bool newCourseEndDateNotifications = false;
 
         [ObservableProperty]
         private int startDateNotificationDays = 1; // Default to 1 day
@@ -72,16 +71,14 @@ namespace C_971.ViewModels
         private int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
-        private DateTime newCourseStartDateReminderDateTime;
-
-        [ObservableProperty]
+        private DateTime newCourseStartDateReminderDateTime;[ObservableProperty]
         private DateTime newCourseEndDateReminderDateTime;
 
         [ObservableProperty]
-        public int newCourseTermId = 0;
+        private int newCourseTermId = 0;
 
         [ObservableProperty]
-        public int newCourseInstructorId = 0;
+        private int newCourseInstructorId = 0;
 
         [ObservableProperty]
         private CourseInstructor instructor = new();
@@ -94,9 +91,7 @@ namespace C_971.ViewModels
 
         // UI State
         [ObservableProperty]
-        private bool isEditing;
-
-        public bool IsNotEditing => !IsEditing;
+        private bool isEditing;public bool IsNotEditing => !IsEditing;
 
         private bool _isLoadingData = false; // Add this flag
 
@@ -138,11 +133,10 @@ namespace C_971.ViewModels
             AssessmentType.Performance
         ];
 
-        public CourseDetailsViewModel(DatabaseService database, NotificationService notification, PermissionService permission)
+        public CourseDetailsViewModel(DatabaseService database, NotificationService notification)
         {
             _database = database;
             _notification = notification;
-            _permission = permission;
 
         }
 
@@ -647,69 +641,6 @@ namespace C_971.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to cancel notification: {ex.Message}");
             }
-        }
-
-        [RelayCommand]
-        public async Task TestNotificationAsync()
-        {
-            // Schedule notification for 30 seconds from now
-            DateTime testTime = DateTime.Now.AddSeconds(30);
-
-            bool success = false;
-            try
-            {
-                NotificationRequest request = new()
-                {
-                    NotificationId = 9999,
-                    Title = "Test Notification",
-                    Description = "This is a test notification scheduled 30 seconds from now.",
-                    Schedule = { NotifyTime = testTime }
-                };
-                _ = await LocalNotificationCenter.Current.Show(request);
-                success = true;
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlertAsync("Error", $"Failed to schedule test notification: {ex.Message}", "OK");
-
-            }
-
-            if (success)
-            {
-                await Shell.Current.DisplayAlertAsync("Test Scheduled",
-                    "Notification will appear in 30 seconds. Close the app completely!", "OK");
-            }
-        }
-
-        public async Task<bool> ScheduleTestNotificationAsync(string title, string message, int secondsFromNow = 10)
-        {
-            if (!await EnsurePermissionAsync())
-            {
-                return false;
-            }
-
-            DateTime testTime = DateTime.Now.AddSeconds(secondsFromNow);
-
-            System.Diagnostics.Debug.WriteLine($"Scheduling test notification for: {testTime:HH:mm:ss}");
-            System.Diagnostics.Debug.WriteLine($"Current time: {DateTime.Now:HH:mm:ss}");
-
-            NotificationRequest request = new()
-            {
-                NotificationId = 9999, // Test ID
-                Title = $"TEST: {title}",
-                Subtitle = "EduTrack Test",
-                Description = message,
-                Schedule = { NotifyTime = testTime }
-            };
-
-            _ = await LocalNotificationCenter.Current.Show(request);
-            return true;
-        }
-
-        private async Task<bool> EnsurePermissionAsync()
-        {
-            return await _permission.HasNotificationPermissionAsync() ||
-                   await _permission.RequestNotificationPermissionAsync();
         }
 
         private async Task LoadInstructorAsync()

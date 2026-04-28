@@ -1,4 +1,4 @@
-﻿using C_971.Models;
+using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,33 +16,31 @@ namespace C_971.ViewModels
         private readonly DatabaseService _database;
 
         [ObservableProperty]
-        public User user = new();
+        private User user = new();
 
         [ObservableProperty]
-        public User newUser;
+        private User newUser = null!;
 
         [ObservableProperty]
-        private Course course;
+        private Course course = null!;
 
         [ObservableProperty]
-        private Course newCourse;
+        private Course newCourse = null!;
 
         [ObservableProperty]
-        private AcademicTerm term;
+        private AcademicTerm term = null!;
 
         [ObservableProperty]
-        private AcademicTerm newTerm;
+        private AcademicTerm newTerm = null!;
 
         [ObservableProperty]
-        private string reportText;
+        private string reportText = null!;
 
         [ObservableProperty]
-        private string reportTitle;
+        private string reportTitle = null!;
 
         [ObservableProperty]
-        private bool isBusy;
-
-        private const string REPORTS_FOLDER_KEY = "reports_default_folder";
+        private bool isBusy;private const string REPORTS_FOLDER_KEY = "reports_default_folder";
 
         public ReportViewModel(DatabaseService database)
         {
@@ -52,19 +50,16 @@ namespace C_971.ViewModels
         partial void OnUserChanged(User value)
         {
             NewUser = value;
-            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New User: {NewUser}", "OK");
         }
 
         partial void OnCourseChanged(Course value)
         {
             NewCourse = value;
-            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New Course: {NewCourse}", "OK");
         }
 
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
-            _ = Shell.Current.DisplayAlertAsync("Updated Values", $"New Term: {NewTerm}", "OK");
         }
 
 
@@ -79,12 +74,11 @@ namespace C_971.ViewModels
             {
                 List<CourseAssessment> assessments = await _database.GetAssessmentsForUserAndTermAsync(NewUser.Id, NewTerm.Id);
 
-                await Shell.Current.DisplayAlertAsync("Wait", $"Number of assessments: {assessments.Count}", "OK");
-
                 if (!assessments.Any())
                 {
                     await Shell.Current.DisplayAlertAsync("No Assessments",
                         "No assessments found for the selected term.", "OK");
+                    return;
                 }
 
                 // Generate Report
@@ -115,7 +109,13 @@ namespace C_971.ViewModels
             {
                 List<Course> courses = await _database.GetCoursesWithDetailsAsync(NewUser.Id, NewTerm.Id);
 
-                await Shell.Current.DisplayAlertAsync("Test", $"Number of courses: {courses.Count}", "OK");
+                if (!courses.Any())
+                {
+                    await Shell.Current.DisplayAlertAsync("No Courses",
+                        "No courses found for the selected term.", "OK");
+                    return;
+                }
+
                 // Generate Report
                 foreach (Course course in courses)
                 {
@@ -125,8 +125,6 @@ namespace C_971.ViewModels
                                     $"Status: {course.Status}\n\n" +
                                     $"Grade: {course.Grade}\n\n";
                 }
-
-                await Shell.Current.DisplayAlertAsync("Course Report", ReportText, "OK");
             }
             catch (Exception ex)
             {
@@ -144,11 +142,18 @@ namespace C_971.ViewModels
 
             try
             {
-                List<CourseWithAssessments> coursesWithAssessments = await _database.GetCoursesWithAssessmentsAsync(User.Id, Term.Id);
+                List<CourseWithAssessments> coursesWithAssessments = await _database.GetCoursesWithAssessmentsAsync(NewUser.Id, NewTerm.Id);
+
+                if (!coursesWithAssessments.Any())
+                {
+                    await Shell.Current.DisplayAlertAsync("No Courses",
+                        "No courses found for the selected term.", "OK");
+                    return;
+                }
 
                 // Generate Report Header
                 ReportText += $"=== COURSES AND ASSESSMENTS REPORT ===\n";
-                ReportText += $"Term: {Term.Name}\n";
+                ReportText += $"Term: {NewTerm.Name}\n";
                 ReportText += $"Generated: {DateTime.Now:yyyy-MM-dd HH:mm}\n";
                 ReportText += $"Total Courses: {coursesWithAssessments.Count}\n\n";
 
@@ -185,8 +190,6 @@ namespace C_971.ViewModels
 
                     ReportText += "".PadRight(50, '-') + "\n\n";
                 }
-
-                await Shell.Current.DisplayAlertAsync("Courses & Assessments Report", ReportText, "OK");
             }
             catch (Exception ex)
             {
@@ -200,11 +203,10 @@ namespace C_971.ViewModels
         {
             try
             {
-
-                // DEBUG: Check if content is actually there
                 if (string.IsNullOrEmpty(reportContent))
                 {
-                    await Shell.Current.DisplayAlertAsync("Debug", "Report content is empty!", "OK");
+                    await Shell.Current.DisplayAlertAsync("No Report",
+                        "No report content was generated to save.", "OK");
                     return;
                 }
 

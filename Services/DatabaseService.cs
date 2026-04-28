@@ -523,7 +523,6 @@ namespace C_971.Services
 
             foreach (Course course in courses)
             {
-                await Shell.Current.DisplayAlertAsync("Course Id", $"{course.Id}", "OK");
                 // Get assessments for each course
                 string assessmentsQuery = @"
                     SELECT * FROM course_assessment
