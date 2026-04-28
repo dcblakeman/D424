@@ -1,0 +1,38 @@
+name: D424 Android Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Install MAUI Android Workload
+      run: dotnet workload install maui-android --ignore-failed-sources
+
+    - name: Workload Restore
+      run: dotnet workload restore
+
+    - name: Restore Dependencies
+      run: dotnet restore C_971.csproj
+
+    - name: Build Android App
+      run: dotnet build C_971.csproj -c Release -f net10.0-android --no-restore
+
+    - name: Upload Android Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-build
+        path: bin/Release/net10.0-android/*-Signed.apk
