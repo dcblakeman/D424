@@ -1,9 +1,9 @@
 using C_971.Models;
 using C_971.Services;
+using C_971.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Net.Mail;
 
 namespace C_971.ViewModels
 {
@@ -287,7 +287,7 @@ namespace C_971.ViewModels
             }
 
             // Basic email validation
-            if (!IsValidEmail(NewInstructorEmail))
+            if (!ValidationRules.IsValidEmail(NewInstructorEmail))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid email address", "OK");
                 return false;
@@ -308,26 +308,13 @@ namespace C_971.ViewModels
             }
 
             // Check for correct phone number format
-            if (!System.Text.RegularExpressions.Regex.IsMatch(NewInstructorPhone.Trim(), @"^(\+[1-9]\d{10,14}|[1-9]\d{2}-\d{3}-\d{4})$"))
+            if (!ValidationRules.IsValidPhone(NewInstructorPhone))
             {
                 _ = Shell.Current.DisplayAlertAsync("Validation Error", "Please enter a valid phone number", "OK");
                 return false;
             }
 
             return true;
-        }
-
-        private static bool IsValidEmail(string email)
-        {
-            try
-            {
-                MailAddress addr = new(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         private void ClearForm()

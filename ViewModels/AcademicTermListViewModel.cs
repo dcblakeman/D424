@@ -1,5 +1,6 @@
 using C_971.Models;
 using C_971.Services;
+using C_971.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -227,7 +228,7 @@ namespace C_971.ViewModels
                 return false;
             }
 
-            if (NewTermEndDate <= NewTermStartDate)
+            if (!ValidationRules.IsValidDateRange(NewTermStartDate, NewTermEndDate))
             {
                 _ = Shell.Current.DisplayAlertAsync("Error", "End date must be after start date", "OK");
                 return false;
