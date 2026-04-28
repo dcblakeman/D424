@@ -1,4 +1,4 @@
-name: D424 Android Build & Test
+name: Android CI
 
 on:
   push:
@@ -28,11 +28,12 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore C_971.csproj
 
-    - name: Build Android App
-      run: dotnet build C_971.csproj -c Release -f net10.0-android --no-restore
+    - name: Publish Android App Bundle
+      run: dotnet publish C_971.csproj -c Release -f net10.0-android -p:AndroidPackageFormats=aab --no-restore
 
     - name: Upload Android Artifact
       uses: actions/upload-artifact@v4
       with:
         name: android-build
-        path: bin/Release/net10.0-android/*-Signed.apk
+        path: bin/Release/net10.0-android/publish/*.aab
+        if-no-files-found: error

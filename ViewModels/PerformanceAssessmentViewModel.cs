@@ -1,11 +1,9 @@
-
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.LocalNotification;
 using System.Collections.ObjectModel;
-using Waher.Script.Constants;
 
 namespace C_971.ViewModels
 {
@@ -96,27 +94,37 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = [];
 
-        public List<CourseAssessment> _allPerformanceAssessments = [];
+        private List<CourseAssessment> _allPerformanceAssessments = [];
 
         // UI State
         [ObservableProperty]
-        private bool isEditing;[ObservableProperty]
+        private bool isEditing;
+
+        [ObservableProperty]
         private bool isRefreshing;
 
         [ObservableProperty]
-        private bool isAddingAssessment;[ObservableProperty]
+        private bool isAddingAssessment;
+
+        [ObservableProperty]
         private bool isRemovingAssessment;
 
         [ObservableProperty]
-        private bool isSavingAssessment;[ObservableProperty]
+        private bool isSavingAssessment;
+
+        [ObservableProperty]
         private bool isDeletingAssessment;
 
         [ObservableProperty]
-        private bool isLoadingAssessments;[ObservableProperty]
+        private bool isLoadingAssessments;
+
+        [ObservableProperty]
         private bool isSearching;
 
         [ObservableProperty]
-        private bool isLoading;public bool IsNotLoading => !IsLoading;
+        private bool isLoading;
+
+        public bool IsNotLoading => !IsLoading;
 
         public bool IsNotSearching => !IsSearching;
 

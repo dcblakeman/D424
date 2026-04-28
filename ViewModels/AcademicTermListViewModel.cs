@@ -26,7 +26,9 @@ namespace C_971.ViewModels
         private User newUser = null!;
 
         [ObservableProperty]
-        private int userId;[ObservableProperty]
+        private int userId;
+
+        [ObservableProperty]
         private int newUserId;
 
         [ObservableProperty]
@@ -34,11 +36,15 @@ namespace C_971.ViewModels
 
         // UI State
         [ObservableProperty]
-        private bool isAddingTerm;[ObservableProperty]
+        private bool isAddingTerm;
+
+        [ObservableProperty]
         private bool isRemovingTerm;
 
         [ObservableProperty]
-        private bool isRefreshing;public bool IsNotAddingTerm => !IsAddingTerm;
+        private bool isRefreshing;
+
+        public bool IsNotAddingTerm => !IsAddingTerm;
 
         // Search
         [ObservableProperty]

@@ -14,7 +14,9 @@ namespace C_971.ViewModels
         private readonly DatabaseService _database;
 
         [ObservableProperty]
-        private bool isRefreshing;[ObservableProperty]
+        private bool isRefreshing;
+
+        [ObservableProperty]
         private User user = null!;
 
         [ObservableProperty]
@@ -53,6 +55,7 @@ namespace C_971.ViewModels
         {
             NewUser = value;
         }
+
         partial void OnTermChanged(AcademicTerm value)
         {
             NewTerm = value;
@@ -73,6 +76,7 @@ namespace C_971.ViewModels
             }
 
             IsRefreshing = true;
+            try
             {
                 Notes = (List<CourseNote>)await _database.GetCourseNotesByCourseIdAsync(NewCourse.Id);
 
@@ -80,7 +84,12 @@ namespace C_971.ViewModels
                 CourseNotesList = new ObservableCollection<CourseNote>(Notes);
                 OnPropertyChanged(nameof(CourseNotesList));
             }
+            finally
+            {
+                IsRefreshing = false;
+            }
         }
+
         [RelayCommand]
         private async Task GoBack()
         {

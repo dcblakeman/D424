@@ -71,7 +71,9 @@ namespace C_971.ViewModels
         private int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
-        private DateTime newCourseStartDateReminderDateTime;[ObservableProperty]
+        private DateTime newCourseStartDateReminderDateTime;
+
+        [ObservableProperty]
         private DateTime newCourseEndDateReminderDateTime;
 
         [ObservableProperty]
@@ -91,7 +93,9 @@ namespace C_971.ViewModels
 
         // UI State
         [ObservableProperty]
-        private bool isEditing;public bool IsNotEditing => !IsEditing;
+        private bool isEditing;
+
+        public bool IsNotEditing => !IsEditing;
 
         private bool _isLoadingData = false; // Add this flag
 

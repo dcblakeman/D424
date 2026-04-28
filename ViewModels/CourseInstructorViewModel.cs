@@ -59,11 +59,15 @@ namespace C_971.ViewModels
 
         // UI State
         [ObservableProperty]
-        private bool isAddingInstructor;[ObservableProperty]
+        private bool isAddingInstructor;
+
+        [ObservableProperty]
         private bool isRemovingInstructor;
 
         [ObservableProperty]
-        private bool isRefreshing;public bool IsNotAddingInstructor => !IsAddingInstructor && !IsRemovingInstructor;
+        private bool isRefreshing;
+
+        public bool IsNotAddingInstructor => !IsAddingInstructor && !IsRemovingInstructor;
 
         public bool IsNotRemovingInstructor => !IsRemovingInstructor;
 

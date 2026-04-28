@@ -20,7 +20,9 @@ namespace C_971.ViewModels
         private User newUser = null!;
 
         [ObservableProperty]
-        private int newUserId;[ObservableProperty]
+        private int newUserId;
+
+        [ObservableProperty]
         private AcademicTerm term = null!;
 
         [ObservableProperty]

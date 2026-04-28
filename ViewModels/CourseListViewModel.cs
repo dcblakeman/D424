@@ -1,12 +1,9 @@
 
-
-
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using Waher.Script.Functions.Strings;
 
 namespace C_971.ViewModels
 {
@@ -62,11 +59,15 @@ namespace C_971.ViewModels
 
         // UI State
         [ObservableProperty]
-        private bool isAddingCourse;[ObservableProperty]
+        private bool isAddingCourse;
+
+        [ObservableProperty]
         private bool isRemovingCourse;
 
         [ObservableProperty]
-        private bool isRefreshing;public bool IsNotAddingCourse => !IsAddingCourse;
+        private bool isRefreshing;
+
+        public bool IsNotAddingCourse => !IsAddingCourse;
 
         // Search
         [ObservableProperty]
@@ -75,7 +76,7 @@ namespace C_971.ViewModels
         [ObservableProperty]
         private ObservableCollection<Course> courses = [];
 
-        public List<Course> _allCourses = [];
+        private List<Course> _allCourses = [];
 
         // Static Collections
         public ObservableCollection<CourseStatus> StatusOptions { get; } =

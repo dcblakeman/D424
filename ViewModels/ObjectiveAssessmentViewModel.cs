@@ -1,12 +1,9 @@
-
 using C_971.Models;
 using C_971.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Plugin.LocalNotification;
 using System.Collections.ObjectModel;
-
-
 namespace C_971.ViewModels
 {
     [QueryProperty(nameof(Course), "course")]
@@ -80,7 +77,9 @@ namespace C_971.ViewModels
         private int endDateNotificationDays = 1;   // Default to 1 day
 
         [ObservableProperty]
-        private DateTime assessmentStartDateReminderTime;[ObservableProperty]
+        private DateTime assessmentStartDateReminderTime;
+
+        [ObservableProperty]
         private DateTime assessmentEndDateReminderTime;
 
         [ObservableProperty]
@@ -90,30 +89,42 @@ namespace C_971.ViewModels
         private int assessmentCourseId = 0;
 
         [ObservableProperty]
-        private FinalGrade assessmentGrade;[ObservableProperty]
+        private FinalGrade assessmentGrade;
+
+        [ObservableProperty]
         private ObservableCollection<CourseAssessment> assessments = [];
 
         private List<CourseAssessment> _allObjectiveAssessments = [];
 
         // UI State
         [ObservableProperty]
-        private bool isEditing;[ObservableProperty]
+        private bool isEditing;
+
+        [ObservableProperty]
         private bool isRefreshing;
 
         [ObservableProperty]
-        private bool isAddingAssessment;[ObservableProperty]
+        private bool isAddingAssessment;
+
+        [ObservableProperty]
         private bool isRemovingAssessment;
 
         [ObservableProperty]
-        private bool isSavingAssessment;[ObservableProperty]
+        private bool isSavingAssessment;
+
+        [ObservableProperty]
         private bool isDeletingAssessment;
 
         [ObservableProperty]
-        private bool isLoadingAssessments;[ObservableProperty]
+        private bool isLoadingAssessments;
+
+        [ObservableProperty]
         private bool isNavigating = true;
 
         [ObservableProperty]
-        private bool isSearching;[ObservableProperty]
+        private bool isSearching;
+
+        [ObservableProperty]
         private bool isLoading;
 
         public bool IsNotNavigating => !IsNavigating;

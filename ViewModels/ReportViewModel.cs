@@ -12,8 +12,8 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(User), "user")]
     public partial class ReportViewModel : ObservableObject
     {
-
         private readonly DatabaseService _database;
+        private const string ReportsFolderKey = "reports_default_folder";
 
         [ObservableProperty]
         private User user = new();
@@ -40,7 +40,7 @@ namespace C_971.ViewModels
         private string reportTitle = null!;
 
         [ObservableProperty]
-        private bool isBusy;private const string REPORTS_FOLDER_KEY = "reports_default_folder";
+        private bool isBusy;
 
         public ReportViewModel(DatabaseService database)
         {
@@ -96,7 +96,7 @@ namespace C_971.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
             }
-            await ReportViewModel.SaveReport(ReportText, ReportTitle);
+            await SaveReport(ReportText, ReportTitle);
         }
 
         // Generate a report to output all of the courses with grades
@@ -131,7 +131,7 @@ namespace C_971.ViewModels
                 await Shell.Current.DisplayAlertAsync("Error", $"Failed to generate report: {ex.Message}", "OK");
             }
 
-            await ReportViewModel.SaveReport(ReportText, ReportTitle);
+            await SaveReport(ReportText, ReportTitle);
         }
 
         [RelayCommand]
@@ -196,7 +196,7 @@ namespace C_971.ViewModels
                 await Shell.Current.DisplayAlertAsync("Error", $"Failed to generate report: {ex.Message}", "OK");
             }
 
-            await ReportViewModel.SaveReport(ReportText, ReportTitle);
+            await SaveReport(ReportText, ReportTitle);
         }
 
         public static async Task SaveReport(string reportContent, string reportTitle)
@@ -238,7 +238,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                string reportsPath = Preferences.Get(REPORTS_FOLDER_KEY, string.Empty);
+                string reportsPath = Preferences.Get(ReportsFolderKey, string.Empty);
                 string[] files = Directory.GetFiles(reportsPath);
 
                 if (files.Length == 0)
@@ -263,7 +263,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                string reportsPath = Preferences.Get(REPORTS_FOLDER_KEY, string.Empty);
+                string reportsPath = Preferences.Get(ReportsFolderKey, string.Empty);
                 List<string> files = Directory.GetFiles(reportsPath).ToList();
 
                 if (files.Count > 0)
@@ -288,7 +288,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         private async Task ShowCurrentReportsFolder()
         {
-            string savedPath = Preferences.Get(REPORTS_FOLDER_KEY, "Not set");
+            string savedPath = Preferences.Get(ReportsFolderKey, "Not set");
 
             if (savedPath == "Not set")
             {
@@ -344,7 +344,7 @@ namespace C_971.ViewModels
         [RelayCommand]
         public async Task ResetReportsFolder()
         {
-            Preferences.Remove(REPORTS_FOLDER_KEY);
+            Preferences.Remove(ReportsFolderKey);
             await Shell.Current.DisplayAlertAsync("Reset Complete",
                 "Reports folder has been reset. You'll be prompted to choose a new folder next time.", "OK");
         }

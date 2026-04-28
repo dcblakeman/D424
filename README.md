@@ -22,12 +22,12 @@ College Course Tracker is a .NET MAUI mobile app for organizing academic terms, 
 
 ## Project structure
 
+- `Docs/` - wireframes, release prep, and supporting course documents
 - `Views/` - MAUI pages
 - `ViewModels/` - MVVM presentation logic
 - `Models/` - domain models and data shapes
 - `Services/` - persistence, permissions, notifications, and app services
 - `Resources/` - icons, splash assets, fonts, and images
-- `Store/` - release and store submission notes
 
 ## Local development
 
