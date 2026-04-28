@@ -1,7 +1,8 @@
 **DO NOT DISTRIBUTE OR PUBLICLY POST SOLUTIONS TO THESE LABS. MAKE ALL FORKS OF THIS REPOSITORY WITH SOLUTION CODE PRIVATE. PLEASE REFER TO THE STUDENT CODE OF CONDUCT AND ETHICAL EXPECTATIONS FOR COLLEGE OF INFORMATION TECHNOLOGY STUDENTS FOR SPECIFICS.**
     
-    ## WESTERN GOVERNORS UNIVERSITY
-    [## D424 - SOFTWARE ENGINEERING CAPSTONE](https://github.com/dcblakeman/D424/actions/runs/25011543238/artifacts/6667818738)
+## WESTERN GOVERNORS UNIVERSITY
+https://github.com/dcblakeman/D424/releases/download/v1.0.1/android-build.zip
+(https://github.com/dcblakeman/D424/actions/runs/25011543238/artifacts/6667818738)
     Welcome to Software Engineering Capstone! This is an opportunity for students to develop full stack software engineering documentation and applications. They will execute documentation, unit testing, revision of software applications, and deploy software applications with scripts and containers on a cloud platform.
     
     FOR SPECIFIC TASK INSTRUCTIONS AND REQUIREMENTS FOR THIS ASSESSMENT, PLEASE REFER TO THE COURSE PAGE.
