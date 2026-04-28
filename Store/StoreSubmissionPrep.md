@@ -5,36 +5,32 @@
 - App name: `College Course Tracker`
 - Version name: `1.0`
 - Version code: `1`
-- Android release artifacts currently build successfully under:
-  - `bin\Release\net10.0-android\publish\College_Course_Tracker.College_Course_Tracker-Signed.aab`
-  - `bin\Release\net10.0-android\publish\College_Course_Tracker.College_Course_Tracker-Signed.apk`
+- Android release artifacts currently build successfully under the `bin\Release\net10.0-android\publish` folder.
+- Current signed Android App Bundle:
+  - `bin\Release\net10.0-android\publish\com.dcblakeman.collegecoursetracker-Signed.aab`
 - Windows and Android release builds are passing locally.
 
 ## Blockers Before Store Submission
 
-1. Replace the current Android/iOS app identifier with a permanent production identifier.
-   - Current values are not store-ready:
-     - `C_971.csproj`: `com.companyname.c_971`
-     - Generated Android package output: `College_Course_Tracker.College_Course_Tracker`
-2. Create a production Android signing keystore and store its credentials safely.
-3. Provide store account access:
+1. Create a production Android signing keystore and store its credentials safely.
+2. Provide store account access:
    - Google Play Console
    - Apple Developer / App Store Connect
-4. Provide final store metadata:
+3. Provide final store metadata:
    - Privacy policy URL
    - Support URL
    - Marketing URL (optional)
    - Final support email
-5. Capture release screenshots for Android and iPhone/iPad.
-6. For iOS, use a Mac build host with Xcode and App Store Connect upload access.
+4. Capture release screenshots for Android and iPhone/iPad.
+5. For iOS, use a Mac build host with Xcode and App Store Connect upload access.
 
-## Suggested Production Identifier
+## Production Identifier
 
-Recommended default:
+Chosen identifier:
 
 - `com.dcblakeman.collegecoursetracker`
 
-Any replacement should be decided carefully because store package identifiers are effectively permanent once the app record exists.
+This should now be treated as the permanent production identifier for Android and iOS builds.
 
 ## Google Play Draft Listing
 
@@ -135,4 +131,3 @@ Version `1.0`
 - Track academic terms, courses, assessments, and notes
 - Manage instructor details and reminders
 - Review saved academic information through in-app reports
-

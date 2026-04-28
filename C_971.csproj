@@ -22,7 +22,7 @@
 		<ApplicationTitle>College Course Tracker</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.c_971</ApplicationId>
+		<ApplicationId>com.dcblakeman.collegecoursetracker</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
