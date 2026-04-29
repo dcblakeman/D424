@@ -23,32 +23,45 @@
         <VerticalStackLayout Padding="15,0,15,15" Spacing="3">
 
             <!-- Buttons Section -->
-            <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="0,5,0,0">
+            <FlexLayout Direction="Row"
+                        Wrap="Wrap"
+                        JustifyContent="SpaceBetween"
+                        AlignItems="Stretch"
+                        AlignContent="Start"
+                        Margin="0,5,0,15">
 
                 <Button Text="{Binding EditButtonText}"
-                    Command="{Binding ToggleEditCommand}"
-                    BackgroundColor="{Binding EditButtonColor}"
-                    FontAttributes="Bold"  
-                    TextColor="White"
-                    Margin="0,0,0,15"/>
+                        Command="{Binding ToggleEditCommand}"
+                        BackgroundColor="{Binding EditButtonColor}"
+                        FontAttributes="Bold"
+                        TextColor="White"
+                        MinimumWidthRequest="160"
+                        HorizontalOptions="Fill"
+                        FlexLayout.Basis="48%"
+                        FlexLayout.Grow="1"
+                        Margin="0,0,8,8"/>
 
-                <Button Grid.Column="1"
-                    Text="Edit Instructor"
-                    FontAttributes="Bold"
-                    Command="{Binding GetInstructorCommand}"
-                    BackgroundColor="#F44336"
-                    TextColor="White"
-                    Margin="0,0,0,15"/>
+                <Button Text="Edit Instructor"
+                        FontAttributes="Bold"
+                        Command="{Binding GetInstructorCommand}"
+                        BackgroundColor="#F44336"
+                        TextColor="White"
+                        MinimumWidthRequest="160"
+                        HorizontalOptions="Fill"
+                        FlexLayout.Basis="48%"
+                        FlexLayout.Grow="1"
+                        Margin="0,0,0,8"/>
 
                 <!--Back Button-->
-                <Button Grid.Column="2"
-                    Text="Back"
-                    FontAttributes="Bold"
-                    Command="{Binding GoBackCommand}"
-                    BackgroundColor="Grey"
-                    TextColor="White"
-                    Margin="0,0,0,15"/>
-            </Grid>
+                <Button Text="Back"
+                        FontAttributes="Bold"
+                        Command="{Binding GoBackCommand}"
+                        BackgroundColor="Grey"
+                        TextColor="White"
+                        HorizontalOptions="Fill"
+                        FlexLayout.Basis="100%"
+                        FlexLayout.Grow="1"/>
+            </FlexLayout>
 
             <!-- Course Details Section -->
             <Border Stroke="DarkBlue"
