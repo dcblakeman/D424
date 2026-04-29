@@ -45,8 +45,7 @@ public partial class CourseInstructorView : ContentPage
             viewModel.NewCourse = viewModel.Course;
             viewModel.NewUser = viewModel.User;
 
-            // Navigate to detail view - only pass course since that's what CourseDetailsView expects
-            await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>
+            await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
             {
                 ["user"] = viewModel.NewUser,
                 ["course"] = viewModel.NewCourse,
