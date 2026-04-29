@@ -69,6 +69,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="C_971.Tests\**\*.cs" />
+	  <EmbeddedResource Remove="C_971.Tests\**" />
+	  <MauiXaml Remove="C_971.Tests\**\*.xaml" />
+	  <None Remove="C_971.Tests\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="Platforms\Android\AndroidManifest.xml" />
 	</ItemGroup>
 

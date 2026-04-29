@@ -354,8 +354,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                // Use relative navigation (no leading slash)
-                await Shell.Current.GoToAsync("AssessmentSelectionView", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
                     ["term"] = NewTerm,

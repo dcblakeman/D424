@@ -73,7 +73,7 @@ namespace C_971.Views
             else
             {
                 // Normal navigation behavior
-                await Shell.Current.GoToAsync("CourseDetailsView", new Dictionary<string, object>
+                await Shell.Current.GoToAsync(nameof(CourseDetailsView), new Dictionary<string, object>
                 {
                     ["user"] = viewModel.NewUser,
                     ["course"] = viewModel.NewCourse = newCourse,

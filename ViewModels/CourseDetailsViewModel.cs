@@ -556,7 +556,7 @@ namespace C_971.ViewModels
                     await SaveCourse();
                 }
 
-                await Shell.Current.GoToAsync($"{nameof(CourseListView)}", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
                     ["term"] = NewTerm,

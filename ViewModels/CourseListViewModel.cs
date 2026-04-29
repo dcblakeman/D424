@@ -188,7 +188,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await Shell.Current.GoToAsync("AcademicTermListView", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["user"] = NewUser,
