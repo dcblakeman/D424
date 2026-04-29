@@ -57,14 +57,14 @@ namespace C_971
             builder.Services.AddSingleton<CourseInstructorView>();
             builder.Services.AddSingleton<CourseInstructorViewModel>();
 
-            builder.Services.AddSingleton<AssessmentSelectionView>();
-            builder.Services.AddSingleton<AssessmentSelectionViewModel>();
+            builder.Services.AddTransient<AssessmentSelectionView>();
+            builder.Services.AddTransient<AssessmentSelectionViewModel>();
 
-            builder.Services.AddSingleton<PerformanceAssessmentView>();
-            builder.Services.AddSingleton<PerformanceAssessmentViewModel>();
+            builder.Services.AddTransient<PerformanceAssessmentView>();
+            builder.Services.AddTransient<PerformanceAssessmentViewModel>();
 
-            builder.Services.AddSingleton<ObjectiveAssessmentView>();
-            builder.Services.AddSingleton<ObjectiveAssessmentViewModel>();
+            builder.Services.AddTransient<ObjectiveAssessmentView>();
+            builder.Services.AddTransient<ObjectiveAssessmentViewModel>();
 
             builder.Services.AddSingleton<ReportView>();
             builder.Services.AddSingleton<ReportViewModel>();

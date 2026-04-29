@@ -77,7 +77,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await Shell.Current.GoToAsync($"/{nameof(PerformanceAssessmentView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync(nameof(PerformanceAssessmentView), true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
@@ -95,7 +95,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync(nameof(ObjectiveAssessmentView), true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
