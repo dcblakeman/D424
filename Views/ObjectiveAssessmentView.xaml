@@ -174,10 +174,12 @@
                     </Grid>
 
                     <!-- Assessment List - Only visible when searching -->
-                    <CollectionView ItemsSource="{Binding Assessments}" 
-                                IsVisible="{Binding IsSearching}"
-                                BackgroundColor="White">
-                        <CollectionView.ItemTemplate>
+                    <VerticalStackLayout
+                        IsVisible="{Binding IsSearching}"
+                        BackgroundColor="White"
+                        Spacing="0"
+                        BindableLayout.ItemsSource="{Binding Assessments}">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:CourseAssessment">
                                 <Grid Padding="10">
                                     <Border StrokeThickness="1" Stroke="LightGray" Padding="10">
@@ -200,29 +202,24 @@
                                                 <Label Text="Course ID:" FontAttributes="Bold"/>
                                                 <Label Text="{Binding CourseId}"/>
                                             </HorizontalStackLayout>
-                                        <HorizontalStackLayout Spacing="10">
-                                            <Label Text="Type:" FontAttributes="Bold"/>
-                                            <Label Text="{Binding Type}"/>
-                                        </HorizontalStackLayout>
-                                        <HorizontalStackLayout Spacing="10">
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label Text="Type:" FontAttributes="Bold"/>
+                                                <Label Text="{Binding Type}"/>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Spacing="10">
                                                 <Label Text="Status:" FontAttributes="Bold"/>
                                                 <Label Text="{Binding Status}" TextColor="DarkBlue"/>
                                             </HorizontalStackLayout>
-                                        <HorizontalStackLayout Spacing="10">
-                                            <Label Text="IsActive:" FontAttributes="Bold"/>
-                                            <Label Text="{Binding IsActive}" TextColor="DarkBlue"/>
-                                        </HorizontalStackLayout>
-                                    </VerticalStackLayout>
+                                            <HorizontalStackLayout Spacing="10">
+                                                <Label Text="IsActive:" FontAttributes="Bold"/>
+                                                <Label Text="{Binding IsActive}" TextColor="DarkBlue"/>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
                                     </Border>
                                 </Grid>
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                        <CollectionView.EmptyView>
-                            <StackLayout Padding="20" VerticalOptions="Center">
-                                <Label Text="No assessments available" HorizontalOptions="Center" FontSize="18" TextColor="Gray"/>
-                            </StackLayout>
-                        </CollectionView.EmptyView>
-                    </CollectionView>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
 
                 </VerticalStackLayout>
             </ScrollView>

@@ -20,7 +20,7 @@
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
-    <Grid RowDefinitions="Auto,Auto" Margin="23" RowSpacing="10">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="23" RowSpacing="10">
         <!-- Main buttons frame -->
         <Frame Grid.Row="0"
            BackgroundColor="{AppThemeBinding Light=#F8F9FA, Dark=#2D3748}" 
@@ -61,8 +61,6 @@
                     HorizontalOptions="Fill" />
             </StackLayout>
         </Frame>
-
-        <!-- Empty space in the middle -->
 
         <!-- Back button frame at bottom -->
         <Frame Grid.Row="2"
