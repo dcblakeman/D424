@@ -123,8 +123,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                // Navigate back to previous page with course context
-                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
                     ["term"] = NewTerm,

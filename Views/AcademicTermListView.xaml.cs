@@ -65,7 +65,7 @@ public partial class AcademicTermListView : ContentPage
         else
         {
             // Normal navigation behavior
-            await Shell.Current.GoToAsync("CourseListView", new Dictionary<string, object>
+            await Shell.Current.GoToAsync(nameof(CourseListView), new Dictionary<string, object>
             {
                 ["term"] = term,
                 ["user"] = viewModel.NewUser

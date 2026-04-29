@@ -250,7 +250,7 @@ namespace C_971.ViewModels
         {
             try
             {
-                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
                     ["instructor"] = NewInstructor,
