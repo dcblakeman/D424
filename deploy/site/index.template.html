@@ -42,9 +42,9 @@
         <h2>Why this deployment works</h2>
         <ul>
           <li>Publishes over HTTPS from a managed cloud endpoint.</li>
-          <li>Uses GitLab CI/CD to redeploy automatically after a push to <code>master</code>.</li>
+          <li>Uses a GitHub Pages workflow to redeploy automatically after a push to <code>main</code>.</li>
           <li>Distributes the signed Android build from a public release link.</li>
-          <li>Keeps the code repository and deployed site connected in one workflow.</li>
+          <li>Keeps matching GitLab automation in the source repository for project export and parity.</li>
         </ul>
       </article>
     </section>
@@ -63,9 +63,9 @@
       <article class="card">
         <h2>Deployment Automation</h2>
         <p>
-          The <code>.gitlab-ci.yml</code> pipeline runs the PowerShell build script in a container image to
-          generate the published <code>public</code> site. A companion Dockerfile uses the same generated site
-          and serves it through Nginx for portable container-based hosting.
+          The GitHub Pages workflow publishes the generated <code>public</code> site from the default branch.
+          The repository also includes a GitLab Pages pipeline and a companion Dockerfile so the same deployment
+          can be reproduced in Git-based and container-based environments.
         </p>
       </article>
     </section>
