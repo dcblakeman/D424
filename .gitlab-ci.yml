@@ -1,0 +1,10 @@
+pages:
+  stage: deploy
+  image: mcr.microsoft.com/powershell:7.4-alpine-3.19
+  script:
+    - pwsh -File ./deploy/build-pages.ps1 -OutputDir public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

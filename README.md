@@ -6,6 +6,7 @@ College Course Tracker is a .NET MAUI mobile app for organizing academic terms, 
 
 - Android APK: [com.dcblakeman.collegecoursetracker-v1.0.3.apk](Releases/v1.0.3/com.dcblakeman.collegecoursetracker-v1.0.3.apk)
 - Android App Bundle: [com.dcblakeman.collegecoursetracker-v1.0.3.aab](Releases/v1.0.3/com.dcblakeman.collegecoursetracker-v1.0.3.aab)
+- GitLab Pages deployment: [College Course Tracker deployment page](https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/)
 
 ## What it does
 
@@ -28,6 +29,7 @@ College Course Tracker is a .NET MAUI mobile app for organizing academic terms, 
 ## Project structure
 
 - `Docs/` - wireframes, release prep, and supporting course documents
+- `deploy/` - GitLab Pages automation, export scripts, and deployment site assets
 - `Views/` - MAUI pages
 - `ViewModels/` - MVVM presentation logic
 - `Models/` - domain models and data shapes
@@ -53,6 +55,17 @@ dotnet run --project C_971.csproj -f net10.0-windows10.0.19041.0
 ```powershell
 dotnet publish C_971.csproj -f net10.0-android -c Release
 ```
+
+## Deployment
+
+College Course Tracker is deployed as a public distribution portal through GitLab Pages. The deployment publishes a live HTTPS page with the current Android install link, release metadata, and repository references.
+
+### Deployment automation
+
+- `deploy/build-pages.ps1` generates the static Pages site
+- `.gitlab-ci.yml` publishes the generated `public/` directory on pushes to `master`
+- `deploy/Dockerfile` packages the same deployment site into an Nginx container image for portable hosting
+- `deploy/export-project.ps1` creates a compressed project export for submission and archival
 
 ## Release status
 
