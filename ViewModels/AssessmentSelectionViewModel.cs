@@ -54,6 +54,7 @@ namespace C_971.ViewModels
             NewTerm = value;
         }
 
+        [RelayCommand]
         private async Task GoBack()
         {
             try
@@ -71,6 +72,7 @@ namespace C_971.ViewModels
             }
         }
 
+        [RelayCommand]
         private async Task NavigateToPerformanceAssessmentView()
         {
             try
@@ -88,6 +90,7 @@ namespace C_971.ViewModels
             }
         }
 
+        [RelayCommand]
         private async Task NavigateToObjectiveAssessmentView()
         {
             try
@@ -105,6 +108,7 @@ namespace C_971.ViewModels
             }
         }
 
+        [RelayCommand]
         private async Task NavigateToReportView()
         {
             if (NewCourse == null)
