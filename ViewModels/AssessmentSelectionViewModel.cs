@@ -10,7 +10,7 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(User), "user")]
-    public partial class AssessmentSelectionViewModel : ObservableObject
+    public class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
         public AssessmentSelectionViewModel(DatabaseService database)
@@ -54,12 +54,11 @@ namespace C_971.ViewModels
             NewTerm = value;
         }
 
-        [RelayCommand]
         private async Task GoBack()
-        {
+        {x`
             try
             {
-                await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("CourseDetailsView", true, new Dictionary<string, object>
                 {
                     ["course"] = NewCourse,
                     ["term"] = NewTerm,
@@ -72,12 +71,11 @@ namespace C_971.ViewModels
             }
         }
 
-        [RelayCommand]
         private async Task NavigateToPerformanceAssessmentView()
         {
             try
             {
-                await Shell.Current.GoToAsync(nameof(PerformanceAssessmentView), new Dictionary<string, object>
+                await Shell.Current.GoToAsync("PerformanceAssessmentView", true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
@@ -90,12 +88,11 @@ namespace C_971.ViewModels
             }
         }
 
-        [RelayCommand]
         private async Task NavigateToObjectiveAssessmentView()
         {
             try
             {
-                await Shell.Current.GoToAsync($"{nameof(ObjectiveAssessmentView)}", new Dictionary<string, object>
+                await Shell.Current.GoToAsync("ObjectiveAssessmentView", true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
@@ -108,7 +105,6 @@ namespace C_971.ViewModels
             }
         }
 
-        [RelayCommand]
         private async Task NavigateToReportView()
         {
             if (NewCourse == null)
@@ -118,7 +114,7 @@ namespace C_971.ViewModels
 
             try
             {
-                await Shell.Current.GoToAsync(nameof(ReportView), true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync("ReportView", true, new Dictionary<string, object>
                 {
                     ["term"] = NewTerm,
                     ["course"] = NewCourse,
