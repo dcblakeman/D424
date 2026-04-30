@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>College Course Tracker Deployment</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <img class="app-icon" src="assets/appicon.png" alt="College Course Tracker app icon">
+      <div class="hero-copy">
+        <p class="eyebrow">GitLab Pages Deployment</p>
+        <h1>College Course Tracker</h1>
+        <p class="lede">
+          This cloud deployment publishes the mobile app distribution page for College Course Tracker,
+          including the current Android build, source repository, and release metadata.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="{{APK_URL}}">Download Android APK</a>
+          <a class="button" href="{{RELEASE_URL}}">Open Release Assets</a>
+          <a class="button" href="{{REPO_URL}}">View GitLab Repository</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card-grid">
+      <article class="card">
+        <h2>Deployment Summary</h2>
+        <dl>
+          <div><dt>Cloud provider</dt><dd>GitLab Pages</dd></div>
+          <div><dt>Deployment URL</dt><dd><a href="{{DEPLOYMENT_URL}}">{{DEPLOYMENT_URL}}</a></dd></div>
+          <div><dt>Repository</dt><dd><a href="{{REPO_URL}}">{{REPO_URL}}</a></dd></div>
+          <div><dt>Release channel</dt><dd><a href="{{RELEASE_URL}}">GitHub Release v1.0.2</a></dd></div>
+          <div><dt>Commit</dt><dd>{{COMMIT}}</dd></div>
+          <div><dt>Generated</dt><dd>{{BUILD_TIMESTAMP}}</dd></div>
+        </dl>
+      </article>
+
+      <article class="card">
+        <h2>Why this deployment works</h2>
+        <ul>
+          <li>Publishes over HTTPS from a managed cloud endpoint.</li>
+          <li>Uses GitLab CI/CD to redeploy automatically after a push to <code>master</code>.</li>
+          <li>Distributes the signed Android build from a public release link.</li>
+          <li>Keeps the code repository and deployed site connected in one workflow.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="split">
+      <article class="card">
+        <h2>Core Features</h2>
+        <ul class="feature-list">
+          <li>Term, course, assessment, note, and instructor management</li>
+          <li>SQLite-backed local persistence and validation</li>
+          <li>Reminder scheduling and reporting workflows</li>
+          <li>Android install package linked directly from the deployment page</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Deployment Automation</h2>
+        <p>
+          The <code>.gitlab-ci.yml</code> pipeline runs the PowerShell build script in a container image to
+          generate the published <code>public</code> site. A companion Dockerfile uses the same generated site
+          and serves it through Nginx for portable container-based hosting.
+        </p>
+      </article>
+    </section>
+
+    <section class="card screenshot-card">
+      <div class="section-heading">
+        <h2>App Preview</h2>
+        <p>Representative planning screen included with the deployment materials.</p>
+      </div>
+      <img class="screenshot" src="assets/courses-screen.png" alt="Course planning screen preview">
+    </section>
+  </main>
+</body>
+</html>
