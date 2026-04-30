@@ -6,7 +6,8 @@ College Course Tracker is a .NET MAUI mobile app for organizing academic terms, 
 
 - Android APK: [com.dcblakeman.collegecoursetracker-v1.0.3.apk](Releases/v1.0.3/com.dcblakeman.collegecoursetracker-v1.0.3.apk)
 - Android App Bundle: [com.dcblakeman.collegecoursetracker-v1.0.3.aab](Releases/v1.0.3/com.dcblakeman.collegecoursetracker-v1.0.3.aab)
-- GitLab Pages deployment: [College Course Tracker deployment page](https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/)
+- GitHub Pages deployment: [College Course Tracker deployment page](https://dcblakeman.github.io/D424/)
+- GitLab Pages deployment path: `https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/`
 
 ## What it does
 
@@ -58,7 +59,7 @@ dotnet publish C_971.csproj -f net10.0-android -c Release
 
 ## Deployment
 
-College Course Tracker is deployed as a public distribution portal through GitLab Pages. The deployment publishes a live HTTPS page with the current Android install link, release metadata, and repository references.
+College Course Tracker is deployed as a public distribution portal through GitHub Pages, with matching automation also maintained in the GitLab repository. The deployment publishes a live HTTPS page with the current Android install link, release metadata, and repository references.
 
 ### Deployment automation
 

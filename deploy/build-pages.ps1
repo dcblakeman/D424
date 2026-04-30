@@ -15,8 +15,8 @@ $outputPath = if ([System.IO.Path]::IsPathRooted($OutputDir)) {
 $assetsPath = Join-Path $outputPath "assets"
 $templatePath = Join-Path $siteRoot "index.template.html"
 $stylesPath = Join-Path $siteRoot "styles.css"
-$iconSource = Join-Path $repoRoot "Resources\AppIcon\appicon.png"
-$wireframeSource = Join-Path $repoRoot "Docs\Wireframes\Courses Screen@1x.png"
+$iconSource = Join-Path (Join-Path (Join-Path $repoRoot "Resources") "AppIcon") "appicon.png"
+$wireframeSource = Join-Path (Join-Path (Join-Path $repoRoot "Docs") "Wireframes") "Courses Screen@1x.png"
 
 if (Test-Path $outputPath) {
     Remove-Item -Recurse -Force $outputPath
@@ -37,12 +37,18 @@ $commit = if ($env:CI_COMMIT_SHORT_SHA) {
 }
 
 $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm 'UTC'")
-$deploymentUrl = "https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/"
+$deploymentProvider = if ($env:DEPLOYMENT_PROVIDER) { $env:DEPLOYMENT_PROVIDER } else { "GitLab Pages" }
+$deploymentUrl = if ($env:DEPLOYMENT_URL) {
+    $env:DEPLOYMENT_URL
+} else {
+    "https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/"
+}
 $repoUrl = "https://gitlab.com/wgu-gitlab-environment/student-repos/dcblakeman/d424-software-engineering-capstone"
 $releaseUrl = "https://github.com/dcblakeman/D424/releases/tag/v1.0.2"
 $apkUrl = "https://github.com/dcblakeman/D424/releases/download/v1.0.2/com.dcblakeman.collegecoursetracker-Signed.apk"
 
 $html = Get-Content $templatePath -Raw
+$html = $html.Replace("{{DEPLOYMENT_PROVIDER}}", $deploymentProvider)
 $html = $html.Replace("{{COMMIT}}", $commit.Trim())
 $html = $html.Replace("{{BUILD_TIMESTAMP}}", $timestamp)
 $html = $html.Replace("{{DEPLOYMENT_URL}}", $deploymentUrl)
