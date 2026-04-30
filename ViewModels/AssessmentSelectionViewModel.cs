@@ -10,7 +10,7 @@ namespace C_971.ViewModels
     [QueryProperty(nameof(Term), "term")]
     [QueryProperty(nameof(Course), "course")]
     [QueryProperty(nameof(User), "user")]
-    public class AssessmentSelectionViewModel : ObservableObject
+    public partial class AssessmentSelectionViewModel : ObservableObject
     {
         private readonly DatabaseService _database;
         public AssessmentSelectionViewModel(DatabaseService database)
