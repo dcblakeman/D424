@@ -43,6 +43,7 @@ $deploymentUrl = if ($env:DEPLOYMENT_URL) {
 } else {
     "https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/"
 }
+$releaseLabel = "GitHub Release v1.0.4"
 $repoUrl = "https://gitlab.com/wgu-gitlab-environment/student-repos/dcblakeman/d424-software-engineering-capstone"
 $releaseUrl = "https://github.com/dcblakeman/D424/releases/tag/v1.0.4"
 $apkUrl = "https://github.com/dcblakeman/D424/releases/download/v1.0.4/com.dcblakeman.collegecoursetracker-v1.0.4.apk"
@@ -53,6 +54,7 @@ $html = $html.Replace("{{COMMIT}}", $commit.Trim())
 $html = $html.Replace("{{BUILD_TIMESTAMP}}", $timestamp)
 $html = $html.Replace("{{DEPLOYMENT_URL}}", $deploymentUrl)
 $html = $html.Replace("{{REPO_URL}}", $repoUrl)
+$html = $html.Replace("{{RELEASE_LABEL}}", $releaseLabel)
 $html = $html.Replace("{{RELEASE_URL}}", $releaseUrl)
 $html = $html.Replace("{{APK_URL}}", $apkUrl)
 
