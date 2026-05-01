@@ -12,6 +12,7 @@ namespace C_971
 
             // Register navigation routes for all non-root pages.
             Routing.RegisterRoute("AcademicTermListView", typeof(AcademicTermListView));
+            Routing.RegisterRoute("AiAssistantView", typeof(AiAssistantView));
             Routing.RegisterRoute("CourseListView", typeof(CourseListView));
             Routing.RegisterRoute("CourseDetailsView", typeof(CourseDetailsView));
             Routing.RegisterRoute("AddNoteView", typeof(AddNoteView));

@@ -3,6 +3,7 @@ using C_971.Services;
 using C_971.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.ApplicationModel;
 
 namespace C_971.ViewModels;
 
@@ -35,6 +36,19 @@ public partial class LoginViewModel : ObservableObject
     public LoginViewModel(DatabaseService database)
     {
         _database = database;
+    }
+
+    [RelayCommand]
+    public async Task OpenUniversityOfThePeople()
+    {
+        try
+        {
+            await Launcher.Default.OpenAsync(new Uri(Constants.UniversityOfThePeopleUrl));
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Link Error", $"Unable to open the link right now: {ex.Message}", "OK");
+        }
     }
 
     internal async Task<int> GetUserIdByEmailAsync(string email)

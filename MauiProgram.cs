@@ -31,6 +31,11 @@ namespace C_971
 #pragma warning restore CA1416 // Validate platform compatibility
 
             // Register database service and interface
+            builder.Services.AddSingleton(new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(90)
+            });
+            builder.Services.AddSingleton<OpenAiChatService>();
             builder.Services.AddSingleton<DatabaseService>();
             builder.Services.AddSingleton<NotificationService>();
             builder.Services.AddSingleton<PermissionService>();
@@ -41,6 +46,9 @@ namespace C_971
 
             builder.Services.AddTransient<AcademicTermListView>();
             builder.Services.AddTransient<AcademicTermListViewModel>();
+
+            builder.Services.AddTransient<AiAssistantView>();
+            builder.Services.AddTransient<AiAssistantViewModel>();
 
             builder.Services.AddSingleton<CourseListView>();
             builder.Services.AddSingleton<CourseListViewModel>();

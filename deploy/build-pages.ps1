@@ -44,8 +44,8 @@ $deploymentUrl = if ($env:DEPLOYMENT_URL) {
     "https://wgu-gitlab-environment.gitlab.io/student-repos/dcblakeman/d424-software-engineering-capstone/"
 }
 $repoUrl = "https://gitlab.com/wgu-gitlab-environment/student-repos/dcblakeman/d424-software-engineering-capstone"
-$releaseUrl = "https://github.com/dcblakeman/D424/releases/tag/v1.0.2"
-$apkUrl = "https://github.com/dcblakeman/D424/releases/download/v1.0.2/com.dcblakeman.collegecoursetracker-Signed.apk"
+$releaseUrl = "https://github.com/dcblakeman/D424/releases/tag/v1.0.4"
+$apkUrl = "https://github.com/dcblakeman/D424/releases/download/v1.0.4/com.dcblakeman.collegecoursetracker-v1.0.4.apk"
 
 $html = Get-Content $templatePath -Raw
 $html = $html.Replace("{{DEPLOYMENT_PROVIDER}}", $deploymentProvider)

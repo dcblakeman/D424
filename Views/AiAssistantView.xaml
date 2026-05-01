@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:C_971"
+             xmlns:model="clr-namespace:C_971.Models"
+             xmlns:viewmodel="clr-namespace:C_971.ViewModels"
+             x:Class="C_971.Views.AiAssistantView"
+             x:DataType="viewmodel:AiAssistantViewModel">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Shell.TitleView>
+        <Label Text="{x:Static local:Constants.AiAssistantTitle}"
+               FontSize="24"
+               FontAttributes="Bold"
+               TextColor="Black"
+               VerticalOptions="Center"
+               HorizontalOptions="Center" />
+    </Shell.TitleView>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="15,10,15,15" RowSpacing="10">
+        <Border Grid.Row="0"
+                Stroke="#5C6BC0"
+                StrokeThickness="1"
+                BackgroundColor="{AppThemeBinding Light=#F4F8FF, Dark=#1F2A3D}"
+                Padding="14">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Use your own OpenAI API key"
+                       FontAttributes="Bold"
+                       FontSize="18"
+                       TextColor="Black" />
+
+                <Label Text="Your key stays on this device. For a public production release, move OpenAI calls behind your own backend instead of shipping a client-side key flow."
+                       LineBreakMode="WordWrap"
+                       TextColor="Black" />
+
+                <Entry Text="{Binding ApiKey}"
+                       Placeholder="Paste your OpenAI API key"
+                       IsPassword="True"
+                       ClearButtonVisibility="WhileEditing" />
+
+                <Grid ColumnDefinitions="*,*,*"
+                      ColumnSpacing="8"
+                      RowDefinitions="Auto,Auto"
+                      RowSpacing="8">
+                    <Button Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Save Key"
+                            Command="{Binding SaveApiKeyCommand}"
+                            BackgroundColor="#1E88E5"
+                            TextColor="White" />
+                    <Button Grid.Row="0"
+                            Grid.Column="1"
+                            Text="Clear Key"
+                            Command="{Binding ClearApiKeyCommand}"
+                            BackgroundColor="#EF5350"
+                            TextColor="White" />
+                    <Button Grid.Row="0"
+                            Grid.Column="2"
+                            Text="OpenAI Keys"
+                            Command="{Binding OpenApiKeyPortalCommand}"
+                            BackgroundColor="#7E57C2"
+                            TextColor="White" />
+                    <Button Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Text="Clear Chat"
+                            Command="{Binding ClearConversationCommand}"
+                            BackgroundColor="#546E7A"
+                            TextColor="White" />
+                    <Button Grid.Row="1"
+                            Grid.Column="2"
+                            Text="Back"
+                            Command="{Binding GoBackCommand}"
+                            BackgroundColor="#9E9E9E"
+                            TextColor="White" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Messages}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:AssistantChatMessage">
+                    <Border Stroke="{Binding BubbleStroke}"
+                            StrokeThickness="1"
+                            BackgroundColor="{Binding BubbleBackground}"
+                            Padding="12"
+                            Margin="0,0,0,10">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Spacing="6">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Grid.Column="0"
+                                       Text="{Binding Speaker}"
+                                       FontAttributes="Bold"
+                                       TextColor="Black" />
+                                <Label Grid.Column="1"
+                                       Text="{Binding TimestampText}"
+                                       FontSize="12"
+                                       TextColor="#5F6368" />
+                            </Grid>
+                            <Label Text="{Binding Text}"
+                                   LineBreakMode="WordWrap"
+                                   TextColor="Black" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,Auto"
+              ColumnSpacing="10">
+            <Editor Grid.Column="0"
+                    Text="{Binding UserPrompt}"
+                    Placeholder="Ask Codex about studying, planning, notes, or assessments..."
+                    AutoSize="TextChanges"
+                    MaxLength="2000"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#2D3748}"
+                    TextColor="Black" />
+
+            <VerticalStackLayout Grid.Column="1"
+                                 Spacing="8"
+                                 VerticalOptions="End">
+                <ActivityIndicator IsRunning="{Binding IsSending}"
+                                   IsVisible="{Binding IsSending}" />
+                <Button Text="Send"
+                        Command="{Binding SendPromptCommand}"
+                        IsEnabled="{Binding IsNotSending}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        MinimumWidthRequest="90" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>
