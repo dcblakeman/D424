@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="C_971.Views.AcademicTermListView"
              x:Name="AcademicTermListPage"
+             xmlns:local="clr-namespace:C_971"
              xmlns:model="clr-namespace:C_971.Models"  
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
              x:DataType="viewmodel:AcademicTermListViewModel">
@@ -20,7 +21,7 @@
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
     
-    <Grid RowDefinitions="Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
         <!-- Search Bar Section -->
         <Border Grid.Row="0"
                 Stroke="#2196F3"
@@ -43,21 +44,63 @@
                        Margin="5"/>
         </Border>
 
+        <Border Grid.Row="1"
+                Stroke="#7E57C2"
+                StrokeThickness="1"
+                BackgroundColor="{AppThemeBinding Light=#F5F1FF, Dark=#2D2440}"
+                Padding="12"
+                Margin="15,0,15,10">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="{x:Static local:Constants.UniversityOfThePeopleReminderTitle}"
+                           FontAttributes="Bold"
+                           TextColor="Black"/>
+                    <Label Text="{x:Static local:Constants.UniversityOfThePeopleReminderText}"
+                           LineBreakMode="WordWrap"
+                           TextColor="Black"/>
+                </VerticalStackLayout>
+                <Button Grid.Column="1"
+                        Text="Open"
+                        Command="{Binding OpenUniversityOfThePeopleCommand}"
+                        BackgroundColor="#7E57C2"
+                        TextColor="White"
+                        VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
         <!-- Buttons Section -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Padding="10,5,10,5">
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*,*"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="8"
+              RowSpacing="8"
+              Padding="10,5,10,5">
             <Button Grid.Column="0"
+                    Grid.Row="0"
                     Text="Add Term"
                     Command="{Binding AddTermCommand}"
                     BackgroundColor="#2196F3"
                     TextColor="White"
                     IsVisible="{Binding IsNotAddingTerm}"/>
             <Button Grid.Column="1"
+                    Grid.Row="0"
                     Text="Remove Term"
                     Command="{Binding RemoveTermCommand}"
                     BackgroundColor="#F44336"
                     TextColor="White"
                     IsVisible="{Binding IsNotAddingTerm}"/>
-            <Button Grid.Column="2"
+            <Button Grid.Column="0"
+                Grid.Row="1"
+                Text="{x:Static local:Constants.AiAssistantTitle}"
+                Command="{Binding OpenAiAssistantCommand}"
+                BackgroundColor="#7E57C2"
+                TextColor="White"
+                IsVisible="{Binding IsNotAddingTerm}"/>
+            <Button Grid.Column="1"
+                Grid.Row="1"
                 Text="Logout"
                 Command="{Binding LogoutCommand}"
                 BackgroundColor="#9E9E9E"
@@ -66,7 +109,7 @@
         </Grid>
 
         <!-- Remove Mode Instructions -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 BackgroundColor="LightCoral"
                 Stroke="Red"
                 StrokeThickness="1"
@@ -91,7 +134,7 @@
         </Border>
 
         <!-- Add New Term Section (shown when adding) -->
-        <Border Grid.Row="2" 
+        <Border Grid.Row="3" 
                 Stroke="DarkBlue"
                 StrokeThickness="2"
                 Padding="10"
@@ -140,7 +183,7 @@
         </Border>
 
         <!-- Content Section -->
-        <RefreshView Grid.Row="3"
+        <RefreshView Grid.Row="4"
                      IsRefreshing="{Binding IsRefreshing}">
             
             <CollectionView ItemsSource="{Binding AcademicTerms}">

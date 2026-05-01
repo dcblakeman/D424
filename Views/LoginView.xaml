@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="C_971.Views.LoginView"
+             xmlns:local="clr-namespace:C_971"
              xmlns:model="clr-namespace:C_971.Models"  
              xmlns:viewmodel="clr-namespace:C_971.ViewModels"  
              x:DataType="viewmodel:LoginViewModel">
@@ -64,6 +65,26 @@
                         Command="{Binding RegisterUserCommand}" 
                         Pressed="OnButtonPressed"
                         Released="OnButtonReleased"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame BackgroundColor="{AppThemeBinding Light=#F4F8FF, Dark=#1F2A3D}"
+               HasShadow="True"
+               CornerRadius="10"
+               Padding="20"
+               VerticalOptions="Start">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{x:Static local:Constants.UniversityOfThePeopleReminderTitle}"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="Black" />
+                    <Label Text="{x:Static local:Constants.UniversityOfThePeopleReminderText}"
+                       LineBreakMode="WordWrap"
+                       TextColor="Black" />
+                    <Button Text="Learn More"
+                        Command="{Binding OpenUniversityOfThePeopleCommand}"
+                        BackgroundColor="#5C6BC0"
+                        TextColor="White" />
                 </VerticalStackLayout>
             </Frame>
 

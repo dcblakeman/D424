@@ -1,8 +1,10 @@
 using C_971.Models;
 using C_971.Services;
 using C_971.Utilities;
+using C_971.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.ApplicationModel;
 using System.Collections.ObjectModel;
 
 namespace C_971.ViewModels
@@ -66,6 +68,28 @@ namespace C_971.ViewModels
         public AcademicTermListViewModel(DatabaseService database)
         {
             _database = database;
+        }
+
+        [RelayCommand]
+        private async Task OpenUniversityOfThePeople()
+        {
+            try
+            {
+                await Launcher.Default.OpenAsync(new Uri(Constants.UniversityOfThePeopleUrl));
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Link Error", $"Unable to open the link right now: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task OpenAiAssistant()
+        {
+            await Shell.Current.GoToAsync(nameof(AiAssistantView), true, new Dictionary<string, object>
+            {
+                ["user"] = NewUser
+            });
         }
 
         partial void OnUserChanged(User value)
